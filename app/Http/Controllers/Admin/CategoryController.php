@@ -42,7 +42,7 @@ class CategoryController extends Controller
         // Tạo category mới
         Category::create($request->only('name', 'parent_id'));
 
-        return redirect()->route('categories.index')->with('success', 'Thêm danh mục thành công');
+        return redirect()->route('admin.categories.index')->with('success', 'Thêm danh mục thành công');
     }
 
     /**
@@ -80,7 +80,7 @@ class CategoryController extends Controller
 
         $category->update($request->only('name', 'parent_id'));
 
-        return redirect()->route('categories.index')->with('success', 'Cập nhật danh mục thành công');
+        return redirect()->route('admin.categories.index')->with('success', 'Cập nhật danh mục thành công');
     }
 
     /**
@@ -91,6 +91,6 @@ class CategoryController extends Controller
         $category = Category::findOrFail($id);
         $category->delete();
 
-        return redirect()->route('categories.index')->with('success', 'Đã xoá danh mục');
+        return redirect()->route('admin.categories.index')->with('success', 'Đã xoá danh mục');
     }
 }
