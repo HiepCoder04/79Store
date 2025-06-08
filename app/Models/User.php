@@ -17,29 +17,36 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
+    protected $table = 'users';
+
     protected $fillable = [
         'name',
         'email',
+        'phone',
         'password',
+        'role',
+        'date_of_birth',
+        'email_verified_at',
+        'remember_token',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'password' => 'hashed',
+        'date_of_birth' => 'date',
     ];
+
+    /**
+     * Một user có thể có nhiều địa chỉ.
+     */
+    // public function addresses()
+    // {
+    //     return $this->hasMany(UserAddress::class, 'user_id', 'id');
+    // }
+
+
 }
