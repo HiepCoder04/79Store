@@ -46,39 +46,57 @@
             <div class="container">
                 <div class="row">
                     <div class="col-6 d-lg-flex d-none h-100 my-auto pe-0 position-absolute top-0 start-0 text-center justify-content-center flex-column">
-                        <div class="position-relative bg-gradient-primary h-100 m-3 px-7 border-radius-lg d-flex flex-column justify-content-center" style="background-image: url('{{ asset('assets/img/illustrations/illustration-signup.jpg') }}'); background-size: cover;">
+                        <div class="position-relative bg-gradient-primary h-100 m-3 px-7 border-radius-lg d-flex flex-column justify-content-center"
+                             style="background-image: url('{{ asset('assets/img/illustrations/illustration-signup.jpg') }}'); background-size: cover;">
                         </div>
                     </div>
                     <div class="col-xl-4 col-lg-5 col-md-7 d-flex flex-column ms-auto me-auto ms-lg-auto me-lg-5">
                         <div class="card card-plain">
                             <div class="card-header">
-                                <h4 class="font-weight-bolder">Sign Up</h4>
-                                <p class="mb-0">Enter your email and password to register</p>
+                                <h4 class="font-weight-bolder">Đăng Ký</h4>
+                                <p class="mb-0">Vui Lòng Nhập Email Và Mật Khẩu Để Đăng Ký</p>
                             </div>
+
                             <div class="card-body">
-                                <form method="POST" action="{{ url('/register') }}">
+                                {{-- Hiển thị lỗi --}}
+                                @if ($errors->any())
+                                    <div class="alert alert-danger">
+                                        <ul class="mb-0">
+                                            @foreach ($errors->all() as $error)
+                                                <li>{{ $error }}</li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                @endif
+
+                                <form method="POST" action="{{ route('registerPost') }}">
                                     @csrf
                                     <div class="input-group input-group-outline mb-3">
-                                        <label class="form-label" for="name">Name</label>
-                                        <input type="text" name="name" id="name" class="form-control" required autofocus>
+                                        <label class="form-label" for="name">Họ Và Tên</label>
+                                        <input type="text" name="name" id="name" class="form-control" value="{{ old('name') }}" required autofocus>
                                     </div>
                                     <div class="input-group input-group-outline mb-3">
                                         <label class="form-label" for="email">Email</label>
-                                        <input type="email" name="email" id="email" class="form-control" required>
+                                        <input type="email" name="email" id="email" class="form-control" value="{{ old('email') }}" required>
                                     </div>
                                     <div class="input-group input-group-outline mb-3">
-                                        <label class="form-label" for="password" >Password</label>
+                                        <label class="form-label" for="password">Mật Khẩu</label>
                                         <input type="password" id="password" name="password" class="form-control" required>
                                     </div>
+                                    <div class="input-group input-group-outline mb-3">
+                                        <label class="form-label" for="password_confirmation">Nhập Lại Mật Khẩu</label>
+                                        <input type="password" id="password_confirmation" name="password_confirmation" class="form-control" required>
+                                    </div>
                                     <div class="text-center">
-                                        <button type="submit" class="btn btn-lg bg-gradient-dark btn-lg w-100 mt-4 mb-0">Sign Up</button>
+                                        <button type="submit" class="btn btn-lg bg-gradient-dark btn-lg w-100 mt-4 mb-0">Đăng Ký</button>
                                     </div>
                                 </form>
                             </div>
+
                             <div class="card-footer text-center pt-0 px-lg-2 px-1">
                                 <p class="mb-2 text-sm mx-auto">
                                     Already have an account?
-                                    <a href="{{ url('/login') }}" class="text-primary text-gradient font-weight-bold">Sign in</a>
+                                    <a href="{{ route('login') }}" class="text-primary text-gradient font-weight-bold">Đăng Nhập</a>
                                 </p>
                             </div>
                         </div>
@@ -88,6 +106,7 @@
         </div>
     </section>
 </main>
+
 
   <!--   Core JS Files   -->
   <script src="../assets/js/core/popper.min.js"></script>
