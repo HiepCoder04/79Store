@@ -69,18 +69,33 @@
                 </div>
               </div>
               <div class="card-body">
-                <form method="POST" action="{{ url('/login') }}">
-    @csrf
-    <div>
-        <label for="email">Email</label>
-        <input id="email" type="email" name="email" required autofocus>
-    </div>
-    <div>
-        <label for="password">Password</label>
-        <input id="password" type="password" name="password" required>
-    </div>
-    <button type="submit">Login</button>
-</form>
+                <form method="POST" action="{{ route('loginPost') }}" class="text-start">
+                              @csrf
+
+                              <div class="input-group input-group-outline my-3">
+                                  <label class="form-label">Email</label>
+                                  <input type="email" name="email" class="form-control" required>
+                              </div>
+
+                              <div class="input-group input-group-outline mb-3">
+                                  <label class="form-label">Mật Khẩu</label>
+                                  <input type="password" name="password" class="form-control" required>
+                              </div>
+
+                              <div class="form-check form-switch d-flex align-items-center mb-3">
+                                  <input class="form-check-input" type="checkbox" name="remember" id="rememberMe">
+                                  <label class="form-check-label mb-0 ms-3" for="rememberMe">Nhớ Tài Khoản</label>
+                              </div>
+
+                              <div class="text-center">
+                                  <button type="submit" class="btn bg-gradient-dark w-100 my-4 mb-2">Đăng Nhập</button>
+                              </div>
+
+                              <p class="mt-4 text-sm text-center">
+                                  Bạn Đã Có Tài Khoản Chưa
+                                  <a href="{{ route('register') }}" class="text-primary text-gradient font-weight-bold">Đăng Ký</a>
+                              </p>
+                </form>
 
               </div>
             </div>
