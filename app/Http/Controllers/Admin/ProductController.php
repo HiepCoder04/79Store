@@ -183,4 +183,7 @@ public function store(Request $request)
         $product->load('variants', 'galleries', 'category');
         return view('admin.products.detail', compact('product'));
     }
+    public function thongke(){
+        return view('admin.thongke.thongke');
+    }
 }

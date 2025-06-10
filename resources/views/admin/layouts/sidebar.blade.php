@@ -36,7 +36,7 @@
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link text-dark" href="">
+        <a class="nav-link text-dark" href="{{route('admin.users.listUser')}}">
           <span class="nav-link-text">Quản Lí Người dùng</span>
         </a>
       </li>

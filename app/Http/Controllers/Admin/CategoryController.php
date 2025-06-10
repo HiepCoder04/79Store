@@ -8,89 +8,77 @@ use App\Models\Category;
 
 class CategoryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    // Hiển thị danh sách danh mục kèm thông tin parent
     public function index()
     {
-        // Lấy tất cả category kèm theo thông tin parent để hiển thị
         $categories = Category::with('parent')->get();
         return view('admin.categories.index', compact('categories'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    // Form thêm danh mục
     public function create()
     {
-        // Lấy danh sách category làm options cho parent_id
         $parents = Category::all();
         return view('admin.categories.create', compact('parents'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    // Lưu danh mục mới với validation unique cho name
     public function store(Request $request)
     {
-        // Validate dữ liệu
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:categories,name',
             'parent_id' => 'nullable|exists:categories,id',
         ]);
 
-        // Tạo category mới
         Category::create($request->only('name', 'parent_id'));
 
-        return redirect()->route('categories.index')->with('success', 'Thêm danh mục thành công');
+        return redirect()->route('admin.categories.index')->with('success', 'Thêm danh mục thành công');
     }
 
-    /**
-     * Display the specified resource.
-     * Không cần dùng trong trường hợp này, có thể để trống hoặc redirect
-     */
+    // Redirect về danh sách (không dùng show chi tiết)
     public function show(string $id)
     {
-        return redirect()->route('categories.index');
+        return redirect()->route('admin.categories.index');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
+    // Form sửa danh mục (loại trừ chính nó khỏi danh sách parent)
     public function edit(string $id)
     {
         $category = Category::findOrFail($id);
-        // Lấy danh sách category ngoại trừ chính nó để tránh chọn parent trùng
         $parents = Category::where('id', '!=', $category->id)->get();
 
         return view('admin.categories.edit', compact('category', 'parents'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+    // Cập nhật danh mục với validation unique bỏ qua chính nó
     public function update(Request $request, string $id)
     {
         $category = Category::findOrFail($id);
 
         $request->validate([
-            'name' => 'required|string|max:255',
-            'parent_id' => 'nullable|exists:categories,id|not_in:'.$category->id,
+            'name' => 'required|string|max:255|unique:categories,name,' . $category->id,
+            'parent_id' => 'nullable|exists:categories,id|not_in:' . $category->id,
         ]);
 
         $category->update($request->only('name', 'parent_id'));
 
-        return redirect()->route('categories.index')->with('success', 'Cập nhật danh mục thành công');
+        return redirect()->route('admin.categories.index')->with('success', 'Cập nhật danh mục thành công');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+    // Xóa danh mục, kiểm tra nếu còn danh mục con thì báo lỗi
     public function destroy(string $id)
     {
         $category = Category::findOrFail($id);
+
+        $hasChildren = Category::where('parent_id', $category->id)->exists();
+
+        if ($hasChildren) {
+            return redirect()->route('admin.categories.index')
+                ->with('error', 'Không thể xóa danh mục vì còn danh mục con. Vui lòng xóa danh mục con trước.');
+        }
+
         $category->delete();
 
-        return redirect()->route('categories.index')->with('success', 'Đã xoá danh mục');
+        return redirect()->route('admin.categories.index')->with('success', 'Đã xoá danh mục');
     }
 }
