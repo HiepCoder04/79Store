@@ -8,6 +8,11 @@ use App\Http\Controllers\AuthController;
 
 
 
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::resource('products', ProductController::class);
+
+
+
 Route::prefix('auth')->controller(AuthController::class)->group(function () {
     Route::get('/login', [AuthController::class, 'login'])->name('login');
     Route::post('/login', [AuthController::class, 'loginPost'])->name('loginPost');
@@ -60,7 +65,8 @@ Route::group([
     });
 
     // CATEGORY CRUD ROUTES
-    Route::resource('categories', CategoryController::class)->except(['show']);
+
+   Route::resource('categories', CategoryController::class)->except(['show']);
 });
 
 

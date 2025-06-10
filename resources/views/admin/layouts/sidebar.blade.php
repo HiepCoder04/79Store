@@ -26,7 +26,7 @@
   <div class="collapse" id="submenuQuanLi">
     <ul class="nav flex-column ms-4">
       <li class="nav-item">
-        <a class="nav-link text-dark" href="{{route('admin.products.listProducts')}}">
+        <a class="nav-link text-dark" href="{{route('admin.products.index')}}">
           <span class="nav-link-text">Quản Lí Sản phẩm</span>
         </a>
       </li>
