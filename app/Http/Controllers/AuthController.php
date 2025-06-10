@@ -31,7 +31,7 @@ class AuthController extends Controller
         } elseif ($user->role === 'staff') {
             return redirect()->intended('/staff/dashboard');
         } elseif ($user->role === 'customer' || $user->role === 'guest') {
-            return redirect()->intended('/home');
+            return redirect()->route('client.home');
         } else {
             Auth::logout(); // tránh truy cập lạ
             return redirect()->route('login')->withErrors([
