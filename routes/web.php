@@ -15,7 +15,7 @@ Route::prefix('auth')->controller(AuthController::class)->group(function () {
     Route::get('/register', [AuthController::class, 'register'])->name('register');
     Route::post('/register', [AuthController::class, 'registerPost'])->name('registerPost');
 
-    // Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
 
 // Route::middleware(['auth', 'role:admin'])->group(function () {
@@ -33,6 +33,12 @@ Route::prefix('auth')->controller(AuthController::class)->group(function () {
 // });
 Route::get('/', [ProductController::class, 'thongke'])->name('thongke');
 
+Route::get('/home', function () {
+    return view('client.home');
+});
+
+
+//ADMIN
 Route::group([
     'prefix' => 'admin',
     'as' => 'admin.'
@@ -55,4 +61,23 @@ Route::group([
 
     // CATEGORY CRUD ROUTES
     Route::resource('categories', CategoryController::class)->except(['show']);
+});
+
+
+
+//CLIENT
+Route::group([
+    'prefix' => 'client',
+    'as' => 'client.'
+], function () {
+
+    // HOME ROUTE
+    Route::get('/home', function () {
+        return view('client.home');
+    })->name('home');
+
+    Route::get('/about', function () {
+        return view('client.users.about-detail');
+    })->name('about');
+
 });
