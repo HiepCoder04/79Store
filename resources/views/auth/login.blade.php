@@ -75,13 +75,17 @@
                               <div class="input-group input-group-outline my-3">
                                   <label class="form-label">Email</label>
                                   <input type="email" name="email" class="form-control" required>
+                                  
                               </div>
+                              
 
                               <div class="input-group input-group-outline mb-3">
                                   <label class="form-label">Mật Khẩu</label>
                                   <input type="password" name="password" class="form-control" required>
                               </div>
-
+                              @error('email')
+                                      <small class="text-danger">{{ $message }}</small>
+                                  @enderror
                               <div class="form-check form-switch d-flex align-items-center mb-3">
                                   <input class="form-check-input" type="checkbox" name="remember" id="rememberMe">
                                   <label class="form-check-label mb-0 ms-3" for="rememberMe">Nhớ Tài Khoản</label>

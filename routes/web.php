@@ -11,7 +11,7 @@ use App\Http\Controllers\AuthController;
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::resource('products', ProductController::class);
 
-
+});
 
 Route::prefix('auth')->controller(AuthController::class)->group(function () {
     Route::get('/login', [AuthController::class, 'login'])->name('login');
@@ -48,14 +48,6 @@ Route::group([
     'prefix' => 'admin',
     'as' => 'admin.'
 ], function () {
-
-    // PRODUCT ROUTES
-    Route::group([
-        'prefix' => 'products',
-        'as' => 'products.'
-    ], function () {
-        Route::get('/', [ProductController::class, 'listProducts'])->name('listProducts');
-    });
 
     Route::group([
         'prefix' => 'users',
