@@ -10,6 +10,21 @@ use App\Http\Controllers\AuthController;
 
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::resource('products', ProductController::class);
+    Route::get('/', function(){
+        return view('admin.thongke.thongke');
+    })->name('home-admin');
+    //user
+    Route::group([
+        'prefix' => 'users',
+        'as' => 'users.'
+    ], function () {
+        Route::get('/', [UserController::class, 'listUser'])->name('listUser');
+    });
+
+    // CATEGORY CRUD ROUTES
+
+    Route::resource('categories', CategoryController::class)->except(['show']);
+});
 
 
 
@@ -42,48 +57,20 @@ Route::get('/home', function () {
     return view('client.home');
 });
 
+  // HOME ROUTE
+  Route::get('/home', function () {
+    return view('client.home');
+})->name('home');
+Route::get('/', function () {
+return view('client.home');});
 
-//ADMIN
-Route::group([
-    'prefix' => 'admin',
-    'as' => 'admin.'
-], function () {
+Route::get('/about', function () {
+    return view('client.users.about-detail');
+})->name('about');
 
-    // PRODUCT ROUTES
-    Route::group([
-        'prefix' => 'products',
-        'as' => 'products.'
-    ], function () {
-        Route::get('/', [ProductController::class, 'listProducts'])->name('listProducts');
-    });
-
-    Route::group([
-        'prefix' => 'users',
-        'as' => 'users.'
-    ], function () {
-        Route::get('/', [UserController::class, 'listUser'])->name('listUser');
-    });
-
-    // CATEGORY CRUD ROUTES
-
-   Route::resource('categories', CategoryController::class)->except(['show']);
-});
-
-
-
-//CLIENT
-Route::group([
-    'prefix' => 'client',
-    'as' => 'client.'
-], function () {
-
-    // HOME ROUTE
-    Route::get('/home', function () {
-        return view('client.home');
-    })->name('home');
-
-    Route::get('/about', function () {
-        return view('client.users.about-detail');
-    })->name('about');
-
-});
+Route::get('/shop', function () {
+    return view('client.shop');
+})->name('shop');
+Route::get('/shopDetail', function () {
+    return view('client.shopDetail');
+})->name('shop-detail');
