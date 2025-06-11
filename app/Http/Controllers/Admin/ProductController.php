@@ -188,4 +188,5 @@ class ProductController extends Controller
     {
         return view('admin.thongke.thongke');
     }
+
 }

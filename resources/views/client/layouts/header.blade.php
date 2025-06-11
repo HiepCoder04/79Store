@@ -60,7 +60,7 @@
 
                                 <!-- Cart -->
                                 <div class="cart">
-                                    <a href="#"><i class="fa fa-shopping-cart" aria-hidden="true"></i> <span>Cart <span class="cart-quantity">(1)</span></span></a>
+                                    <a href="{{route('cart.index')}}"><i class="fa fa-shopping-cart" aria-hidden="true"></i> <span>Cart <span class="cart-quantity">(1)</span></span></a>
                                 </div>
                             </div>
                         </div>
@@ -95,11 +95,11 @@
                             <!-- Navbar Start -->
                             <div class="classynav">
                                 <ul>
-                                    <li><a href="index.html">Home</a></li>
+                                    <li><a href="{{route('client.home')}}">Home</a></li>
                                     <li><a href="{{route('client.about')}}">Giới Thiệu</a></li>
                                     <li><a href="#">Pages</a>
                                         <ul class="dropdown">
-                                            <li><a href="index.html">Home</a></li>
+                                            <li><a href="{{route('client.home')}}">Home</a></li>
                                             <li><a href="{{route('client.about')}}">Giới Thiệu</a></li>
                                             <li><a href="shop.html">Shop</a>
                                                 <ul class="dropdown">
