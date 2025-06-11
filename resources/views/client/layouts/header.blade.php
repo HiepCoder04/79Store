@@ -66,7 +66,7 @@
 
                             <!-- Cart -->
                             <div class="cart">
-                                <a href="#"><i class="fa fa-shopping-cart" aria-hidden="true"></i> <span>Cart <span
+                                <a href="{{route('cart.index')}}"><i class="fa fa-shopping-cart" aria-hidden="true"></i> <span>Cart <span
                                             class="cart-quantity">(1)</span></span></a>
                             </div>
                         </div>
