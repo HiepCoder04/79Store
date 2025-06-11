@@ -16,7 +16,8 @@
             <div class="col-12">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('home') }}"><i class="fa fa-home"></i> Home</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('home') }}"><i class="fa fa-home"></i> Home</a>
+                        </li>
                         <li class="breadcrumb-item active" aria-current="page">Shop</li>
                     </ol>
                 </nav>
@@ -68,8 +69,8 @@
                     <div class="shop-widget price mb-50">
                         <h4 class="widget-title">Prices</h4>
                         <div class="widget-desc">
-                            <div class="slider-range" data-min="8" data-max="30" data-unit="$"
-                                data-value-min="8" data-value-max="30" data-label-result="Price:">
+                            <div class="slider-range" data-min="8" data-max="30" data-unit="$" data-value-min="8"
+                                data-value-max="30" data-label-result="Price:">
                                 <div class="range-price">Price: $8 - $30</div>
                             </div>
                         </div>
@@ -81,33 +82,45 @@
                         <div class="widget-desc">
                             <!-- Single Checkbox -->
                             <div class="custom-control custom-checkbox d-flex align-items-center mb-2">
-                                <input type="checkbox" class="custom-control-input" id="customCheck1" name="category[]" value="all">
-                                <label class="custom-control-label" for="customCheck1">All plants <span class="text-muted">(72)</span></label>
+                                <input type="checkbox" class="custom-control-input" id="customCheck1" name="category[]"
+                                    value="all">
+                                <label class="custom-control-label" for="customCheck1">All plants <span
+                                        class="text-muted">(72)</span></label>
                             </div>
                             <!-- Single Checkbox -->
                             <div class="custom-control custom-checkbox d-flex align-items-center mb-2">
-                                <input type="checkbox" class="custom-control-input" id="customCheck2" name="category[]" value="outdoor">
-                                <label class="custom-control-label" for="customCheck2">Outdoor plants <span class="text-muted">(20)</span></label>
+                                <input type="checkbox" class="custom-control-input" id="customCheck2" name="category[]"
+                                    value="outdoor">
+                                <label class="custom-control-label" for="customCheck2">Outdoor plants <span
+                                        class="text-muted">(20)</span></label>
                             </div>
                             <!-- Single Checkbox -->
                             <div class="custom-control custom-checkbox d-flex align-items-center mb-2">
-                                <input type="checkbox" class="custom-control-input" id="customCheck3" name="category[]" value="indoor">
-                                <label class="custom-control-label" for="customCheck3">Indoor plants <span class="text-muted">(15)</span></label>
+                                <input type="checkbox" class="custom-control-input" id="customCheck3" name="category[]"
+                                    value="indoor">
+                                <label class="custom-control-label" for="customCheck3">Indoor plants <span
+                                        class="text-muted">(15)</span></label>
                             </div>
                             <!-- Single Checkbox -->
                             <div class="custom-control custom-checkbox d-flex align-items-center mb-2">
-                                <input type="checkbox" class="custom-control-input" id="customCheck4" name="category[]" value="office">
-                                <label class="custom-control-label" for="customCheck4">Office Plants <span class="text-muted">(20)</span></label>
+                                <input type="checkbox" class="custom-control-input" id="customCheck4" name="category[]"
+                                    value="office">
+                                <label class="custom-control-label" for="customCheck4">Office Plants <span
+                                        class="text-muted">(20)</span></label>
                             </div>
                             <!-- Single Checkbox -->
                             <div class="custom-control custom-checkbox d-flex align-items-center mb-2">
-                                <input type="checkbox" class="custom-control-input" id="customCheck5" name="category[]" value="potted">
-                                <label class="custom-control-label" for="customCheck5">Potted <span class="text-muted">(15)</span></label>
+                                <input type="checkbox" class="custom-control-input" id="customCheck5" name="category[]"
+                                    value="potted">
+                                <label class="custom-control-label" for="customCheck5">Potted <span
+                                        class="text-muted">(15)</span></label>
                             </div>
                             <!-- Single Checkbox -->
                             <div class="custom-control custom-checkbox d-flex align-items-center mb-2">
-                                <input type="checkbox" class="custom-control-input" id="customCheck6" name="category[]" value="others">
-                                <label class="custom-control-label" for="customCheck6">Others <span class="text-muted">(2)</span></label>
+                                <input type="checkbox" class="custom-control-input" id="customCheck6" name="category[]"
+                                    value="others">
+                                <label class="custom-control-label" for="customCheck6">Others <span
+                                        class="text-muted">(2)</span></label>
                             </div>
                         </div>
                     </div>
@@ -118,27 +131,32 @@
                         <div class="widget-desc">
                             <!-- Single Checkbox -->
                             <div class="custom-control custom-checkbox d-flex align-items-center mb-2">
-                                <input type="checkbox" class="custom-control-input" id="customCheck7" name="sort[]" value="new">
+                                <input type="checkbox" class="custom-control-input" id="customCheck7" name="sort[]"
+                                    value="new">
                                 <label class="custom-control-label" for="customCheck7">New arrivals</label>
                             </div>
                             <!-- Single Checkbox -->
                             <div class="custom-control custom-checkbox d-flex align-items-center mb-2">
-                                <input type="checkbox" class="custom-control-input" id="customCheck8" name="sort[]" value="a-z">
+                                <input type="checkbox" class="custom-control-input" id="customCheck8" name="sort[]"
+                                    value="a-z">
                                 <label class="custom-control-label" for="customCheck8">Alphabetically, A-Z</label>
                             </div>
                             <!-- Single Checkbox -->
                             <div class="custom-control custom-checkbox d-flex align-items-center mb-2">
-                                <input type="checkbox" class="custom-control-input" id="customCheck9" name="sort[]" value="z-a">
+                                <input type="checkbox" class="custom-control-input" id="customCheck9" name="sort[]"
+                                    value="z-a">
                                 <label class="custom-control-label" for="customCheck9">Alphabetically, Z-A</label>
                             </div>
                             <!-- Single Checkbox -->
                             <div class="custom-control custom-checkbox d-flex align-items-center mb-2">
-                                <input type="checkbox" class="custom-control-input" id="customCheck10" name="sort[]" value="low-high">
+                                <input type="checkbox" class="custom-control-input" id="customCheck10" name="sort[]"
+                                    value="low-high">
                                 <label class="custom-control-label" for="customCheck10">Price: low to high</label>
                             </div>
                             <!-- Single Checkbox -->
                             <div class="custom-control custom-checkbox d-flex align-items-center">
-                                <input type="checkbox" class="custom-control-input" id="customCheck11" name="sort[]" value="high-low">
+                                <input type="checkbox" class="custom-control-input" id="customCheck11" name="sort[]"
+                                    value="high-low">
                                 <label class="custom-control-label" for="customCheck11">Price: high to low</label>
                             </div>
                         </div>
@@ -151,7 +169,8 @@
                             <!-- Single Best Seller Products -->
                             <div class="single-best-seller-product d-flex align-items-center">
                                 <div class="product-thumbnail">
-                                    <a href="{{ route('shop-detail') }}"><img src="{{ asset('assets/img/bg-img/4.jpg') }}" alt="Cactus Flower"></a>
+                                    <a href="{{ route('shop-detail') }}"><img
+                                            src="{{ asset('assets/img/bg-img/4.jpg') }}" alt="Cactus Flower"></a>
                                 </div>
                                 <div class="product-info">
                                     <a href="{{ route('shop-detail') }}">Cactus Flower</a>
@@ -168,7 +187,8 @@
                             <!-- Single Best Seller Products -->
                             <div class="single-best-seller-product d-flex align-items-center">
                                 <div class="product-thumbnail">
-                                    <a href="{{ route('shop-detail') }}"><img src="{{ asset('assets/img/bg-img/5.jpg') }}" alt="Tulip Flower"></a>
+                                    <a href="{{ route('shop-detail') }}"><img
+                                            src="{{ asset('assets/img/bg-img/5.jpg') }}" alt="Tulip Flower"></a>
                                 </div>
                                 <div class="product-info">
                                     <a href="{{ route('shop-detail') }}">Tulip Flower</a>
@@ -185,7 +205,8 @@
                             <!-- Single Best Seller Products -->
                             <div class="single-best-seller-product d-flex align-items-center">
                                 <div class="product-thumbnail">
-                                    <a href="{{ route('shop-detail') }}"><img src="{{ asset('assets/img/bg-img/34.jpg') }}" alt="Recuerdos Plant"></a>
+                                    <a href="{{ route('shop-detail') }}"><img
+                                            src="{{ asset('assets/img/bg-img/34.jpg') }}" alt="Recuerdos Plant"></a>
                                 </div>
                                 <div class="product-info">
                                     <a href="{{ route('shop-detail') }}">Recuerdos Plant</a>
@@ -213,14 +234,15 @@
                             <div class="single-product-area mb-50">
                                 <!-- Product Image -->
                                 <div class="product-img">
-                                    <a href="{{ route('shop-detail') }}"><img src="{{ asset('assets/img/bg-img/40.png') }}" alt="Cactus Flower"></a>
+                                    <a href="{{ route('shop-detail') }}"><img
+                                            src="{{ asset('assets/img/bg-img/40.png') }}" alt="Cactus Flower"></a>
                                     <!-- Product Tag -->
                                     <div class="product-tag">
                                         <a href="#">Hot</a>
                                     </div>
                                     <div class="product-meta d-flex">
                                         <a href="#" class="wishlist-btn"><i class="icon_heart_alt"></i></a>
-                                        <a href="{{ route('cart.add') }}" class="add-to-cart-btn">Add to cart</a>
+                                        <a href="" class="add-to-cart-btn">Add to cart</a>
                                         <a href="#" class="compare-btn"><i class="arrow_left-right_alt"></i></a>
                                     </div>
                                 </div>
@@ -239,10 +261,11 @@
                             <div class="single-product-area mb-50">
                                 <!-- Product Image -->
                                 <div class="product-img">
-                                    <a href="{{ route('shop-detail') }}"><img src="{{ asset('assets/img/bg-img/41.png') }}" alt="Cactus Flower"></a>
+                                    <a href="{{ route('shop-detail') }}"><img
+                                            src="{{ asset('assets/img/bg-img/41.png') }}" alt="Cactus Flower"></a>
                                     <div class="product-meta d-flex">
                                         <a href="#" class="wishlist-btn"><i class="icon_heart_alt"></i></a>
-                                        <a href="{{ route('cart.add') }}" class="add-to-cart-btn">Add to cart</a>
+                                        <a href="" class="add-to-cart-btn">Add to cart</a>
                                         <a href="#" class="compare-btn"><i class="arrow_left-right_alt"></i></a>
                                     </div>
                                 </div>
@@ -261,10 +284,11 @@
                             <div class="single-product-area mb-50">
                                 <!-- Product Image -->
                                 <div class="product-img">
-                                    <a href="{{ route('shop-detail') }}"><img src="{{ asset('assets/img/bg-img/42.png') }}" alt="Cactus Flower"></a>
+                                    <a href="{{ route('shop-detail') }}"><img
+                                            src="{{ asset('assets/img/bg-img/42.png') }}" alt="Cactus Flower"></a>
                                     <div class="product-meta d-flex">
                                         <a href="#" class="wishlist-btn"><i class="icon_heart_alt"></i></a>
-                                        <a href="{{ route('cart.add') }}" class="add-to-cart-btn">Add to cart</a>
+                                        <a href="" class="add-to-cart-btn">Add to cart</a>
                                         <a href="#" class="compare-btn"><i class="arrow_left-right_alt"></i></a>
                                     </div>
                                 </div>
@@ -283,10 +307,11 @@
                             <div class="single-product-area mb-50">
                                 <!-- Product Image -->
                                 <div class="product-img">
-                                    <a href="{{ route('shop-detail') }}"><img src="{{ asset('assets/img/bg-img/43.png') }}" alt="Cactus Flower"></a>
+                                    <a href="{{ route('shop-detail') }}"><img
+                                            src="{{ asset('assets/img/bg-img/43.png') }}" alt="Cactus Flower"></a>
                                     <div class="product-meta d-flex">
                                         <a href="#" class="wishlist-btn"><i class="icon_heart_alt"></i></a>
-                                        <a href="{{ route('cart.add') }}" class="add-to-cart-btn">Add to cart</a>
+                                        <a href="" class="add-to-cart-btn">Add to cart</a>
                                         <a href="#" class="compare-btn"><i class="arrow_left-right_alt"></i></a>
                                     </div>
                                 </div>
@@ -305,10 +330,11 @@
                             <div class="single-product-area mb-50">
                                 <!-- Product Image -->
                                 <div class="product-img">
-                                    <a href="{{ route('shop-detail') }}"><img src="{{ asset('assets/img/bg-img/44.png') }}" alt="Cactus Flower"></a>
+                                    <a href="{{ route('shop-detail') }}"><img
+                                            src="{{ asset('assets/img/bg-img/44.png') }}" alt="Cactus Flower"></a>
                                     <div class="product-meta d-flex">
                                         <a href="#" class="wishlist-btn"><i class="icon_heart_alt"></i></a>
-                                        <a href="{{ route('cart.add') }}" class="add-to-cart-btn">Add to cart</a>
+                                        <a href="" class="add-to-cart-btn">Add to cart</a>
                                         <a href="#" class="compare-btn"><i class="arrow_left-right_alt"></i></a>
                                     </div>
                                 </div>
@@ -327,10 +353,11 @@
                             <div class="single-product-area mb-50">
                                 <!-- Product Image -->
                                 <div class="product-img">
-                                    <a href="{{ route('shop-detail') }}"><img src="{{ asset('assets/img/bg-img/45.png') }}" alt="Cactus Flower"></a>
+                                    <a href="{{ route('shop-detail') }}"><img
+                                            src="{{ asset('assets/img/bg-img/45.png') }}" alt="Cactus Flower"></a>
                                     <div class="product-meta d-flex">
                                         <a href="#" class="wishlist-btn"><i class="icon_heart_alt"></i></a>
-                                        <a href="{{ route('cart.add') }}" class="add-to-cart-btn">Add to cart</a>
+                                        <a href="" class="add-to-cart-btn">Add to cart</a>
                                         <a href="#" class="compare-btn"><i class="arrow_left-right_alt"></i></a>
                                     </div>
                                 </div>
@@ -349,10 +376,11 @@
                             <div class="single-product-area mb-50">
                                 <!-- Product Image -->
                                 <div class="product-img">
-                                    <a href="{{ route('shop-detail') }}"><img src="{{ asset('assets/img/bg-img/46.png') }}" alt="Cactus Flower"></a>
+                                    <a href="{{ route('shop-detail') }}"><img
+                                            src="{{ asset('assets/img/bg-img/46.png') }}" alt="Cactus Flower"></a>
                                     <div class="product-meta d-flex">
                                         <a href="#" class="wishlist-btn"><i class="icon_heart_alt"></i></a>
-                                        <a href="{{ route('cart.add') }}" class="add-to-cart-btn">Add to cart</a>
+                                        <a href="" class="add-to-cart-btn">Add to cart</a>
                                         <a href="#" class="compare-btn"><i class="arrow_left-right_alt"></i></a>
                                     </div>
                                 </div>
@@ -371,14 +399,15 @@
                             <div class="single-product-area mb-50">
                                 <!-- Product Image -->
                                 <div class="product-img">
-                                    <a href="{{ route('shop-detail') }}"><img src="{{ asset('assets/img/bg-img/47.png') }}" alt="Cactus Flower"></a>
+                                    <a href="{{ route('shop-detail') }}"><img
+                                            src="{{ asset('assets/img/bg-img/47.png') }}" alt="Cactus Flower"></a>
                                     <!-- Product Tag -->
                                     <div class="product-tag sale-tag">
                                         <a href="#">Sale</a>
                                     </div>
                                     <div class="product-meta d-flex">
                                         <a href="#" class="wishlist-btn"><i class="icon_heart_alt"></i></a>
-                                        <a href="{{ route('cart.add') }}" class="add-to-cart-btn">Add to cart</a>
+                                        <a href="" class="add-to-cart-btn">Add to cart</a>
                                         <a href="#" class="compare-btn"><i class="arrow_left-right_alt"></i></a>
                                     </div>
                                 </div>
@@ -397,10 +426,11 @@
                             <div class="single-product-area mb-50">
                                 <!-- Product Image -->
                                 <div class="product-img">
-                                    <a href="{{ route('shop-detail') }}"><img src="{{ asset('assets/img/bg-img/48.png') }}" alt="Cactus Flower"></a>
+                                    <a href="{{ route('shop-detail') }}"><img
+                                            src="{{ asset('assets/img/bg-img/48.png') }}" alt="Cactus Flower"></a>
                                     <div class="product-meta d-flex">
                                         <a href="#" class="wishlist-btn"><i class="icon_heart_alt"></i></a>
-                                        <a href="{{ route('cart.add') }}" class="add-to-cart-btn">Add to cart</a>
+                                        <a href="" class="add-to-cart-btn">Add to cart</a>
                                         <a href="#" class="compare-btn"><i class="arrow_left-right_alt"></i></a>
                                     </div>
                                 </div>
@@ -420,7 +450,8 @@
                         <ul class="pagination">
                             <li class="page-item"><a class="page-link" href="#">1</a></li>
                             <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#"><i class="fa fa-angle-right"></i></a></li>
+                            <li class="page-item"><a class="page-link" href="#"><i class="fa fa-angle-right"></i></a>
+                            </li>
                         </ul>
                     </nav>
                 </div>
