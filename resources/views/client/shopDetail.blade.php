@@ -7,7 +7,7 @@
 <div class="breadcrumb-area">
     <!-- Top Breadcrumb Area -->
     <div class="top-breadcrumb-area bg-img bg-overlay d-flex align-items-center justify-content-center"
-        style="background-image: url('{{ asset("assets/img/bg-img/24.jpg") }}');">
+        style="background-image: url({{ asset('assets/img/bg-img/24.jpg') }});">
 
         <h2>SHOP DETAILS</h2>
     </div>
@@ -61,13 +61,13 @@
                             </div>
                             <ol class="carousel-indicators">
                                 <li class="active" data-target="#product_details_slider" data-slide-to="0"
-                                    style="background-image: url('{{ asset("assets/img/bg-img/49.jpg") }}');">
+                                    style="background-image: url('{{ asset('assets/img/bg-img/49.jpg') }}');">
                                 </li>
                                 <li data-target="#product_details_slider" data-slide-to="1"
-                                    style="background-image: url('{{ asset("assets/img/bg-img/50.jpg") }}');">
+                                    style="background-image: url('{{ asset('assets/img/bg-img/50.jpg') }}');">
                                 </li>
                                 <li data-target="#product_details_slider" data-slide-to="2"
-                                    style="background-image: url('{{ asset("assets/img/bg-img/51.jpg") }}');">
+                                    style="background-image: url('{{ asset('assets/img/bg-img/51.jpg') }});">
                                 </li>
                             </ol>
                         </div>

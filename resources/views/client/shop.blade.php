@@ -220,7 +220,7 @@
                                     </div>
                                     <div class="product-meta d-flex">
                                         <a href="#" class="wishlist-btn"><i class="icon_heart_alt"></i></a>
-                                        <a href="{{ route('cart.add') }}" class="add-to-cart-btn">Add to cart</a>
+                                        <a href="#" class="add-to-cart-btn">Add to cart</a>
                                         <a href="#" class="compare-btn"><i class="arrow_left-right_alt"></i></a>
                                     </div>
                                 </div>
@@ -242,7 +242,7 @@
                                     <a href="{{ route('shop-detail') }}"><img src="{{ asset('assets/img/bg-img/41.png') }}" alt="Cactus Flower"></a>
                                     <div class="product-meta d-flex">
                                         <a href="#" class="wishlist-btn"><i class="icon_heart_alt"></i></a>
-                                        <a href="{{ route('cart.add') }}" class="add-to-cart-btn">Add to cart</a>
+                                        <a href="#" class="add-to-cart-btn">Add to cart</a>
                                         <a href="#" class="compare-btn"><i class="arrow_left-right_alt"></i></a>
                                     </div>
                                 </div>
@@ -264,7 +264,7 @@
                                     <a href="{{ route('shop-detail') }}"><img src="{{ asset('assets/img/bg-img/42.png') }}" alt="Cactus Flower"></a>
                                     <div class="product-meta d-flex">
                                         <a href="#" class="wishlist-btn"><i class="icon_heart_alt"></i></a>
-                                        <a href="{{ route('cart.add') }}" class="add-to-cart-btn">Add to cart</a>
+                                        <a href="#" class="add-to-cart-btn">Add to cart</a>
                                         <a href="#" class="compare-btn"><i class="arrow_left-right_alt"></i></a>
                                     </div>
                                 </div>
@@ -286,7 +286,7 @@
                                     <a href="{{ route('shop-detail') }}"><img src="{{ asset('assets/img/bg-img/43.png') }}" alt="Cactus Flower"></a>
                                     <div class="product-meta d-flex">
                                         <a href="#" class="wishlist-btn"><i class="icon_heart_alt"></i></a>
-                                        <a href="{{ route('cart.add') }}" class="add-to-cart-btn">Add to cart</a>
+                                        <a href="#" class="add-to-cart-btn">Add to cart</a>
                                         <a href="#" class="compare-btn"><i class="arrow_left-right_alt"></i></a>
                                     </div>
                                 </div>
@@ -308,7 +308,7 @@
                                     <a href="{{ route('shop-detail') }}"><img src="{{ asset('assets/img/bg-img/44.png') }}" alt="Cactus Flower"></a>
                                     <div class="product-meta d-flex">
                                         <a href="#" class="wishlist-btn"><i class="icon_heart_alt"></i></a>
-                                        <a href="{{ route('cart.add') }}" class="add-to-cart-btn">Add to cart</a>
+                                        <a href="#" class="add-to-cart-btn">Add to cart</a>
                                         <a href="#" class="compare-btn"><i class="arrow_left-right_alt"></i></a>
                                     </div>
                                 </div>
@@ -330,7 +330,7 @@
                                     <a href="{{ route('shop-detail') }}"><img src="{{ asset('assets/img/bg-img/45.png') }}" alt="Cactus Flower"></a>
                                     <div class="product-meta d-flex">
                                         <a href="#" class="wishlist-btn"><i class="icon_heart_alt"></i></a>
-                                        <a href="{{ route('cart.add') }}" class="add-to-cart-btn">Add to cart</a>
+                                        <a href="#" class="add-to-cart-btn">Add to cart</a>
                                         <a href="#" class="compare-btn"><i class="arrow_left-right_alt"></i></a>
                                     </div>
                                 </div>
@@ -352,7 +352,7 @@
                                     <a href="{{ route('shop-detail') }}"><img src="{{ asset('assets/img/bg-img/46.png') }}" alt="Cactus Flower"></a>
                                     <div class="product-meta d-flex">
                                         <a href="#" class="wishlist-btn"><i class="icon_heart_alt"></i></a>
-                                        <a href="{{ route('cart.add') }}" class="add-to-cart-btn">Add to cart</a>
+                                        <a href="#" class="add-to-cart-btn">Add to cart</a>
                                         <a href="#" class="compare-btn"><i class="arrow_left-right_alt"></i></a>
                                     </div>
                                 </div>
@@ -378,7 +378,7 @@
                                     </div>
                                     <div class="product-meta d-flex">
                                         <a href="#" class="wishlist-btn"><i class="icon_heart_alt"></i></a>
-                                        <a href="{{ route('cart.add') }}" class="add-to-cart-btn">Add to cart</a>
+                                        <a href="#" class="add-to-cart-btn">Add to cart</a>
                                         <a href="#" class="compare-btn"><i class="arrow_left-right_alt"></i></a>
                                     </div>
                                 </div>
@@ -400,7 +400,7 @@
                                     <a href="{{ route('shop-detail') }}"><img src="{{ asset('assets/img/bg-img/48.png') }}" alt="Cactus Flower"></a>
                                     <div class="product-meta d-flex">
                                         <a href="#" class="wishlist-btn"><i class="icon_heart_alt"></i></a>
-                                        <a href="{{ route('cart.add') }}" class="add-to-cart-btn">Add to cart</a>
+                                        <a href="#" class="add-to-cart-btn">Add to cart</a>
                                         <a href="#" class="compare-btn"><i class="arrow_left-right_alt"></i></a>
                                     </div>
                                 </div>
