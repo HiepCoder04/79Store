@@ -31,7 +31,7 @@ class AuthController extends Controller
         } elseif ($user->role === 'staff') {
             return redirect()->intended('/staff/dashboard');
         } elseif ($user->role === 'customer' || $user->role === 'guest') {
-            return redirect()->route('client.home');
+            return redirect()->route('home')->with('success','Đăng nhập thành công');
         } else {
             Auth::logout(); // tránh truy cập lạ
             return redirect()->route('login')->withErrors([
@@ -71,7 +71,7 @@ class AuthController extends Controller
         ]);
 
         Auth::login($user);
-        return redirect('/login');
+        return redirect('auth/login')->with('success','Đăng kí thành công');
     }
 
     // POST: /logout
@@ -81,6 +81,6 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('login');
+        return redirect()->route('home')->with('success','Đăng xuất thành công');
     }
 }
