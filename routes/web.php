@@ -1,15 +1,17 @@
 <?php
 
+use App\Http\Controllers\Client\HomeController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Client\CartController;
-
+use App\Http\Controllers\Admin\BannerController;
 
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::resource('products', ProductController::class);
+    Route::resource('banners', BannerController::class);
     Route::get('/', function () {
         return view('admin.thongke.thongke');
     })->name('home-admin');
@@ -55,12 +57,8 @@ Route::get('/home', function () {
 });
 
 // HOME ROUTE
-Route::get('/home', function () {
-    return view('client.home');
-})->name('home');
-Route::get('/', function () {
-    return view('client.home');
-});
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/home', [HomeController::class, 'index']);
 
 Route::get('/about', function () {
     return view('client.users.about-detail');
