@@ -40,6 +40,19 @@
           <span class="nav-link-text">Quản Lí Người dùng</span>
         </a>
       </li>
+
+      <li class="nav-item">
+        <a class="nav-link text-dark" href="{{route('admin.category_blogs.index')}}">
+          <span class="nav-link-text">Quản Lí Danh Mục Blog</span>
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link text-dark" href="{{route('admin.blogs.index')}}">
+          <span class="nav-link-text">Quản Lí Blog</span>
+        </a>
+      </li>
+      
     </ul>
   </div>
 </li>
