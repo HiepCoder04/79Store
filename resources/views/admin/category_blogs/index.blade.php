@@ -9,7 +9,7 @@
           <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between">
             <h6 class="text-white text-capitalize ps-3">Danh sách danh mục blog</h6>
             <a href="{{ route('admin.category_blogs.create') }}" class="btn btn-sm btn-info me-3">
-              <i class="material-icons text-sm">add</i> Thêm mới
+              <i class="material-icons text-sm">Thêm mới</i> 
             </a>
           </div>
         </div>
@@ -50,14 +50,14 @@
                   </td>
                   <td class="align-middle text-center">
                     <a href="{{ route('admin.category_blogs.edit', $category) }}" class="btn btn-sm bg-gradient-info text-white px-3 mb-0">
-                      <i class="material-icons text-sm me-2">edit</i>Sửa
+                      <i class="material-icons text-sm me-2">Sửa</i>
                     </a>
                     
                     <form action="{{ route('admin.category_blogs.destroy', $category) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa danh mục này?')">
                       @csrf
                       @method('DELETE')
                       <button type="submit" class="btn btn-sm bg-gradient-danger text-white px-3 mb-0">
-                        <i class="material-icons text-sm me-2">delete</i>Xóa
+                        <i class="material-icons text-sm me-2">Xóa</i>
                       </button>
                     </form>
                   </td>

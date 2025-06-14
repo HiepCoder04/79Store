@@ -12,11 +12,12 @@ class Blog extends Model
         'title',
         'slug',
         'content',
-        'category_blog_id',
+        'category_blog_id', // Đổi từ category_id sang category_blog_id
         'is_active',
+        'img',
     ];
 
-    // Sửa lại quan hệ: một Blog thuộc về một BlogCategory
+    // Sửa lại quan hệ để sử dụng đúng tên cột
     public function category()
     {
         return $this->belongsTo(BlogCategory::class, 'category_blog_id');

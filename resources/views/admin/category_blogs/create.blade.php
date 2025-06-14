@@ -9,7 +9,7 @@
           <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between align-items-center">
             <h6 class="text-white text-capitalize ps-3">Thêm danh mục blog mới</h6>
             <a href="{{ route('admin.category_blogs.index') }}" class="btn btn-sm btn-light me-3">
-              <i class="material-icons text-sm">arrow_back</i> Quay lại
+              <i class="material-icons text-sm">Quay lại</i> 
             </a>
           </div>
         </div>

@@ -50,9 +50,13 @@
 <script src="{{ asset('assets/js/plugins/chartjs.min.js') }}"></script>
 
 <script>
-  var ctx = document.getElementById("chart-bars").getContext("2d");
-  // ... (giữ nguyên toàn bộ mã ChartJS như bạn đã viết)
+  var canvas = document.getElementById("chart-line");
+  if (canvas) {
+      var ctx = canvas.getContext("2d");
+      // vẽ biểu đồ nếu cần
+  }
 </script>
+
 
 <script>
   var win = navigator.platform.indexOf('Win') > -1;

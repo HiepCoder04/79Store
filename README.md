@@ -1,66 +1,104 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Hướng dẫn thiết lập dự án Laravel mới clone về
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Chào mừng bạn đến với dự án Laravel! Dưới đây là các bước chi tiết để thiết lập và chạy dự án sau khi clone từ repository.
 
-## About Laravel
+## Yêu cầu hệ thống
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Trước khi bắt đầu, hãy đảm bảo máy tính của bạn đã cài đặt các công cụ sau:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- **PHP**: Phiên bản 8.1 trở lên
+- **Composer**: Quản lý gói phụ thuộc cho PHP
+- **MySQL** hoặc cơ sở dữ liệu tương thích (PostgreSQL, SQLite, v.v.)
+- **Node.js** và **NPM** (cho việc biên dịch tài nguyên frontend, nếu cần)
+- **Git**: Để clone repository
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Các bước thiết lập
 
-## Learning Laravel
+1. **Clone repository**
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+   ```bash
+   git clone https://github.com/codegaeme/laravel_shop
+   cd laravel_shop
+   ```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+2. **Cài đặt các gói phụ thuộc PHP**Chạy lệnh sau để cài đặt các thư viện PHP được yêu cầu:
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+   ```bash
+   composer install
+   ```
 
-## Laravel Sponsors
+3. **Sao chép file môi trường**Sao chép file `.env.example` để tạo file `.env`:
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+   ```bash
+   cp .env.example .env
+   ```
 
-### Premium Partners
+4. **Tạo khóa ứng dụng**Tạo khóa ứng dụng Laravel bằng lệnh:
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+   ```bash
+   php artisan key:generate
+   ```
 
-## Contributing
+5. **Cấu hình cơ sở dữ liệu**
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+   - Mở file `.env` và cập nhật thông tin cơ sở dữ liệu:
 
-## Code of Conduct
+     ```env
+     DB_CONNECTION=mysql
+     DB_HOST=127.0.0.1
+     DB_PORT=3306
+     DB_DATABASE=<TÊN_CSDL>
+     DB_USERNAME=<TÊN_NGƯỜI_DÙNG>
+     DB_PASSWORD=<MẬT_KHẨU>
+     ```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+   - Đảm bảo cơ sở dữ liệu đã được tạo trước trong MySQL hoặc hệ quản trị cơ sở dữ liệu bạn sử dụng.
 
-## Security Vulnerabilities
+6. **Chạy migration**Chạy lệnh để tạo các bảng trong cơ sở dữ liệu:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+   ```bash
+   php artisan migrate
+   ```
 
-## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+7. **Khởi động server**Chạy server phát triển của Laravel:
+
+   ```bash
+   php artisan serve
+   ```
+
+   Mặc định, ứng dụng sẽ chạy tại `http://localhost:8000`.
+
+## Lưu ý
+
+- Nếu bạn gặp lỗi liên quan đến quyền, hãy đảm bảo cấp quyền phù hợp cho các thư mục như `storage` và `bootstrap/cache`:
+
+  ```bash
+  chmod -R 775 storage bootstrap/cache
+  ```
+
+- Nếu dự án sử dụng các dịch vụ bên thứ ba (như mail, queue, v.v.), hãy kiểm tra và cập nhật cấu hình trong file `.env`.
+
+## Các lệnh hữu ích
+
+- Xóa cache nếu gặp lỗi:
+
+  ```bash
+  php artisan cache:clear
+  php artisan config:clear
+  php artisan route:clear
+  php artisan view:clear
+  ```
+
+- Tối ưu hóa dự án:
+
+  ```bash
+  php artisan optimize
+```
+
+## Giải quyết vấn đề
+
+- Nếu gặp lỗi liên quan đến Composer, thử xóa thư mục `vendor` và file `composer.lock`, sau đó chạy lại `composer install`.
+- Kiểm tra version PHP và Composer để đảm bảo tương thích với dự án.
+
+Chúc bạn thành công với dự án Laravel! Nếu có thắc mắc, hãy liên hệ với nhóm phát triển.
