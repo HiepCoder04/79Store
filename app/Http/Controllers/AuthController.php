@@ -41,7 +41,7 @@ class AuthController extends Controller
     }
 
     return back()->withErrors([
-        'email' => 'Thông tin đăng nhập không chính xác.',
+        'email' => 'Sai tài khoản hoặc mật khẩu',
     ])->withInput();
 }
 

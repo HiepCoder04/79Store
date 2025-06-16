@@ -60,24 +60,6 @@ Trước khi bắt đầu, hãy đảm bảo máy tính của bạn đã cài đ
    php artisan migrate
    ```
 
-  
-
-   <!-- ```bash
-   php artisan db:seed
-   ``` -->
-
-<!-- 7. **Cài đặt các gói phụ thuộc frontend (nếu có**)Nếu dự án sử dụng các tài nguyên frontend (như Vite hoặc Webpack), chạy các lệnh sau:
-
-   ```bash
-   npm install
-   npm run dev
-   ```
-
-   Hoặc để build cho production:
-
-   ```bash
-   npm run build -->
-   ```
 
 7. **Khởi động server**Chạy server phát triển của Laravel:
 
