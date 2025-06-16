@@ -163,65 +163,7 @@
                     </div>
 
                     <!-- Shop Widget -->
-                    <div class="shop-widget best-seller mb-50">
-                        <h4 class="widget-title">Best Seller</h4>
-                        <div class="widget-desc">
-                            <!-- Single Best Seller Products -->
-                            <div class="single-best-seller-product d-flex align-items-center">
-                                <div class="product-thumbnail">
-                                    <a href="{{ route('shop-detail') }}"><img
-                                            src="{{ asset('assets/img/bg-img/4.jpg') }}" alt="Cactus Flower"></a>
-                                </div>
-                                <div class="product-info">
-                                    <a href="{{ route('shop-detail') }}">Cactus Flower</a>
-                                    <p>$10.99</p>
-                                    <div class="ratings">
-                                        <i class="fa fa-star"></i>
-                                        <i class="fa fa-star"></i>
-                                        <i class="fa fa-star"></i>
-                                        <i class="fa fa-star"></i>
-                                        <i class="fa fa-star"></i>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Single Best Seller Products -->
-                            <div class="single-best-seller-product d-flex align-items-center">
-                                <div class="product-thumbnail">
-                                    <a href="{{ route('shop-detail') }}"><img
-                                            src="{{ asset('assets/img/bg-img/5.jpg') }}" alt="Tulip Flower"></a>
-                                </div>
-                                <div class="product-info">
-                                    <a href="{{ route('shop-detail') }}">Tulip Flower</a>
-                                    <p>$11.99</p>
-                                    <div class="ratings">
-                                        <i class="fa fa-star"></i>
-                                        <i class="fa fa-star"></i>
-                                        <i class="fa fa-star"></i>
-                                        <i class="fa fa-star"></i>
-                                        <i class="fa fa-star"></i>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Single Best Seller Products -->
-                            <div class="single-best-seller-product d-flex align-items-center">
-                                <div class="product-thumbnail">
-                                    <a href="{{ route('shop-detail') }}"><img
-                                            src="{{ asset('assets/img/bg-img/34.jpg') }}" alt="Recuerdos Plant"></a>
-                                </div>
-                                <div class="product-info">
-                                    <a href="{{ route('shop-detail') }}">Recuerdos Plant</a>
-                                    <p>$9.99</p>
-                                    <div class="ratings">
-                                        <i class="fa fa-star"></i>
-                                        <i class="fa fa-star"></i>
-                                        <i class="fa fa-star"></i>
-                                        <i class="fa fa-star"></i>
-                                        <i class="fa fa-star"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+
                 </div>
             </div>
 
@@ -229,86 +171,19 @@
             <div class="col-12 col-md-8 col-lg-9">
                 <div class="shop-products-area">
                     <div class="row">
+                        @foreach ($products as $pro)
                         <!-- Single Product Area -->
                         <div class="col-12 col-sm-6 col-lg-4">
                             <div class="single-product-area mb-50">
                                 <!-- Product Image -->
                                 <div class="product-img">
-                                    <a href="{{ route('shop-detail') }}"><img
-                                            src="{{ asset('assets/img/bg-img/40.png') }}" alt="Cactus Flower"></a>
-                                    <!-- Product Tag -->
-                                    <div class="product-tag">
-                                        <a href="#">Hot</a>
-                                    </div>
-                                    <div class="product-meta d-flex">
-                                        <a href="#" class="wishlist-btn"><i class="icon_heart_alt"></i></a>
-                                        <a href="" class="add-to-cart-btn">Add to cart</a>
-                                        <a href="#" class="compare-btn"><i class="arrow_left-right_alt"></i></a>
-                                    </div>
-                                </div>
-                                <!-- Product Info -->
-                                <div class="product-info mt-15 text-center">
-                                    <a href="{{ route('shop-detail') }}">
-                                        <p>Cactus Flower</p>
-                                    </a>
-                                    <h6>$10.99</h6>
-                                </div>
-                            </div>
-                        </div>
 
-                        <!-- Single Product Area -->
-                        <div class="col-12 col-sm-6 col-lg-4">
-                            <div class="single-product-area mb-50">
-                                <!-- Product Image -->
-                                <div class="product-img">
-                                    <a href="{{ route('shop-detail') }}"><img
-                                            src="{{ asset('assets/img/bg-img/41.png') }}" alt="Cactus Flower"></a>
-                                    <div class="product-meta d-flex">
-                                        <a href="#" class="wishlist-btn"><i class="icon_heart_alt"></i></a>
-                                        <a href="" class="add-to-cart-btn">Add to cart</a>
-                                        <a href="#" class="compare-btn"><i class="arrow_left-right_alt"></i></a>
-                                    </div>
-                                </div>
-                                <!-- Product Info -->
-                                <div class="product-info mt-15 text-center">
-                                    <a href="{{ route('shop-detail') }}">
-                                        <p>Cactus Flower</p>
-                                    </a>
-                                    <h6>$10.99</h6>
-                                </div>
-                            </div>
-                        </div>
 
-                        <!-- Single Product Area -->
-                        <div class="col-12 col-sm-6 col-lg-4">
-                            <div class="single-product-area mb-50">
-                                <!-- Product Image -->
-                                <div class="product-img">
-                                    <a href="{{ route('shop-detail') }}"><img
-                                            src="{{ asset('assets/img/bg-img/42.png') }}" alt="Cactus Flower"></a>
-                                    <div class="product-meta d-flex">
-                                        <a href="#" class="wishlist-btn"><i class="icon_heart_alt"></i></a>
-                                        <a href="" class="add-to-cart-btn">Add to cart</a>
-                                        <a href="#" class="compare-btn"><i class="arrow_left-right_alt"></i></a>
-                                    </div>
-                                </div>
-                                <!-- Product Info -->
-                                <div class="product-info mt-15 text-center">
-                                    <a href="{{ route('shop-detail') }}">
-                                        <p>Cactus Flower</p>
-                                    </a>
-                                    <h6>$10.99</h6>
-                                </div>
-                            </div>
-                        </div>
+                                    @if ($pro->galleries->first())
+                                    <img src="{{ $pro->galleries->first()->image }}" class="img-fluid img-thumbnail"
+                                        alt="Product Image">
+                                    @endif
 
-                        <!-- Single Product Area -->
-                        <div class="col-12 col-sm-6 col-lg-4">
-                            <div class="single-product-area mb-50">
-                                <!-- Product Image -->
-                                <div class="product-img">
-                                    <a href="{{ route('shop-detail') }}"><img
-                                            src="{{ asset('assets/img/bg-img/43.png') }}" alt="Cactus Flower"></a>
                                     <div class="product-meta d-flex">
                                         <a href="#" class="wishlist-btn"><i class="icon_heart_alt"></i></a>
                                         <a href="" class="add-to-cart-btn">Add to cart</a>
@@ -317,132 +192,15 @@
                                 </div>
                                 <!-- Product Info -->
                                 <div class="product-info mt-15 text-center">
-                                    <a href="{{ route('shop-detail') }}">
-                                        <p>Cactus Flower</p>
+                                    <a href="{{ route('shop-detail',$pro->id) }}">
+                                        <p>{{$pro->name}}</p>
                                     </a>
-                                    <h6>$10.99</h6>
-                                </div>
-                            </div>
-                        </div>
 
-                        <!-- Single Product Area -->
-                        <div class="col-12 col-sm-6 col-lg-4">
-                            <div class="single-product-area mb-50">
-                                <!-- Product Image -->
-                                <div class="product-img">
-                                    <a href="{{ route('shop-detail') }}"><img
-                                            src="{{ asset('assets/img/bg-img/44.png') }}" alt="Cactus Flower"></a>
-                                    <div class="product-meta d-flex">
-                                        <a href="#" class="wishlist-btn"><i class="icon_heart_alt"></i></a>
-                                        <a href="" class="add-to-cart-btn">Add to cart</a>
-                                        <a href="#" class="compare-btn"><i class="arrow_left-right_alt"></i></a>
-                                    </div>
-                                </div>
-                                <!-- Product Info -->
-                                <div class="product-info mt-15 text-center">
-                                    <a href="{{ route('shop-detail') }}">
-                                        <p>Cactus Flower</p>
-                                    </a>
-                                    <h6>$10.99</h6>
                                 </div>
                             </div>
                         </div>
+                        @endforeach
 
-                        <!-- Single Product Area -->
-                        <div class="col-12 col-sm-6 col-lg-4">
-                            <div class="single-product-area mb-50">
-                                <!-- Product Image -->
-                                <div class="product-img">
-                                    <a href="{{ route('shop-detail') }}"><img
-                                            src="{{ asset('assets/img/bg-img/45.png') }}" alt="Cactus Flower"></a>
-                                    <div class="product-meta d-flex">
-                                        <a href="#" class="wishlist-btn"><i class="icon_heart_alt"></i></a>
-                                        <a href="" class="add-to-cart-btn">Add to cart</a>
-                                        <a href="#" class="compare-btn"><i class="arrow_left-right_alt"></i></a>
-                                    </div>
-                                </div>
-                                <!-- Product Info -->
-                                <div class="product-info mt-15 text-center">
-                                    <a href="{{ route('shop-detail') }}">
-                                        <p>Cactus Flower</p>
-                                    </a>
-                                    <h6>$10.99</h6>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Single Product Area -->
-                        <div class="col-12 col-sm-6 col-lg-4">
-                            <div class="single-product-area mb-50">
-                                <!-- Product Image -->
-                                <div class="product-img">
-                                    <a href="{{ route('shop-detail') }}"><img
-                                            src="{{ asset('assets/img/bg-img/46.png') }}" alt="Cactus Flower"></a>
-                                    <div class="product-meta d-flex">
-                                        <a href="#" class="wishlist-btn"><i class="icon_heart_alt"></i></a>
-                                        <a href="" class="add-to-cart-btn">Add to cart</a>
-                                        <a href="#" class="compare-btn"><i class="arrow_left-right_alt"></i></a>
-                                    </div>
-                                </div>
-                                <!-- Product Info -->
-                                <div class="product-info mt-15 text-center">
-                                    <a href="{{ route('shop-detail') }}">
-                                        <p>Cactus Flower</p>
-                                    </a>
-                                    <h6>$10.99</h6>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Single Product Area -->
-                        <div class="col-12 col-sm-6 col-lg-4">
-                            <div class="single-product-area mb-50">
-                                <!-- Product Image -->
-                                <div class="product-img">
-                                    <a href="{{ route('shop-detail') }}"><img
-                                            src="{{ asset('assets/img/bg-img/47.png') }}" alt="Cactus Flower"></a>
-                                    <!-- Product Tag -->
-                                    <div class="product-tag sale-tag">
-                                        <a href="#">Sale</a>
-                                    </div>
-                                    <div class="product-meta d-flex">
-                                        <a href="#" class="wishlist-btn"><i class="icon_heart_alt"></i></a>
-                                        <a href="" class="add-to-cart-btn">Add to cart</a>
-                                        <a href="#" class="compare-btn"><i class="arrow_left-right_alt"></i></a>
-                                    </div>
-                                </div>
-                                <!-- Product Info -->
-                                <div class="product-info mt-15 text-center">
-                                    <a href="{{ route('shop-detail') }}">
-                                        <p>Cactus Flower</p>
-                                    </a>
-                                    <h6>$10.99</h6>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Single Product Area -->
-                        <div class="col-12 col-sm-6 col-lg-4">
-                            <div class="single-product-area mb-50">
-                                <!-- Product Image -->
-                                <div class="product-img">
-                                    <a href="{{ route('shop-detail') }}"><img
-                                            src="{{ asset('assets/img/bg-img/48.png') }}" alt="Cactus Flower"></a>
-                                    <div class="product-meta d-flex">
-                                        <a href="#" class="wishlist-btn"><i class="icon_heart_alt"></i></a>
-                                        <a href="" class="add-to-cart-btn">Add to cart</a>
-                                        <a href="#" class="compare-btn"><i class="arrow_left-right_alt"></i></a>
-                                    </div>
-                                </div>
-                                <!-- Product Info -->
-                                <div class="product-info mt-15 text-center">
-                                    <a href="{{ route('shop-detail') }}">
-                                        <p>Cactus Flower</p>
-                                    </a>
-                                    <h6>$10.99</h6>
-                                </div>
-                            </div>
-                        </div>
                     </div>
 
                     <!-- Pagination -->
