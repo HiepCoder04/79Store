@@ -42,17 +42,17 @@ Route::middleware('auth')->group(function () {
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
     Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
     // Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
-    // Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
+    Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
 });
 
 
 
 
 
-Route::get('/', [ProductController::class, 'thongke'])->name('thongke');
-Route::get('/home', function () {
-    return view('client.home');
-});
+// Route::get('/', [ProductController::class, 'thongke'])->name('thongke');
+// Route::get('/home', function () {
+//     return view('client.home');
+// });
 
 // HOME ROUTE
 Route::get('/home', function () {
