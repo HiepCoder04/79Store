@@ -2,129 +2,149 @@
 
 @section('title', 'Giỏ hàng')
 
-@section('content')
-<section class="about-us-area section-padding-100-0">
-    <div class="container">
-        <!-- Top Breadcrumb Area -->
-        <div class="top-breadcrumb-area bg-img bg-overlay d-flex align-items-center justify-content-center" style="background-image: url({{ asset('img/bg-img/24.jpg') }});">
-            <h2>Giỏ hàng</h2>
-        </div>
+@php use Illuminate\Support\Str; @endphp
 
-        <!-- Breadcrumb -->
-        <div class="row mt-3">
+@section('content')
+<!-- Breadcrumb -->
+<div class="breadcrumb-area">
+    <div class="top-breadcrumb-area bg-img bg-overlay d-flex align-items-center justify-content-center"
+         style="background-image: url({{ asset('assets/img/bg-img/24.jpg') }});">
+        <h2>Giỏ hàng</h2>
+    </div>
+
+    <div class="container py-4">
+        <div class="row">
             <div class="col-12">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('home')}}"><i class="fa fa-home"></i> Trang chủ</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('home') }}"><i class="fa fa-home"></i> Trang chủ</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Giỏ hàng</li>
                     </ol>
                 </nav>
             </div>
         </div>
+    </div>
+</div>
 
-        <!-- Cart Area Start -->
-        <div class="cart-area section-padding-0-100 clearfix">
-            <div class="container">
-                @if ($items->isEmpty())
-                    <p class="text-center mt-5">Giỏ hàng của bạn đang trống.</p>
-                @else
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="cart-table clearfix">
-                                <table class="table table-responsive">
-                                    <thead>
-                                        <tr>
-                                            <th>Sản phẩm</th>
-                                            <th>Số lượng</th>
-                                            <th>Giá</th>
-                                            <th>Thành tiền</th>
-                                            <th></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($items as $item)
-                                            @php
-                                                $product = $item->productVariant->product;
-                                                $variant = $item->productVariant;
-                                                $gallery = $product->galleries->first(); // nếu có quan hệ
-                                            @endphp
-                                            <tr>
-                                                <td class="cart_product_img">
-                                                    <a href="#">
-                                                        <img src="{{ asset('storage/' . ($gallery->image ?? 'img/default.jpg')) }}" alt="{{ $product->name }}" width="80">
-                                                    </a>
-                                                    <h5>{{ $product->name }}</h5>
-                                                    <small>Loại: {{ $variant->size }} - {{ $variant->pot }}</small>
-                                                </td>
-                                                <td class="qty">
-                                                    <form method="POST" action="{{ route('cart.update') }}">
-                                                        @csrf
-                                                        <input type="hidden" name="variant_id" value="{{ $variant->id }}">
-                                                        <div class="quantity">
-                                                            <input type="number" class="qty-text" name="quantity" value="{{ $item->quantity }}" min="1">
-                                                            <button type="submit" class="btn btn-sm btn-success mt-2">Cập nhật</button>
-                                                        </div>
-                                                    </form>
-                                                </td>
-                                                <td class="price">
-                                                    <span>{{ number_format($variant->price, 0, ',', '.') }}đ</span>
-                                                </td>
-                                                <td class="total_price">
-                                                    <span>{{ number_format($variant->price * $item->quantity, 0, ',', '.') }}đ</span>
-                                                </td>
-                                                <td class="action">
-                                                    <form method="POST" action="{{ route('cart.remove', $item->id) }}">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="btn btn-danger btn-sm"><i class="icon_close"></i></button>
-                                                    </form>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Coupon & Total -->
-                    <div class="row">
-                        <!-- Coupon -->
-                        <div class="col-12 col-lg-6">
-                            <div class="coupon-discount mt-70">
-                                <h5>NHẬP MÃ GIẢM GIÁ</h5>
-                                <form action="#" method="post">
-                                    <input type="text" name="coupon-code" placeholder="Nhập mã khuyến mãi">
-                                    <button type="submit">ÁP DỤNG</button>
-                                </form>
-                            </div>
-                        </div>
-
-                        <!-- Tổng tiền -->
-                        <div class="col-12 col-lg-6">
-                            <div class="cart-totals-area mt-70">
-                                <h5>Tổng giỏ hàng</h5>
-                                <div class="subtotal d-flex justify-content-between">
-                                    <h5>Tạm tính</h5>
-                                    <h5>{{ number_format($total, 0, ',', '.') }}đ</h5>
-                                </div>
-                                <div class="shipping d-flex justify-content-between">
-                                    <h5>Phí vận chuyển</h5>
-                                    <h5>Miễn phí</h5>
-                                </div>
-                                <div class="total d-flex justify-content-between">
-                                    <h5>Tổng cộng</h5>
-                                    <h5>{{ number_format($total, 0, ',', '.') }}đ</h5>
-                                </div>
-                                <div class="checkout-btn mt-3">
-                                    <a href="#" class="btn alazea-btn w-100">TIẾN HÀNH THANH TOÁN</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                @endif
+<!-- Cart Section -->
+<div class="cart-area section-padding-0-100 clearfix">
+    <div class="container">
+        @if ($items->isEmpty())
+            <div class="alert alert-info text-center">Giỏ hàng của bạn đang trống.</div>
+        @else
+        <div class="row">
+            <div class="col-12">
+                <div class="table-responsive shadow-sm rounded-3">
+                    <table class="table table-hover table-bordered align-middle text-center mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Sản phẩm</th>
+                                <th>Chậu</th>
+                                <th>Kích thước</th>
+                                <th>Số lượng</th>
+                                <th>Giá</th>
+                                <th>Thành tiền</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($items as $item)
+                                @php
+                                    $variant = $item->productVariant;
+                                    $product = $variant->product;
+                                    $gallery = $product->galleries->first();
+                                    $image = $gallery->image ?? null;
+                                    $imageUrl = $image
+                                        ? (Str::startsWith($image, 'http') ? $image : asset(ltrim($image, '/')))
+                                        : asset('assets/img/bg-img/default.jpg');
+                                    $subtotal = $variant->price * $item->quantity;
+                                @endphp
+                                <tr>
+                                    <td class="text-start">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <img src="{{ $imageUrl }}" alt="{{ $product->name }}" width="80" class="img-thumbnail">
+                                            <strong>{{ $product->name }}</strong>
+                                        </div>
+                                    </td>
+                                    <td>{{ $variant->pot }}</td>
+                                    <td>{{ $variant->size }}</td>
+                                    <td>
+                                        <form method="POST" action="{{ route('cart.update', $item->id) }}">
+                                            @csrf
+                                            @method('PUT')
+                                            <input type="number" name="quantity" value="{{ $item->quantity }}"
+                                                   min="1" class="form-control text-center" style="width: 80px;">
+                                        </form>
+                                    </td>
+                                    <td>{{ number_format($variant->price, 0, ',', '.') }}đ</td>
+                                    <td>{{ number_format($subtotal, 0, ',', '.') }}đ</td>
+                                    <td>
+                                        <form method="POST" action="{{ route('cart.remove', $item->id) }}">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="btn btn-sm btn-outline-danger" title="Xoá">
+                                                <i class="fa fa-times"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
+
+        <!-- Coupon & Totals -->
+        <div class="row">
+            <!-- Giữ nguyên GIAO DIỆN VOUCHER của bạn -->
+            <div class="col-12 col-lg-6">
+                <div class="coupon-discount mt-70">
+                    <h5>COUPON DISCOUNT</h5>
+                    <form action="" method="post">
+                        @csrf
+                        <input type="text" name="coupon-code" placeholder="Enter your coupon code">
+                        <button type="submit">APPLY COUPON</button>
+                    </form>
+                    @if(session('coupon_error'))
+                        <div class="text-danger mt-2">{{ session('coupon_error') }}</div>
+                    @endif
+                    @if(session('coupon_success'))
+                        <div class="text-success mt-2">{{ session('coupon_success') }}</div>
+                    @endif
+                </div>
+            </div>
+
+            <!-- Tổng tiền -->
+            <div class="col-12 col-lg-6">
+                <div class="cart-totals-area mt-70">
+    <h5 class="title--">Cart Total</h5>
+
+    <div class="subtotal d-flex justify-content-between">
+        <h5>Subtotal</h5>
+        <h5>{{ number_format($total, 0, ',', '.') }}đ</h5>
     </div>
-</section>
+
+    {{-- Giao diện phí vận chuyển --}}
+    <div class="shipping d-flex justify-content-between ">
+    <h5>Phí vận chuyển</h5>
+    <h5 class="text-success">Miễn phí</h5>
+</div>
+</div>
+
+    <div class="total d-flex justify-content-between mt-3">
+        <h5>Tổng cộng</h5>
+        <h5>{{ number_format($total, 0, ',', '.') }}đ</h5> {{-- Có thể cộng thêm phí ship ở đây nếu cần --}}
+    </div>
+
+    <div class="checkout-btn mt-3">
+        <a href="" class="btn alazea-btn w-100">TIẾN HÀNH THANH TOÁN</a>
+    </div>
+</div>
+
+            </div>
+        </div>
+        @endif
+    </div>
+</div>
 @endsection

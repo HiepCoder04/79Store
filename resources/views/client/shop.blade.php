@@ -223,13 +223,13 @@
                             </div>
                         
                         @endforeach
-</div>
+            </div>
 
 
                     <!-- Pagination -->
                     <nav aria-label="Page navigation">
-    <ul class="pagination justify-content-center" id="pagination"></ul>
-</nav>
+            <ul class="pagination justify-content-center" id="pagination"></ul>
+        </nav>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
