@@ -24,12 +24,12 @@
         </thead>
         <tbody>
             @foreach($product->variants as $variant)
-                <tr>
-                    <td>{{ $variant->size }}</td>
-                    <td>{{ $variant->pot ?? 'Không có' }}</td>
-                    <td>{{ $variant->price }}</td>
-                    <td>{{ $variant->stock_quantity }}</td>
-                </tr>
+            <tr>
+                <td>{{ $variant->size }}</td>
+                <td>{{ $variant->pot ?? 'Không có' }}</td>
+                <td>{{ $variant->price }}</td>
+                <td>{{ $variant->stock_quantity }}</td>
+            </tr>
             @endforeach
         </tbody>
     </table>
@@ -37,9 +37,9 @@
     <h3 class="mt-4">Hình ảnh sản phẩm</h3>
     <div class="row">
         @foreach($product->galleries as $gallery)
-            <div class="col-md-3">
-                <img src="{{ $gallery->image }}" class="img-fluid img-thumbnail" alt="Product Image">
-            </div>
+        <div class="col-md-3">
+            <img src="{{ $gallery->image }}" class="img-fluid img-thumbnail" alt="Product Image">
+        </div>
         @endforeach
     </div>
 

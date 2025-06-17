@@ -26,6 +26,7 @@
         </div>
     </div>
 </div>
+
 <!-- ##### Breadcrumb Area End ##### -->
 
 <!-- ##### Single Product Details Area Start ##### -->
@@ -37,57 +38,108 @@
                     <div class="single_product_thumb">
                         <div id="product_details_slider" class="carousel slide" data-ride="carousel">
                             <div class="carousel-inner">
-                                <div class="carousel-item active">
-                                    <a class="product-img" href="{{ asset('assets/img/bg-img/49.jpg') }}"
-                                        title="Product Image">
-                                        <img class="d-block w-100" src="{{ asset('assets/img/bg-img/49.jpg') }}"
-                                            alt="Product 1">
-                                    </a>
+                                @foreach ($product->galleries as $index => $img)
+                                <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
+                                    <img class="w-100" src="{{ $img->image }}" alt="Product {{ $index + 1 }}">
                                 </div>
-                                <div class="carousel-item">
-                                    <a class="product-img" href="{{ asset('assets/img/bg-img/50.jpg') }}"
-                                        title="Product Image">
-                                        <img class="d-block w-100" src="{{ asset('assets/img/bg-img/50.jpg') }}"
-                                            alt="Product 2">
-                                    </a>
-                                </div>
-                                <div class="carousel-item">
-                                    <a class="product-img" href="{{ asset('assets/img/bg-img/51.jpg') }}"
-                                        title="Product Image">
-                                        <img class="d-block w-100" src="{{ asset('assets/img/bg-img/51.jpg') }}"
-                                            alt="Product 3">
-                                    </a>
-                                </div>
+                                @endforeach
                             </div>
+
                             <ol class="carousel-indicators">
-                                <li class="active" data-target="#product_details_slider" data-slide-to="0"
-                                    style="background-image: url('{{ asset('assets/img/bg-img/49.jpg') }}');">
+                                @foreach ($product->galleries as $index => $img)
+                                <li class="{{ $loop->first ? 'active' : '' }}" data-target="#product_details_slider"
+                                    data-slide-to="{{ $index }}" style="background-image: url('{{ $img->image }}');">
                                 </li>
-                                <li data-target="#product_details_slider" data-slide-to="1"
-                                    style="background-image: url('{{ asset('assets/img/bg-img/50.jpg') }}');">
-                                </li>
-                                <li data-target="#product_details_slider" data-slide-to="2"
-                                    style="background-image: url('{{ asset('assets/img/bg-img/51.jpg') }});">
-                                </li>
+                                @endforeach
                             </ol>
                         </div>
                     </div>
                 </div>
 
+
                 <div class="col-12 col-md-6">
                     <div class="single_product_desc">
-                        <h4 class="title">Recuerdos Plant</h4>
-                        <h4 class="price">$9.99</h4>
+                        <h4 class="title">{{ $product->name }}</h4>
+                        <div class="col-12">
+
+                            <!-- Chọn kích thước:
+                            <select id="" class="form-control mt-3">
+                                @foreach ($product->variants as $pro)
+                                <option>{{ $pro->size }}</option>
+                                @endforeach
+                            </select>
+                            Chọn chậu:
+                            <select id="" class="form-control mt-3">
+                                @foreach ($product->variants as $pro)
+                                <option>{{ $pro->pot }}</option>
+                                @endforeach
+                            </select>
+                            
+-->
+                            <form id="variantForm">
+                                Chọn kích thước:
+                                <select id="sizeSelect" class="form-control" name="size">
+                                    @foreach ($product->variants->unique('size') as $variant)
+                                    <option value="{{ $variant->size }}">{{ $variant->size }}</option>
+                                    @endforeach
+                                </select>
+
+                                Chọn chậu:
+                                <select id="potSelect" class="form-control" name="pot">
+                                    @foreach ($product->variants->unique('pot') as $variant)
+                                    <option value="{{ $variant->pot }}">{{ $variant->pot }}</option>
+                                    @endforeach
+                                </select>
+
+                                <p>Giá: <span id="priceDisplay">--</span></p>
+                                <p>Số lượng: <span id="stockDisplay">--</span></p>
+                            </form>
+
+                            <script>
+                            const sizeSelect = document.getElementById('sizeSelect');
+                            const potSelect = document.getElementById('potSelect');
+                            const priceDisplay = document.getElementById('priceDisplay');
+                            const stockDisplay = document.getElementById('stockDisplay');
+
+                            async function updateVariantInfo() {
+                                const size = sizeSelect.value;
+                                const pot = potSelect.value;
+
+                                try {
+                                    const res = await fetch(
+                                        `/api/variant?size=${size}&pot=${pot}&product_id={{ $product->id }}`);
+                                    const variant = await res.json();
+
+                                    if (variant && variant.price !== undefined) {
+                                        priceDisplay.textContent = Number(variant.price).toLocaleString('vi-VN') +
+                                            '₫';
+                                        stockDisplay.textContent = variant.stock_quantity;
+                                    } else {
+                                        priceDisplay.textContent = '--';
+                                        stockDisplay.textContent = '--';
+                                    }
+                                } catch (error) {
+                                    console.error("Lỗi khi gọi API:", error);
+                                }
+                            }
+
+                            sizeSelect.addEventListener('change', updateVariantInfo);
+                            potSelect.addEventListener('change', updateVariantInfo);
+                            document.addEventListener('DOMContentLoaded', updateVariantInfo);
+                            </script>
+
+
+
+                        </div><br>
                         <div class="short_overview">
-                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus pellentesque malesuada
-                                in nibh sed euismod. Curabitur a rhoncus dui. Nunc lobortis cursus magna utrum faucibus.
-                                Vivamus justo nibh, pharetra non risus accumsan, tincidunt suscipit leo.</p>
+                            <p>{{$product->description}}</p>
                         </div>
 
                         <div class="cart--area d-flex flex-wrap align-items-center">
                             <!-- Add to Cart Form -->
                             <form class="cart clearfix d-flex align-items-center" method="post" action="#">
                                 @csrf
+
                                 <div class="quantity">
                                     <span class="qty-minus"
                                         onclick="var effect = document.getElementById('qty'); var qty = effect.value; if( !isNaN( qty ) && qty > 1 ) effect.value--;return false;"><i
@@ -109,9 +161,12 @@
                         </div>
 
                         <div class="products--meta">
-                            <p><span>SKU:</span> <span>CT201807</span></p>
-                            <p><span>Category:</span> <span>Outdoor Plants</span></p>
-                            <p><span>Tags:</span> <span>plants, green, cactus</span></p>
+
+
+
+
+                            <p><span>Category:</span> <span>{{ $product ->category->name }}</span></p>
+
                             <p>
                                 <span>Share on:</span>
                                 <span>

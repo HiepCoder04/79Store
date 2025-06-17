@@ -66,8 +66,8 @@
 
                             <!-- Cart -->
                             <div class="cart">
-                                <a href="{{route('cart.index')}}"><i class="fa fa-shopping-cart" aria-hidden="true"></i> <span>Cart <span
-                                            class="cart-quantity">(1)</span></span></a>
+                                <a href="{{route('cart.index')}}"><i class="fa fa-shopping-cart" aria-hidden="true"></i>
+                                    <span>Cart <span class="cart-quantity">(1)</span></span></a>
                             </div>
                         </div>
                     </div>
@@ -111,7 +111,7 @@
                                         <li><a href="shop.html">Shop</a>
                                             <ul class="dropdown">
                                                 <li><a href="{{ route('shop') }}">Shop</a></li>
-                                                <li><a href="{{ route('shop-detail') }}">Shop Details</a></li>
+
                                                 <li><a href="cart.html">Shopping Cart</a></li>
                                                 <li><a href="checkout.html">Checkout</a></li>
                                             </ul>

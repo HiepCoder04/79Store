@@ -66,9 +66,5 @@ Route::get('/about', function () {
     return view('client.users.about-detail');
 })->name('about');
 
-Route::get('/shop', function () {
-    return view('client.shop');
-})->name('shop');
-Route::get('/shopDetail', function () {
-    return view('client.shopDetail');
-})->name('shop-detail');
+Route::get('/shop', [App\Http\Controllers\Client\ProductVariant::class,'product'])->name('shop');
+Route::get('/shopDetail/{id}',[App\Http\Controllers\Client\ProductVariant::class,'productDetail'])->name('shop-detail');
