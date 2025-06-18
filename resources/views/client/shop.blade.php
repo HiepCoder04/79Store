@@ -171,47 +171,115 @@
             <div class="col-12 col-md-8 col-lg-9">
                 <div class="shop-products-area">
                     <div class="row">
-                        @foreach ($products as $pro)
-                        <!-- Single Product Area -->
-                        <div class="col-12 col-sm-6 col-lg-4">
-                            <div class="single-product-area mb-50">
-                                <!-- Product Image -->
-                                <div class="product-img">
+                        @foreach ($products as $product)
+                            <div class="col-12 col-sm-6 col-lg-4">
+                                <div class="single-product-area mb-50">
+                                    <!-- Product Image -->
+                                    <div class="product-img">
+                                        <a href="{{ route('shop-detail', $product->id) }}">
+                                            @php
+                                                $image = $product->galleries->first()->image ?? '/assets/img/bg-img/default.jpg';
+                                            @endphp
 
+                                            <img src="{{ asset(ltrim($image, '/')) }}" alt="{{ $product->name }}">
+                                        </a>
 
-                                    @if ($pro->galleries->first())
-                                    <img src="{{ $pro->galleries->first()->image }}" class="img-fluid img-thumbnail"
-                                        alt="Product Image">
-                                    @endif
+                                        <div class="product-tag">
+                                            <a href="#">Hot</a>
+                                        </div>
 
-                                    <div class="product-meta d-flex">
-                                        <a href="#" class="wishlist-btn"><i class="icon_heart_alt"></i></a>
-                                        <a href="" class="add-to-cart-btn">Add to cart</a>
-                                        <a href="#" class="compare-btn"><i class="arrow_left-right_alt"></i></a>
+                                        <div class="product-meta d-flex">
+                                            <a href="#" class="wishlist-btn"><i class="icon_heart_alt"></i></a>
+
+                                            <form action="{{ route('cart.add') }}" method="POST">
+                                                @csrf
+                                                <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                                <button type="submit" class="add-to-cart-btn">Add to cart</button>
+                                            </form>
+
+                                            <a href="#" class="compare-btn"><i class="arrow_left-right_alt"></i></a>
+                                        </div>
+                                    </div>
+
+                                    <!-- Product Info -->
+                                    <div class="product-info mt-15 text-center">
+                                        <a href="{{ route('shop-detail', $product->id) }}">
+                                            <p>{{ $product->name }}</p>
+                                        </a>
+
+                                        @php
+                                            $minPrice = $product->variants->min('price');
+                                            $maxPrice = $product->variants->max('price');
+                                        @endphp
+
+                                        <h6>
+                                            {{ number_format($minPrice, 0, ',', '.') }}đ
+                                            @if ($minPrice != $maxPrice)
+                                                – {{ number_format($maxPrice, 0, ',', '.') }}đ
+                                            @endif
+                                        </h6>
                                     </div>
                                 </div>
-                                <!-- Product Info -->
-                                <div class="product-info mt-15 text-center">
-                                    <a href="{{ route('shop-detail',$pro->id) }}">
-                                        <p>{{$pro->name}}</p>
-                                    </a>
-
-                                </div>
                             </div>
-                        </div>
+                        
                         @endforeach
+            </div>
 
-                    </div>
 
                     <!-- Pagination -->
                     <nav aria-label="Page navigation">
-                        <ul class="pagination">
-                            <li class="page-item"><a class="page-link" href="#">1</a></li>
-                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#"><i class="fa fa-angle-right"></i></a>
-                            </li>
-                        </ul>
-                    </nav>
+            <ul class="pagination justify-content-center" id="pagination"></ul>
+        </nav>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const totalPages = {{ $products->lastPage() }};
+        let currentPage = {{ $products->currentPage() }};
+        const baseUrl = "{{ url()->current() }}";
+
+        const pagination = document.getElementById("pagination");
+
+        function renderPagination() {
+            pagination.innerHTML = "";
+
+            // Prev
+            const prev = document.createElement("li");
+            prev.className = "page-item" + (currentPage === 1 ? " disabled" : "");
+            prev.innerHTML = `<a class="page-link" href="#"><span>&laquo;</span></a>`;
+            prev.addEventListener("click", () => {
+                if (currentPage > 1) {
+                    window.location.href = baseUrl + '?page=' + (currentPage - 1);
+                }
+            });
+            pagination.appendChild(prev);
+
+            // Pages
+            for (let i = 1; i <= totalPages; i++) {
+                const li = document.createElement("li");
+                li.className = "page-item" + (i === currentPage ? " active" : "");
+                li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+                li.addEventListener("click", () => {
+                    window.location.href = baseUrl + '?page=' + i;
+                });
+                pagination.appendChild(li);
+            }
+
+            // Next
+            const next = document.createElement("li");
+            next.className = "page-item" + (currentPage === totalPages ? " disabled" : "");
+            next.innerHTML = `<a class="page-link" href="#"><span>&raquo;</span></a>`;
+            next.addEventListener("click", () => {
+                if (currentPage < totalPages) {
+                    window.location.href = baseUrl + '?page=' + (currentPage + 1);
+                }
+            });
+            pagination.appendChild(next);
+        }
+
+        renderPagination();
+    });
+</script>
+
                 </div>
             </div>
         </div>

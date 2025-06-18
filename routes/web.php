@@ -12,7 +12,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::resource('products', ProductController::class);
     Route::get('/', function () {
         return view('admin.thongke.thongke');
-    })->name('home-admin');
+    })->name('thongke');
     //user
     Route::group([
         'prefix' => 'users',
@@ -41,7 +41,7 @@ Route::prefix('auth')->controller(AuthController::class)->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
     Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
-    // Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
+    Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
     Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
 });
 
