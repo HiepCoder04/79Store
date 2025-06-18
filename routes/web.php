@@ -12,7 +12,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::resource('products', ProductController::class);
     Route::get('/', function () {
         return view('admin.thongke.thongke');
-    })->name('home-admin');
+    })->name('thongke');
     //user
     Route::group([
         'prefix' => 'users',
