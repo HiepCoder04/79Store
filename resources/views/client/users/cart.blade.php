@@ -29,6 +29,13 @@
 <!-- Cart Section -->
 <div class="cart-area section-padding-0-100 clearfix">
     <div class="container">
+        @if (session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
         @if ($items->isEmpty())
             <div class="alert alert-info text-center">Giỏ hàng của bạn đang trống.</div>
         @else
@@ -40,7 +47,6 @@
                             <tr>
                                 <th>Sản phẩm</th>
                                 <th>Chậu</th>
-                                <th>Kích thước</th>
                                 <th>Số lượng</th>
                                 <th>Giá</th>
                                 <th>Thành tiền</th>
@@ -67,13 +73,12 @@
                                         </div>
                                     </td>
                                     <td>{{ $variant->pot }}</td>
-                                    <td>{{ $variant->size }}</td>
                                     <td>
                                         <form method="POST" action="{{ route('cart.update', $item->id) }}">
                                             @csrf
                                             @method('PUT')
                                             <input type="number" name="quantity" value="{{ $item->quantity }}"
-                                                   min="1" class="form-control text-center" style="width: 80px;">
+                                                   min="1" class="form-control text-center" style="width: 80px;" onchange="this.form.submit()">
                                         </form>
                                     </td>
                                     <td>{{ number_format($variant->price, 0, ',', '.') }}đ</td>
@@ -97,14 +102,13 @@
 
         <!-- Coupon & Totals -->
         <div class="row">
-            <!-- Giữ nguyên GIAO DIỆN VOUCHER của bạn -->
             <div class="col-12 col-lg-6">
                 <div class="coupon-discount mt-70">
-                    <h5>COUPON DISCOUNT</h5>
+                    <h5>Mã giảm giá</h5>
                     <form action="" method="post">
                         @csrf
-                        <input type="text" name="coupon-code" placeholder="Enter your coupon code">
-                        <button type="submit">APPLY COUPON</button>
+                        <input type="text" name="coupon-code" placeholder="Nhập mã giảm giá">
+                        <button type="submit">Áp dụng</button>
                     </form>
                     @if(session('coupon_error'))
                         <div class="text-danger mt-2">{{ session('coupon_error') }}</div>
@@ -115,33 +119,29 @@
                 </div>
             </div>
 
-            <!-- Tổng tiền -->
             <div class="col-12 col-lg-6">
                 <div class="cart-totals-area mt-70">
-    <h5 class="title--">Cart Total</h5>
+                    <h5 class="title--">Tổng đơn hàng</h5>
 
-    <div class="subtotal d-flex justify-content-between">
-        <h5>Subtotal</h5>
-        <h5>{{ number_format($total, 0, ',', '.') }}đ</h5>
-    </div>
+                    <div class="subtotal d-flex justify-content-between">
+                        <h5>Tạm tính</h5>
+                        <h5>{{ number_format($total, 0, ',', '.') }}đ</h5>
+                    </div>
 
-    {{-- Giao diện phí vận chuyển --}}
-    <div class="shipping d-flex justify-content-between ">
-    <h5>Phí vận chuyển</h5>
-    <h5 class="text-success">Miễn phí</h5>
-</div>
-</div>
+                    <div class="shipping d-flex justify-content-between">
+                        <h5>Phí vận chuyển</h5>
+                        <h5 class="text-success">Miễn phí</h5>
+                    </div>
 
-    <div class="total d-flex justify-content-between mt-3">
-        <h5>Tổng cộng</h5>
-        <h5>{{ number_format($total, 0, ',', '.') }}đ</h5> {{-- Có thể cộng thêm phí ship ở đây nếu cần --}}
-    </div>
+                    <div class="total d-flex justify-content-between mt-3">
+                        <h5>Tổng cộng</h5>
+                        <h5>{{ number_format($total, 0, ',', '.') }}đ</h5>
+                    </div>
 
-    <div class="checkout-btn mt-3">
-        <a href="" class="btn alazea-btn w-100">TIẾN HÀNH THANH TOÁN</a>
-    </div>
-</div>
-
+                    <div class="checkout-btn mt-3">
+                        <button class="btn alazea-btn w-100" disabled>CHƯA HỖ TRỢ THANH TOÁN</button>
+                    </div>
+                </div>
             </div>
         </div>
         @endif
