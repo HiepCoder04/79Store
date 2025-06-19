@@ -13,7 +13,7 @@
         </div>
         <div class="mb-3">
             <label>Mô tả</label>
-            <textarea rows="5" style="width: 100%;"  type="text" name="description" class="bg-gray-100 border border-gray-300 rounded px-4 py-2 w-full text-gray-700 focus:outline-none focus:border-blue-500" value="{{ $product->description }}" required></textarea>
+            <textarea rows="5" style="width: 100%;"  type="text" name="description" class="bg-gray-100 border border-gray-300 rounded px-4 py-2 w-full text-gray-700 focus:outline-none focus:border-blue-500" required> {{ $product->description }}</textarea>
         </div>
         <div class="mb-3">
             <label for="category_id">Danh mục</label>
@@ -52,6 +52,11 @@
             <div class="col-md-3">
                 <img src="{{ asset($gallery->image) }}" class="img-thumbnail mb-2" style="height: 120px;">
                 {{-- Có thể thêm nút xoá ảnh nếu cần --}}
+
+                <div class="form-check mt-1">
+                    <input class="form-check-input" type="checkbox" name="delete_images[]" value="{{ $gallery->id }}" id="delete_{{ $gallery->id }}">
+                    <label class="form-check-label" for="delete_{{ $gallery->id }}">Xoá ảnh</label>
+                </div>
             </div>
             @endforeach
         </div>

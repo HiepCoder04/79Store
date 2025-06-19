@@ -156,7 +156,21 @@ class ProductController extends Controller
                     }
                 }
             }
+            //xóa ảnh đã chọn
+            if ($request->filled('delete_images')) {
+    foreach ($request->delete_images as $galleryId) {
+        $gallery = $product->galleries()->find($galleryId);
+        if ($gallery) {
+            // Optionally: xóa file vật lý luôn
+            $imagePath = public_path($gallery->image);
+            if (file_exists($imagePath)) {
+                unlink($imagePath);
+            }
 
+            $gallery->delete();
+        }
+    }
+}
             // Thêm ảnh mới nếu có
             if ($request->hasFile('images')) {
                 foreach ($request->file('images') as $image) {
