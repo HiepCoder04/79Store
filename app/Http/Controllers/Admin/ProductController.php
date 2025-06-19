@@ -115,7 +115,7 @@ class ProductController extends Controller
            'variants.*.pot' => 'nullable|max:50',
             'variants.*.price' => 'nullable|numeric|min:0',
             'variants.*.stock_quantity' => 'nullable|integer|min:0',
-            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
         ]);
 
         DB::beginTransaction();
