@@ -26,7 +26,7 @@
 
         <div class="mb-3">
             <label>Mô tả</label>
-            <input type="text" name="description" class="bg-gray-100 border border-gray-300 rounded px-4 py-2 w-full text-gray-700 focus:outline-none focus:border-blue-500">
+            <textarea  rows="5" style="width: 100%;" type="text" name="description" class="bg-gray-100 border border-gray-300 rounded px-4 py-2 w-full text-gray-700 focus:outline-none focus:border-blue-500"></textarea>
         </div>
         
         <div class="mb-3">

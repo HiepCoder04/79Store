@@ -16,7 +16,7 @@
     <table class="table table-bordered">
         <thead>
             <tr>
-                <th>Kích thước</th>
+                
                 <th>Chậu</th>
                 <th>Giá</th>
                 <th>Số lượng tồn kho</th>
