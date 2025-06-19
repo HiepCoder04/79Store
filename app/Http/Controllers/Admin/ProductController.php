@@ -190,10 +190,29 @@ class ProductController extends Controller
 
 
     public function destroy(Product $product)
-    {
+{
+    try {
+        // Xoá ảnh vật lý nếu cần
+        foreach ($product->galleries as $gallery) {
+            $imagePath = public_path($gallery->image);
+            if (file_exists($imagePath)) {
+                unlink($imagePath); // Xoá file
+            }
+            $gallery->delete(); // Xoá record DB
+        }
+
+        // Xoá các biến thể sản phẩm
+        $product->variants()->delete();
+
+        // Xoá chính sản phẩm
         $product->delete();
+
         return redirect()->route('admin.products.index')->with('success', 'Sản phẩm đã được xóa!');
+    } catch (\Throwable $e) {
+        \Log::error('Lỗi khi xoá sản phẩm: ' . $e->getMessage());
+        return back()->with('error', 'Lỗi khi xóa sản phẩm!');
     }
+}
 
     public function show(Product $product)
     {
