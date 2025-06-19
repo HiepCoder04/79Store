@@ -25,6 +25,11 @@
         </div>
 
         <div class="mb-3">
+            <label>Mô tả</label>
+            <input type="text" name="description" class="bg-gray-100 border border-gray-300 rounded px-4 py-2 w-full text-gray-700 focus:outline-none focus:border-blue-500">
+        </div>
+        
+        <div class="mb-3">
             <label>Danh mục</label>
             <select name="category_id" class="bg-gray-100 border border-gray-300 rounded px-4 py-2 w-full text-gray-700 focus:outline-none focus:border-blue-500">
                 <option value="">-- Chọn danh mục --</option>
@@ -38,9 +43,6 @@
         <div id="variants">
             <div class="variant mb-3 border rounded p-3 position-relative">
                 <button type="button" class="btn btn-danger btn-sm remove-variant position-absolute" style="right: 10px; top: 10px;">X</button>
-
-                <label>Kích thước</label>
-                <input type="text" name="variants[0][size]" class="bg-gray-100 border border-gray-300 rounded px-4 py-2 w-full text-gray-700 focus:outline-none focus:border-blue-500">
 
                 <label>Chậu</label>
                 <input type="text" name="variants[0][pot]" class="bg-gray-100 border border-gray-300 rounded px-4 py-2 w-full text-gray-700 focus:outline-none focus:border-blue-500">

@@ -25,7 +25,6 @@
         <tbody>
             @foreach($product->variants as $variant)
                 <tr>
-                    <td>{{ $variant->size }}</td>
                     <td>{{ $variant->pot ?? 'Không có' }}</td>
                     <td>{{ $variant->price }}</td>
                     <td>{{ $variant->stock_quantity }}</td>
