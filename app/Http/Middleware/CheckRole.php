@@ -9,18 +9,16 @@ use Illuminate\Support\Facades\Auth;
 
 class CheckRole
 {
-     public function handle($request, Closure $next, ...$roles)
+     public function handle(Request $request, Closure $next, ...$roles)
     {
         if (!Auth::check()) {
-            return redirect()->route('login');
+            return redirect()->route('login')->with('error', 'Bạn cần đăng nhập.');
         }
 
-        $user = Auth::user();
-
-        if (in_array($user->role, $roles)) {
-            return $next($request);
+        if (!in_array(Auth::user()->role, $roles)) {
+            return redirect()->route('home')->with('error', 'Bạn không có quyền truy cập.');
         }
 
-        abort(403, 'Không có quyền truy cập');
+        return $next($request);
     }
 }

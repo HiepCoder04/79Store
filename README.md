@@ -17,8 +17,8 @@ Trước khi bắt đầu, hãy đảm bảo máy tính của bạn đã cài đ
 1. **Clone repository**
 
    ```bash
-   git clone https://github.com/codegaeme/laravel_shop
-   cd laravel_shop
+   git clone https://github.com/HiepCoder04/79Store
+   cd 79Store
    ```
 
 2. **Cài đặt các gói phụ thuộc PHP**Chạy lệnh sau để cài đặt các thư viện PHP được yêu cầu:

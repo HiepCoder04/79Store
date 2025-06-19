@@ -8,24 +8,27 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Client\CartController;
 use App\Http\Controllers\Admin\BannerController;
-
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::resource('products', ProductController::class);
     Route::resource('banners', BannerController::class);
+});
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+
+    // Trang thống kê
     Route::get('/', function () {
         return view('admin.thongke.thongke');
-    })->name('home-admin');
-    //user
-    Route::group([
-        'prefix' => 'users',
-        'as' => 'users.'
-    ], function () {
+    })->name('thongke');
+
+    // CRUD sản phẩm
+    Route::resource('products', ProductController::class);
+
+    // CRUD danh mục (không có show)
+    Route::resource('categories', CategoryController::class)->except(['show']);
+
+    // Danh sách người dùng
+    Route::prefix('users')->name('users.')->group(function () {
         Route::get('/', [UserController::class, 'listUser'])->name('listUser');
     });
-
-    // CATEGORY CRUD ROUTES
-
-    Route::resource('categories', CategoryController::class)->except(['show']);
 });
 
 
@@ -43,18 +46,18 @@ Route::prefix('auth')->controller(AuthController::class)->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
     Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
-    // Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
-    // Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
+    Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
+    Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
 });
 
 
 
 
 
-Route::get('/', [ProductController::class, 'thongke'])->name('thongke');
-Route::get('/home', function () {
-    return view('client.home');
-});
+// Route::get('/', [ProductController::class, 'thongke'])->name('thongke');
+// Route::get('/home', function () {
+//     return view('client.home');
+// });
 
 // HOME ROUTE
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -64,9 +67,5 @@ Route::get('/about', function () {
     return view('client.users.about-detail');
 })->name('about');
 
-Route::get('/shop', function () {
-    return view('client.shop');
-})->name('shop');
-Route::get('/shopDetail', function () {
-    return view('client.shopDetail');
-})->name('shop-detail');
+Route::get('/shop', [App\Http\Controllers\Client\ProductVariant::class,'product'])->name('shop');
+Route::get('/shopDetail/{id}',[App\Http\Controllers\Client\ProductVariant::class,'productDetail'])->name('shop-detail');

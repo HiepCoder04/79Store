@@ -27,7 +27,7 @@ class AuthController extends Controller
         $user = Auth::user();
 
         if ($user->role === 'admin') {
-            return redirect()->route('thongke');
+            return redirect()->route('admin.thongke');
         } elseif ($user->role === 'staff') {
             return redirect()->intended('/staff/dashboard');
         } elseif ($user->role === 'customer' || $user->role === 'guest') {
@@ -81,6 +81,6 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('home')->with('success','Đăng xuất thành công');
+        return redirect()->route('login')->with('success','Đăng xuất thành công');
     }
 }
