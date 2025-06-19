@@ -16,7 +16,7 @@
     <table class="table table-bordered">
         <thead>
             <tr>
-                <th>Kích thước</th>
+                
                 <th>Chậu</th>
                 <th>Giá</th>
                 <th>Số lượng tồn kho</th>
@@ -24,12 +24,20 @@
         </thead>
         <tbody>
             @foreach($product->variants as $variant)
+<<<<<<< HEAD
             <tr>
                 <td>{{ $variant->size }}</td>
                 <td>{{ $variant->pot ?? 'Không có' }}</td>
                 <td>{{ $variant->price }}</td>
                 <td>{{ $variant->stock_quantity }}</td>
             </tr>
+=======
+                <tr>
+                    <td>{{ $variant->pot ?? 'Không có' }}</td>
+                    <td>{{ $variant->price }}</td>
+                    <td>{{ $variant->stock_quantity }}</td>
+                </tr>
+>>>>>>> na
             @endforeach
         </tbody>
     </table>
