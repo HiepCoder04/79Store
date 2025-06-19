@@ -10,12 +10,21 @@ use Illuminate\Support\Facades\DB;
 
 class ProductVariant extends Controller
 {
-    public function product()
-    {
-        $products = Product::with('category','galleries')->latest()->paginate(9);
+    public function product(Request $request)
+{
+    $selectedCategories = $request->input('category', []);
 
-        return view('client.shop', compact('products'));
-    }
+    $products = Product::with('category', 'galleries')
+        ->when(!empty($selectedCategories), function ($query) use ($selectedCategories) {
+            $query->whereIn('category_id', $selectedCategories);
+        })
+        ->latest()
+        ->paginate(9);
+
+    $categories = Category::all();
+
+    return view('client.shop', compact('products', 'categories', 'selectedCategories'));
+}
     public function productDetail($id)
     {
         $product = Product::with('category', 'galleries','variants')->findOrFail($id);

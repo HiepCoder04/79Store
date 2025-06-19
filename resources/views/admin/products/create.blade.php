@@ -37,20 +37,12 @@
                 <option value="{{ $category->id }}">{{ $category->name }}</option>
                 @endforeach
             </select>
-            <div class="mb-3 mt-3">
-            <label>Mô tảpu</label>
-            <input type="text" name="name" class="bg-gray-100 border border-gray-300 rounded px-4 py-2 w-full text-gray-700 focus:outline-none focus:border-blue-500">
-        </div>
         </div>
 
         <h4 class="mt-4">Biến thể sản phẩm</h4>
         <div id="variants">
             <div class="variant mb-3 border rounded p-3 position-relative">
                 <button type="button" class="btn btn-danger btn-sm remove-variant position-absolute" style="right: 10px; top: 10px;">X</button>
-<<<<<<< HEAD
-=======
-
->>>>>>> na
                 <label>Chậu</label>
                 <input type="text" name="variants[0][pot]" class="bg-gray-100 border border-gray-300 rounded px-4 py-2 w-full text-gray-700 focus:outline-none focus:border-blue-500">
 

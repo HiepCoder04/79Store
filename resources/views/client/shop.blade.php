@@ -78,50 +78,25 @@
 
                     <!-- Shop Widget -->
                     <div class="shop-widget catagory mb-50">
-                        <h4 class="widget-title">Categories</h4>
+                        <h4 class="widget-title">Danh Mục</h4>
                         <div class="widget-desc">
                             <!-- Single Checkbox -->
-                            <div class="custom-control custom-checkbox d-flex align-items-center mb-2">
-                                <input type="checkbox" class="custom-control-input" id="customCheck1" name="category[]"
-                                    value="all">
-                                <label class="custom-control-label" for="customCheck1">All plants <span
-                                        class="text-muted">(72)</span></label>
-                            </div>
-                            <!-- Single Checkbox -->
-                            <div class="custom-control custom-checkbox d-flex align-items-center mb-2">
-                                <input type="checkbox" class="custom-control-input" id="customCheck2" name="category[]"
-                                    value="outdoor">
-                                <label class="custom-control-label" for="customCheck2">Outdoor plants <span
-                                        class="text-muted">(20)</span></label>
-                            </div>
-                            <!-- Single Checkbox -->
-                            <div class="custom-control custom-checkbox d-flex align-items-center mb-2">
-                                <input type="checkbox" class="custom-control-input" id="customCheck3" name="category[]"
-                                    value="indoor">
-                                <label class="custom-control-label" for="customCheck3">Indoor plants <span
-                                        class="text-muted">(15)</span></label>
-                            </div>
-                            <!-- Single Checkbox -->
-                            <div class="custom-control custom-checkbox d-flex align-items-center mb-2">
-                                <input type="checkbox" class="custom-control-input" id="customCheck4" name="category[]"
-                                    value="office">
-                                <label class="custom-control-label" for="customCheck4">Office Plants <span
-                                        class="text-muted">(20)</span></label>
-                            </div>
-                            <!-- Single Checkbox -->
-                            <div class="custom-control custom-checkbox d-flex align-items-center mb-2">
-                                <input type="checkbox" class="custom-control-input" id="customCheck5" name="category[]"
-                                    value="potted">
-                                <label class="custom-control-label" for="customCheck5">Potted <span
-                                        class="text-muted">(15)</span></label>
-                            </div>
-                            <!-- Single Checkbox -->
-                            <div class="custom-control custom-checkbox d-flex align-items-center mb-2">
-                                <input type="checkbox" class="custom-control-input" id="customCheck6" name="category[]"
-                                    value="others">
-                                <label class="custom-control-label" for="customCheck6">Others <span
-                                        class="text-muted">(2)</span></label>
-                            </div>
+                            <form method="GET" action="{{ route('shop') }}">
+                                @foreach ($categories as $category)
+                                    <div class="custom-control custom-checkbox d-flex align-items-center mb-2">
+                                        <input type="checkbox"
+                                            class="custom-control-input"
+                                            id="category-{{ $category->id }}"
+                                            name="category[]"
+                                            value="{{ $category->id }}"
+                                            {{ in_array($category->id, $selectedCategories ?? []) ? 'checked' : '' }}>
+                                        <label class="custom-control-label" for="category-{{ $category->id }}">
+                                            {{ $category->name }}
+                                        </label>
+                                    </div>
+                                @endforeach
+                                <button type="submit" class="btn btn-sm alazea-btn mt-2">Lọc</button>
+                            </form>
                         </div>
                     </div>
 
@@ -181,7 +156,7 @@
                                                 $image = $product->galleries->first()->image ?? '/assets/img/bg-img/default.jpg';
                                             @endphp
 
-                                            <img src="{{ asset(ltrim($image, '/')) }}" alt="{{ $product->name }}">
+                                            <img src="{{ asset(ltrim($image, '/')) }}" alt="{{ $product->name }} " width="100%">
                                         </a>
 
                                         <div class="product-tag">
