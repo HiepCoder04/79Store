@@ -44,6 +44,11 @@
                                 <span class="nav-link-text">Quản Lí Người dùng</span>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" href="{{route('admin.banners.index')}}">
+                                <span class="nav-link-text">Quản Lí Banner</span>
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </li>

@@ -28,13 +28,13 @@ class ProductController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|max:255',
+            'description' => 'required|string|max:1500',
             'category_id' => 'required|exists:categories,id',
             'variants' => 'required|array|min:1',
-            'variants.*.size' => 'nullable|max:50',
             'variants.*.pot' => 'nullable|max:50',
             'variants.*.price' => 'nullable|numeric|min:0',
             'variants.*.stock_quantity' => 'nullable|integer|min:0',
-            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
         ]);
 
         DB::beginTransaction();
@@ -44,13 +44,13 @@ class ProductController extends Controller
                 'name' => $validated['name'],
                 'slug' => Str::slug($validated['name']),
                 'category_id' => $validated['category_id'],
+                'description' => $validated['description'],
                 'is_active' => true,
             ]);
 
             foreach ($validated['variants'] as $variant) {
                 $isValid =
-                    array_key_exists('size', $variant) &&
-                    filled($variant['size']) && // dùng Laravel helper để check KHÔNG RỖNG
+                 
                     is_numeric($variant['price'] ?? null) &&
                     is_numeric($variant['stock_quantity'] ?? null);
 
@@ -60,7 +60,7 @@ class ProductController extends Controller
                 if ($isValid) {
 
                     $product->variants()->create([
-                        'size' => $variant['size'] ?? '',
+                       
                         'pot' => $variant['pot'] ?? null,
                         'price' => $variant['price'],
                         'stock_quantity' => $variant['stock_quantity']
@@ -108,13 +108,14 @@ class ProductController extends Controller
     {
         $request->validate([
             'name' => 'required|max:255',
+            'description' => 'required|string|max:1500',
             'category_id' => 'required|exists:categories,id',
             'variants' => 'nullable|array',
-            'variants.*.size' => 'nullable|string|max:50',
-            'variants.*.pot' => 'nullable|string|max:50',
+            
+           'variants.*.pot' => 'nullable|max:50',
             'variants.*.price' => 'nullable|numeric|min:0',
             'variants.*.stock_quantity' => 'nullable|integer|min:0',
-            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
         ]);
 
         DB::beginTransaction();
@@ -122,6 +123,7 @@ class ProductController extends Controller
             $product->update([
                 'name' => $request->name,
                 'slug' => Str::slug($request->name),
+                'description' => $request->description,
                 'category_id' => $request->category_id,
             ]);
 
@@ -129,7 +131,7 @@ class ProductController extends Controller
             if ($request->filled('variants')) {
                 foreach ($request->variants as $variant) {
                     if (
-                        !empty($variant['size']) &&
+                        
                         isset($variant['price'], $variant['stock_quantity']) &&
                         is_numeric($variant['price']) &&
                         is_numeric($variant['stock_quantity'])
@@ -137,7 +139,7 @@ class ProductController extends Controller
                         if (!empty($variant['id'])) {
                             // Update variant
                             $product->variants()->where('id', $variant['id'])->update([
-                                'size' => $variant['size'],
+                               
                                 'pot' => $variant['pot'] ?? null,
                                 'price' => $variant['price'],
                                 'stock_quantity' => $variant['stock_quantity'],
@@ -145,7 +147,7 @@ class ProductController extends Controller
                         } else {
                             // Create new variant
                             $product->variants()->create([
-                                'size' => $variant['size'],
+                                
                                 'pot' => $variant['pot'] ?? null,
                                 'price' => $variant['price'],
                                 'stock_quantity' => $variant['stock_quantity'],
@@ -154,7 +156,21 @@ class ProductController extends Controller
                     }
                 }
             }
+            //xóa ảnh đã chọn
+            if ($request->filled('delete_images')) {
+    foreach ($request->delete_images as $galleryId) {
+        $gallery = $product->galleries()->find($galleryId);
+        if ($gallery) {
+            // Optionally: xóa file vật lý luôn
+            $imagePath = public_path($gallery->image);
+            if (file_exists($imagePath)) {
+                unlink($imagePath);
+            }
 
+            $gallery->delete();
+        }
+    }
+}
             // Thêm ảnh mới nếu có
             if ($request->hasFile('images')) {
                 foreach ($request->file('images') as $image) {
@@ -174,10 +190,29 @@ class ProductController extends Controller
 
 
     public function destroy(Product $product)
-    {
+{
+    try {
+        // Xoá ảnh vật lý nếu cần
+        foreach ($product->galleries as $gallery) {
+            $imagePath = public_path($gallery->image);
+            if (file_exists($imagePath)) {
+                unlink($imagePath); // Xoá file
+            }
+            $gallery->delete(); // Xoá record DB
+        }
+
+        // Xoá các biến thể sản phẩm
+        $product->variants()->delete();
+
+        // Xoá chính sản phẩm
         $product->delete();
+
         return redirect()->route('admin.products.index')->with('success', 'Sản phẩm đã được xóa!');
+    } catch (\Throwable $e) {
+        \Log::error('Lỗi khi xoá sản phẩm: ' . $e->getMessage());
+        return back()->with('error', 'Lỗi khi xóa sản phẩm!');
     }
+}
 
     public function show(Product $product)
     {
