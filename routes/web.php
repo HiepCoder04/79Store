@@ -8,22 +8,23 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Client\CartController;
 
 
-Route::prefix('admin')->name('admin.')->group(function () {
-    Route::resource('products', ProductController::class);
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+
+    // Trang thống kê
     Route::get('/', function () {
         return view('admin.thongke.thongke');
     })->name('thongke');
-    //user
-    Route::group([
-        'prefix' => 'users',
-        'as' => 'users.'
-    ], function () {
+
+    // CRUD sản phẩm
+    Route::resource('products', ProductController::class);
+
+    // CRUD danh mục (không có show)
+    Route::resource('categories', CategoryController::class)->except(['show']);
+
+    // Danh sách người dùng
+    Route::prefix('users')->name('users.')->group(function () {
         Route::get('/', [UserController::class, 'listUser'])->name('listUser');
     });
-
-    // CATEGORY CRUD ROUTES
-
-    Route::resource('categories', CategoryController::class)->except(['show']);
 });
 
 
