@@ -139,7 +139,7 @@
                     </div>
 
                     <div class="checkout-btn mt-3">
-                        <button class="btn alazea-btn w-100" disabled>CHƯA HỖ TRỢ THANH TOÁN</button>
+                        <button class="btn alazea-btn w-100" >Thanh Toán</button>
                     </div>
                 </div>
             </div>
