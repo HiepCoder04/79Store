@@ -26,6 +26,7 @@
 <!-- ##### Breadcrumb Area End ##### -->
 
 <!-- ##### Checkout Area Start ##### -->
+
 <div class="checkout_area mb-100">
     <div class="container">
         <form action="{{ route('checkout.store') }}" method="POST">
