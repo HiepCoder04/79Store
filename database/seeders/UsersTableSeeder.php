@@ -13,5 +13,12 @@ class UsersTableSeeder extends Seeder
     public function run(): void
     {
        User::factory()->count(10)->create();
+
+       User::create([
+        'name' => 'Admin',
+        'email' => 'admin@example.com',
+        'password' => Hash::make('admin123'), // Mật khẩu đã mã hoá
+        'role' => 'admin', // Nếu có cột role
+    ]);
     }
 }
