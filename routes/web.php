@@ -9,10 +9,14 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Client\CartController;
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\VoucherController;
+
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::resource('products', ProductController::class);
     Route::resource('banners', BannerController::class);
-   
+    //voucher admin
+   Route::resource('vouchers', \App\Http\Controllers\Admin\VoucherController::class);
+   //so ng da su dung voucher
+    Route::get('vouchers/{voucher}/users', [\App\Http\Controllers\Admin\VoucherController::class, 'users'])->name('vouchers.users');
 });
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
 
@@ -71,4 +75,5 @@ Route::get('/about', function () {
 
 Route::get('/shop', [App\Http\Controllers\Client\ProductVariant::class,'product'])->name('shop');
 Route::get('/shopDetail/{id}',[App\Http\Controllers\Client\ProductVariant::class,'productDetail'])->name('shop-detail');
+//route su dung voucher cua user
  Route::post('/apply-voucher', [VoucherController::class, 'apply'])->name('apply.voucher');

@@ -49,6 +49,11 @@
                                 <span class="nav-link-text">Quản Lí Banner</span>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" href="{{route('admin.vouchers.index')}}">
+                                <span class="nav-link-text">Quản Lí Voucher</span>
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </li>
