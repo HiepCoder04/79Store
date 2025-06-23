@@ -8,9 +8,11 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Client\CartController;
 use App\Http\Controllers\Admin\BannerController;
+use App\Http\Controllers\VoucherController;
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::resource('products', ProductController::class);
     Route::resource('banners', BannerController::class);
+   
 });
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
 
@@ -69,3 +71,4 @@ Route::get('/about', function () {
 
 Route::get('/shop', [App\Http\Controllers\Client\ProductVariant::class,'product'])->name('shop');
 Route::get('/shopDetail/{id}',[App\Http\Controllers\Client\ProductVariant::class,'productDetail'])->name('shop-detail');
+ Route::post('/apply-voucher', [VoucherController::class, 'apply'])->name('apply.voucher');
