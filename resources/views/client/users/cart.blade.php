@@ -126,7 +126,7 @@
 
                     <div class="subtotal d-flex justify-content-between">
                         <h5>Tạm tính</h5>
-                        <h5>{{ number_format($total, 0, ',', '.') }}đ</h5>
+                        <h5>{{ number_format($cartTotal, 0, ',', '.') }}đ</h5>
                     </div>
 
                     <div class="shipping d-flex justify-content-between">
@@ -136,7 +136,7 @@
 
                     <div class="total d-flex justify-content-between mt-3">
                         <h5>Tổng cộng</h5>
-                        <h5>{{ number_format($total, 0, ',', '.') }}đ</h5>
+                        <h5>{{ number_format($finalTotal, 0, ',', '.') }}đ</h5>
                     </div>
 
                     <div class="checkout-btn mt-3">
