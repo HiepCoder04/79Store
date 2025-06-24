@@ -58,6 +58,10 @@ Route::middleware('auth')->group(function () {
 
      Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
      Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show');
+
+     Route::put('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
+
+
 });
 
 
