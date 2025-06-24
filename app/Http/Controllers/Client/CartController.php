@@ -14,7 +14,7 @@ class CartController extends Controller
  public function index()
 {
     $user = Auth::user();
-
+    $voucher = null;
     $cart = Cart::with('items.productVariant.product')
         ->where('user_id', $user->id)
         ->first();
