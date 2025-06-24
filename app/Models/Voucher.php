@@ -13,6 +13,7 @@ class Voucher extends Model
         'code',
         'title',
         'description',
+        'event_type',
         'start_date',
         'end_date',
         'discount_percent',
