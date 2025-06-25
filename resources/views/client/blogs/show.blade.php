@@ -220,7 +220,7 @@
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="{{ route('home') }}"><i class="fa fa-home"></i> Trang chủ</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('client.blogs.index') }}">Blog</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('client.blogs.indexBlog') }}">Blog</a></li>
                         @if($blog->category)
                             <li class="breadcrumb-item"><a href="{{ route('client.blogs.category', ['slug' => $blog->category->slug]) }}">{{ $blog->category->name }}</a></li>
                         @endif
@@ -374,7 +374,7 @@
                             @if(isset($blog->category))
                                 <li><a href="{{ route('client.blogs.category', ['slug' => $blog->category->slug]) }}">{{ $blog->category->name }}</a></li>
                             @endif
-                            <li><a href="{{ route('client.blogs.index') }}">BLOG</a></li>
+                            <li><a href="{{ route('client.blogs.indexBlog') }}">BLOG</a></li>
                             <li><a href="#">TIN TỨC</a></li>
                         </ol>
                     </div>

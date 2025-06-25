@@ -11,7 +11,10 @@
             <label for="name">Tên sản phẩm</label>
             <input type="text" name="name" class="bg-gray-100 border border-gray-300 rounded px-4 py-2 w-full text-gray-700 focus:outline-none focus:border-blue-500" value="{{ $product->name }}" required>
         </div>
-
+        <div class="mb-3">
+            <label>Mô tả</label>
+            <textarea rows="5" style="width: 100%;"  type="text" name="description" class="bg-gray-100 border border-gray-300 rounded px-4 py-2 w-full text-gray-700 focus:outline-none focus:border-blue-500" required> {{ $product->description }}</textarea>
+        </div>
         <div class="mb-3">
             <label for="category_id">Danh mục</label>
             <select name="category_id" class="bg-gray-100 border border-gray-300 rounded px-4 py-2 w-full text-gray-700 focus:outline-none focus:border-blue-500" required>
@@ -28,8 +31,6 @@
             @foreach ($product->variants as $index => $variant)
             <div class="variant mb-3 border p-3 rounded">
                 <input type="hidden" name="variants[{{ $index }}][id]" value="{{ $variant->id }}">
-                <label>Kích thước</label>
-                <input type="text" name="variants[{{ $index }}][size]" class="bg-gray-100 border border-gray-300 rounded px-4 py-2 w-full text-gray-700 focus:outline-none focus:border-blue-500" value="{{ $variant->size }}">
                 
                 <label>Chậu</label>
                 <input type="text" name="variants[{{ $index }}][pot]" class="bg-gray-100 border border-gray-300 rounded px-4 py-2 w-full text-gray-700 focus:outline-none focus:border-blue-500" value="{{ $variant->pot }}">
@@ -51,6 +52,11 @@
             <div class="col-md-3">
                 <img src="{{ asset($gallery->image) }}" class="img-thumbnail mb-2" style="height: 120px;">
                 {{-- Có thể thêm nút xoá ảnh nếu cần --}}
+
+                <div class="form-check mt-1">
+                    <input class="form-check-input" type="checkbox" name="delete_images[]" value="{{ $gallery->id }}" id="delete_{{ $gallery->id }}">
+                    <label class="form-check-label" for="delete_{{ $gallery->id }}">Xoá ảnh</label>
+                </div>
             </div>
             @endforeach
         </div>
@@ -66,9 +72,7 @@
     document.getElementById('addVariant').onclick = function () {
         const variantHtml = `
             <div class="variant mb-3 border p-3 rounded">
-                <label>Kích thước</label>
-                <input type="text" name="variants[${variantIndex}][size]" class="bg-gray-100 border border-gray-300 rounded px-4 py-2 w-full text-gray-700 focus:outline-none focus:border-blue-500">
-
+                
                 <label>Chậu</label>
                 <input type="text" name="variants[${variantIndex}][pot]" class="bg-gray-100 border border-gray-300 rounded px-4 py-2 w-full text-gray-700 focus:outline-none focus:border-blue-500">
 

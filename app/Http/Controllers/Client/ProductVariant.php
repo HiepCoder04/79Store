@@ -3,13 +3,33 @@
 namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use App\Models\Product;
+use Illuminate\Support\Facades\DB;
 
 class ProductVariant extends Controller
 {
-    public function product()
+    public function product(Request $request)
+{
+    $selectedCategories = $request->input('category', []);
+
+    $products = Product::with('category', 'galleries')
+        ->when(!empty($selectedCategories), function ($query) use ($selectedCategories) {
+            $query->whereIn('category_id', $selectedCategories);
+        })
+        ->latest()
+        ->paginate(9);
+
+    $categories = Category::all();
+
+    return view('client.shop', compact('products', 'categories', 'selectedCategories'));
+}
+    public function productDetail($id)
     {
-        return $this->belongsTo(Product::class);
+        $product = Product::with('category', 'galleries','variants')->findOrFail($id);
+
+
+        return view('client.shopDetail', compact('product'));
     }
 }

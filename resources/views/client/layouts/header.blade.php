@@ -44,11 +44,11 @@
                                     </a>
                                     <ul class="user-dropdown-menu">
                                         <li>
-                                            <a href="{{ route('logout') }}"
+                                            <a href="{{ route('auth.logout') }}"
                                                 onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                                 Đăng Xuất
                                             </a>
-                                            <form id="logout-form" action="{{ route('logout') }}" method="POST"
+                                            <form id="logout-form" action="{{ route('auth.logout') }}" method="POST"
                                                 style="display: none;">
                                                 @csrf
                                             </form>
@@ -56,7 +56,7 @@
                                     </ul>
                                 </div>
                                 @else
-                                <a href="{{ route('login') }}">
+                                <a href="{{ route('auth.login') }}">
                                     <i class="fa fa-user" aria-hidden="true"></i>
                                     <span>Login</span>
                                 </a>
@@ -66,8 +66,8 @@
 
                             <!-- Cart -->
                             <div class="cart">
-                                <a href="{{route('cart.index')}}"><i class="fa fa-shopping-cart" aria-hidden="true"></i> <span>Cart <span
-                                            class="cart-quantity">(1)</span></span></a>
+                                <a href="{{route('cart.index')}}"><i class="fa fa-shopping-cart" aria-hidden="true"></i>
+                                    <span>Cart <span class="cart-quantity">(1)</span></span></a>
                             </div>
                         </div>
                     </div>
@@ -111,7 +111,7 @@
                                         <li><a href="shop.html">Shop</a>
                                             <ul class="dropdown">
                                                 <li><a href="{{ route('shop') }}">Shop</a></li>
-                                                <li><a href="{{ route('shop-detail') }}">Shop Details</a></li>
+
                                                 <li><a href="cart.html">Shopping Cart</a></li>
                                                 <li><a href="checkout.html">Checkout</a></li>
                                             </ul>

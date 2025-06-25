@@ -74,7 +74,7 @@
                                 </div>
                             </div>
                             <div class="card-body">
-                                <form method="POST" action="{{ route('loginPost') }}" class="text-start">
+                                <form method="POST" action="{{ route('auth.loginPost') }}" class="text-start">
                                     @csrf
 
                                     <div class="input-group input-group-outline my-3">
@@ -99,7 +99,7 @@
 
                                     <p class="mt-4 text-sm text-center">
                                         Bạn Đã Có Tài Khoản Chưa
-                                        <a href="{{ route('register') }}"
+                                        <a href="{{ route('auth.register') }}"
                                             class="text-primary text-gradient font-weight-bold">Đăng Ký</a>
                                     </p>
                                 </form>

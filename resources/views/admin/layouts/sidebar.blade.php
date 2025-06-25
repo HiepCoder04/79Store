@@ -29,21 +29,21 @@
                 <!-- Submenu -->
                 <div class="collapse" id="submenuQuanLi">
                     <ul class="nav flex-column ms-4">
-                        {{-- <li class="nav-item">
+                        <li class="nav-item">
                             <a class="nav-link text-dark" href="{{route('admin.products.index')}}">
                                 <span class="nav-link-text">Quản Lí Sản phẩm</span>
                             </a>
-                        </li> --}}
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" href="{{route('admin.categories.index')}}">
                                 <span class="nav-link-text">Quản lí Danh Mục</span>
                             </a>
                         </li>
-                        {{-- <li class="nav-item">
-                            <a class="nav-link text-dark" href="{{route('admin.users.listUser')}}">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" href="{{route('admin.users.list')}}">
                                 <span class="nav-link-text">Quản Lí Người dùng</span>
                             </a>
-                        </li> --}}
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" href="{{route('admin.category_blogs.index')}}">
                                 <span class="nav-link-text">Quản Lí Danh Mục Blog</span>
@@ -52,6 +52,11 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" href="{{route('admin.blogs.index')}}">
                                 <span class="nav-link-text">Quản Lí Blog</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" href="{{route('admin.banners.index')}}">
+                                <span class="nav-link-text">Quản Lí Banner</span>
                             </a>
                         </li>
                     </ul>
@@ -68,16 +73,27 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link text-dark" href="../pages/sign-in.html">
+                <a class="nav-link text-dark" href="{{route('auth.login')}}">
                     <i class="material-symbols-rounded opacity-5">login</i>
-                    <span class="nav-link-text ms-1">Sign In</span>
+                    <span class="nav-link-text ms-1">Đăng Nhập</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link text-dark" href="../pages/sign-up.html">
+                <a class="nav-link text-dark" href="{{route('auth.register')}}">
                     <i class="material-symbols-rounded opacity-5">assignment</i>
-                    <span class="nav-link-text ms-1">Sign Up</span>
+                    <span class="nav-link-text ms-1">Đăng Ký</span>
                 </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-dark" href="{{ route('auth.logout') }}"
+                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                    <i class="material-symbols-rounded opacity-5">logout</i>
+                    <span class="nav-link-text ms-1">Đăng Xuất</span>
+                </a>
+
+                <form id="logout-form" action="{{ route('auth.logout') }}" method="POST" style="display: none;">
+                    @csrf
+                </form>
             </li>
         </ul>
     </div>
