@@ -19,10 +19,16 @@ class CartController extends Controller
         ->where('user_id', $user->id)
         ->first();
 
+
     $items = $cart ? $cart->items : collect();
     $cartTotal = $items->sum(fn($item) => $item->productVariant->price * $item->quantity);
     $finalTotal = $cartTotal;
     $discount = 0;
+
+        $cart = Cart::with('items.productVariant.product.galleries')
+            ->where('user_id', $user->id)
+            ->first();
+
 
     $voucherId = session('applied_voucher');
 
