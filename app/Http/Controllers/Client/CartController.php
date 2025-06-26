@@ -15,7 +15,7 @@ class CartController extends Controller
     {
         $user = Auth::user();
 
-        $cart = Cart::with('items.productVariant.product')
+        $cart = Cart::with('items.productVariant.product.galleries')
             ->where('user_id', $user->id)
             ->first();
 

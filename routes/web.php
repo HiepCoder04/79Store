@@ -8,9 +8,12 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\BlogController;
 use App\Http\Controllers\Admin\BlogCategoryController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\Client\CartController;
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Client\CheckoutController;
+use App\Http\Controllers\Client\OrderController;
+
 use Illuminate\Support\Facades\Auth;
 /*
 |--------------------------------------------------------------------------
@@ -35,7 +38,6 @@ Route::prefix('blogs')->name('client.blogs.')->group(function () {
         ->where('slug', '.*');
     Route::get('/{slug}', [App\Http\Controllers\Client\BlogController::class, 'show'])->name('show');
 });
-
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::resource('products', ProductController::class);
     Route::resource('banners', BannerController::class);
@@ -111,10 +113,21 @@ Route::middleware('auth')->group(function () {
     Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
     Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
 
-    //Thanh Toán
+    //Thanh Toán và Đặt Hàng
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+    Route::get('/thank-you', [CheckoutController::class, 'thankYou'])->name('checkout.thankyou');
+
+    // Quản lý đơn hàng
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show');
+    Route::put('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
 });
+
+//Cổng thanh toán vnpay
+Route::post('/vnpay_payment', [PaymentController::class, 'vnpay_payment']);
+Route::get('/vnpay-callback', [PaymentController::class, 'vnpayCallback'])->name('vnpay.callback');
+
 
 
 

@@ -54,6 +54,9 @@
     <!-- Active js -->
     <script src="{{ asset('assets/js/active.js') }}"></script>
 
+    <!-- Custom page scripts -->
+    @yield('page_scripts')
+
 
 </body>
 
