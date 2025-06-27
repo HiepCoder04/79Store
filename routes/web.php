@@ -18,6 +18,14 @@ use App\Http\Controllers\VoucherController;
 use App\Http\Controllers\Client\CheckoutController;
 use App\Http\Controllers\Client\OrderController;
 
+Route::prefix('blogs')->name('client.blogs.')->group(function () {
+    Route::get('/', [App\Http\Controllers\Client\BlogController::class, 'index'])->name('index');
+    Route::get('/category/{slug?}', [App\Http\Controllers\Client\BlogController::class, 'category'])
+        ->name('category')
+        ->where('slug', '.*');
+    Route::get('/{slug}', [App\Http\Controllers\Client\BlogController::class, 'show'])->name('show');
+});
+
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::resource('products', ProductController::class);
     Route::resource('banners', BannerController::class);
