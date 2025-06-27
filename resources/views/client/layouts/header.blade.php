@@ -44,11 +44,11 @@
                                     </a>
                                     <ul class="user-dropdown-menu">
                                         <li>
-                                            <a href="{{ route('logout') }}"
+                                            <a href="{{ route('auth.logout') }}"
                                                 onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                                 Đăng Xuất
                                             </a>
-                                            <form id="logout-form" action="{{ route('logout') }}" method="POST"
+                                            <form id="logout-form" action="{{ route('auth.logout') }}" method="POST"
                                                 style="display: none;">
                                                 @csrf
                                             </form>
@@ -56,7 +56,7 @@
                                     </ul>
                                 </div>
                                 @else
-                                <a href="{{ route('login') }}">
+                                <a href="{{ route('auth.login') }}">
                                     <i class="fa fa-user" aria-hidden="true"></i>
                                     <span>Login</span>
                                 </a>
@@ -116,11 +116,7 @@
                                                 <li><a href="checkout.html">Checkout</a></li>
                                             </ul>
                                         </li>
-                                        <li><a href="blog.html">Blog</a>
-                                            <ul class="dropdown">
-                                                <li><a href="blog.html">Blog</a></li>
-                                                <li><a href="single-post.html">Blog Details</a></li>
-                                            </ul>
+                                        <li><a href="{{route('client.blogs.index')}}">Blog</a>
                                         </li>
                                         <li><a href="contact.html">Contact</a></li>
                                     </ul>

@@ -69,7 +69,7 @@
                                     </div>
                                 @endif
 
-                                <form method="POST" action="{{ route('registerPost') }}">
+                                <form method="POST" action="{{ route('auth.registerPost') }}">
                                     @csrf
                                     <div class="input-group input-group-outline mb-3">
                                         <label class="form-label" for="name">Họ Và Tên</label>
@@ -96,7 +96,7 @@
                             <div class="card-footer text-center pt-0 px-lg-2 px-1">
                                 <p class="mb-2 text-sm mx-auto">
                                     Already have an account?
-                                    <a href="{{ route('login') }}" class="text-primary text-gradient font-weight-bold">Đăng Nhập</a>
+                                    <a href="{{ route('auth.login') }}" class="text-primary text-gradient font-weight-bold">Đăng Nhập</a>
                                 </p>
                             </div>
                         </div>

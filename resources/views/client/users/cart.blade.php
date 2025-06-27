@@ -105,17 +105,18 @@
             <div class="col-12 col-lg-6">
                 <div class="coupon-discount mt-70">
                     <h5>Mã giảm giá</h5>
-                    <form action="" method="post">
+                    <form action="{{ route('apply.voucher') }}" method="post">
                         @csrf
-                        <input type="text" name="coupon-code" placeholder="Nhập mã giảm giá">
-                        <button type="submit">Áp dụng</button>
+                        <input type="text" name="voucher_code" placeholder="Nhập mã giảm giá">
+                        <button type="submit"  class="btn btn-primary">Áp dụng</button>
                     </form>
-                    @if(session('coupon_error'))
-                        <div class="text-danger mt-2">{{ session('coupon_error') }}</div>
-                    @endif
-                    @if(session('coupon_success'))
-                        <div class="text-success mt-2">{{ session('coupon_success') }}</div>
-                    @endif
+                   {{-- Hiển thị thông báo --}}
+@if(session('success'))
+    <div class="alert alert-success mt-2">{{ session('success') }}</div>
+@endif
+@if(session('error'))
+    <div class="alert alert-danger mt-2">{{ session('error') }}</div>
+@endif
                 </div>
             </div>
 
@@ -125,7 +126,7 @@
 
                     <div class="subtotal d-flex justify-content-between">
                         <h5>Tạm tính</h5>
-                        <h5>{{ number_format($total, 0, ',', '.') }}đ</h5>
+                        <h5>{{ number_format($cartTotal, 0, ',', '.') }}đ</h5>
                     </div>
 
                     <div class="shipping d-flex justify-content-between">
@@ -135,12 +136,13 @@
 
                     <div class="total d-flex justify-content-between mt-3">
                         <h5>Tổng cộng</h5>
-                        <h5>{{ number_format($total, 0, ',', '.') }}đ</h5>
+                        <h5>{{ number_format($finalTotal, 0, ',', '.') }}đ</h5>
                     </div>
 
                     <div class="checkout-btn mt-3">
                         <a href="{{ route('checkout.index') }}" class="btn alazea-btn w-100">Đến Trang Thanh Toán</a>
                     </div>
+                    
                 </div>
             </div>
         </div>

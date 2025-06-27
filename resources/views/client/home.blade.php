@@ -10,4 +10,5 @@
 @include('client.layouts.products')
 @include('client.layouts.blog')
 @include('client.layouts.subscribe')
+
 @endsection

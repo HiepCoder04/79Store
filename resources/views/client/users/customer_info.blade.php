@@ -30,24 +30,27 @@
                     <i class="fa fa-location-dot text-secondary"></i> {{ $default->address }}
                 </div>
                 <div class="text-end">
-                    <button type="button" class="btn btn-sm btn-outline-primary me-2" onclick="document.getElementById('change-address').classList.toggle('d-none')">Thay đổi</button>
+                    <button type="button" id="change-address-btn" class="btn btn-sm btn-outline-primary me-2">Thay đổi</button>
                     <button type="button" class="btn btn-sm btn-outline-success" onclick="document.getElementById('add-new-address').classList.toggle('d-none')">+ Thêm mới</button>
                 </div>
             </div>
         </div>
 
         <div id="change-address" class="d-none mb-3">
-            @foreach($addresses as $address)
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="radio" name="address_id" id="address_{{ $address->id }}" value="{{ $address->id }}" {{ $address->id == $default->id ? 'checked' : '' }}>
-                    <label class="form-check-label" for="address_{{ $address->id }}">
-                        <i class="fa fa-location-dot me-1 text-muted"></i>{{ $address->address }}
-                        @if($address->is_default)
-                            <span class="badge bg-success">Mặc định</span>
-                        @endif
-                    </label>
-                </div>
-            @endforeach
+            <div class="mb-3">
+                <div class="fw-bold mb-2">Chọn từ địa chỉ đã lưu:</div>
+                @foreach($addresses as $address)
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="radio" name="address_id" id="address_{{ $address->id }}" value="{{ $address->id }}" {{ $address->id == $default->id ? 'checked' : '' }}>
+                        <label class="form-check-label" for="address_{{ $address->id }}">
+                            <i class="fa fa-location-dot me-1 text-muted"></i>{{ $address->address }}
+                            @if($address->is_default)
+                                <span class="badge bg-success">Mặc định</span>
+                            @endif
+                        </label>
+                    </div>
+                @endforeach
+            </div>
         </div>
     @endif
 
@@ -60,6 +63,17 @@
             <input class="form-check-input" type="checkbox" name="set_default" id="set_default">
             <label class="form-check-label" for="set_default">Đặt làm mặc định</label>
         </div>
+        <div class="d-flex justify-content-between align-items-center">
+            <!-- Thêm nút để xác nhận thêm địa chỉ mới -->
+            <button type="button" id="confirm-new-address" class="btn btn-sm btn-outline-primary">Xác nhận địa chỉ mới</button>
+            <!-- Nút hủy -->
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="cancel-new-address">Hủy</button>
+        </div>
+    </div>
+    
+    <!-- Thêm thông báo khi thêm địa chỉ mới thành công -->
+    <div id="address-added-success" class="alert alert-success mt-2 d-none">
+        <span>Địa chỉ mới đã được thêm và sẽ được sử dụng cho đơn hàng này.</span>
     </div>
 
     <div class="mb-4">

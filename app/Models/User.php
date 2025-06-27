@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\UserAddress;
 
 class User extends Authenticatable
 {
@@ -54,13 +55,8 @@ class User extends Authenticatable
     {
         return $this->hasOne(UserAddress::class)->where('is_default', 1);
     }
-    /**
-     * Một user có thể có nhiều địa chỉ.
-     */
-    // public function addresses()
-    // {
-    //     return $this->hasMany(UserAddress::class, 'user_id', 'id');
-    // }
-
-
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
 }

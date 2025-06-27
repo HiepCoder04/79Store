@@ -1,74 +1,61 @@
+
 <section class="alazea-blog-area section-padding-100-0">
     <div class="container">
         <div class="row">
             <div class="col-12">
                 <!-- Section Heading -->
                 <div class="section-heading text-center">
-                    <h2>LATEST NEWS</h2>
-                    <p>The breaking news about Gardening &amp; House plants</p>
+                    <h2>TIN TỨC MỚI NHẤT</h2>
+                    <p>Các bài viết chia sẻ kiến thức mới nhất từ chúng tôi</p>
                 </div>
             </div>
         </div>
 
         <div class="row justify-content-center">
-
-            <!-- Single Blog Post Area -->
-            <div class="col-12 col-md-6 col-lg-4">
-                <div class="single-blog-post mb-100">
-                    <div class="post-thumbnail mb-30">
-                        <a href="#"><img src="{{ asset('assets/img/bg-img/6.jpg') }}" alt=""></a>
-                    </div>
-                    <div class="post-content">
-                        <a href="#" class="post-title">
-                            <h5>Garden designers across the country forecast ideas shaping the gardening world in 2018</h5>
-                        </a>
-                        <div class="post-meta">
-                            <a href="#"><i class="fa fa-clock-o" aria-hidden="true"></i> 20 Jun 2018</a>
-                            <a href="#"><i class="fa fa-user" aria-hidden="true"></i> Alan Jackson</a>
+            @if(isset($latest_blogs) && $latest_blogs->count() > 0)
+                @foreach($latest_blogs as $blog)
+                <!-- Single Blog Post Area -->
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="single-blog-post mb-100">
+                        <div class="post-thumbnail mb-30">
+                            <a href="{{ route('client.blogs.show', $blog->slug) }}">
+                                @if($blog->img)
+                                    <img src="{{ asset($blog->img) }}" alt="{{ $blog->title }}">
+                                @else
+                                    <img src="{{ asset('client/img/bg-img/6.jpg') }}" alt="{{ $blog->title }}">
+                                @endif
+                            </a>
                         </div>
-                        <p class="post-excerpt">Integer luctus diam ac scelerisque consectetur. Vivamus nec lacus sit amet. Aenean interdum mid vitae.</p>
+                        <div class="post-content">
+                            <a href="{{ route('client.blogs.show', $blog->slug) }}" class="post-title">
+                                <h5>{{ Str::limit($blog->title, 60) }}</h5>
+                            </a>
+                            <div class="post-meta">
+                                <a href="#"><i class="fa fa-clock-o" aria-hidden="true"></i> {{ $blog->created_at->format('d M Y') }}</a>
+                                @if($blog->category)
+                                    {{-- Đảm bảo luôn truyền tham số slug khi tạo URL --}}
+                                    <a href="{{ route('client.blogs.category', ['slug' => $blog->category->slug]) }}">
+                                        <i class="fa fa-folder" aria-hidden="true"></i> {{ $blog->category->name }}
+                                    </a>
+                                @endif
+                            </div>
+                            <p class="post-excerpt">{{ Str::limit(strip_tags($blog->content), 100) }}</p>
+                        </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Single Blog Post Area -->
-            <div class="col-12 col-md-6 col-lg-4">
-                <div class="single-blog-post mb-100">
-                    <div class="post-thumbnail mb-30">
-                        <a href="#"><img src="{{ asset('assets/img/bg-img/7.jpg') }}" alt=""></a>
-                    </div>
-                    <div class="post-content">
-                        <a href="#" class="post-title">
-                            <h5>2018 Midwest Tree and Shrub Conference: Resilient Plants for a Lasting Landscape</h5>
-                        </a>
-                        <div class="post-meta">
-                            <a href="#"><i class="fa fa-clock-o" aria-hidden="true"></i> 20 Jun 2018</a>
-                            <a href="#"><i class="fa fa-user" aria-hidden="true"></i> Christina Aguilera</a>
-                        </div>
-                        <p class="post-excerpt">Integer luctus diam ac scelerisque consectetur. Vivamus nec lacus sit amet. Aenean interdum mid vitae.</p>
-                    </div>
+                @endforeach
+            @else
+                <div class="col-12 text-center">
+                    <p>Chưa có bài viết nào được đăng.</p>
                 </div>
+            @endif
+        </div>
+        
+        <div class="row">
+            <div class="col-12 text-center mb-100">
+                <a href="{{ route('client.blogs.index') }}" class="btn alazea-btn">Xem tất cả bài viết</a>
             </div>
-
-            <!-- Single Blog Post Area -->
-            <div class="col-12 col-md-6 col-lg-4">
-                <div class="single-blog-post mb-100">
-                    <div class="post-thumbnail mb-30">
-                        <a href="#"><img src="{{ asset('assets/img/bg-img/8.jpg') }}" alt=""></a>
-                    </div>
-                    <div class="post-content">
-                        <a href="#" class="post-title">
-                            <h5>The summer coming up, it’s time for both us and the flowers to soak up the sunshine</h5>
-                        </a>
-                        <div class="post-meta">
-                            <a href="#"><i class="fa fa-clock-o" aria-hidden="true"></i> 19 Jun 2018</a>
-                            <a href="#"><i class="fa fa-user" aria-hidden="true"></i> Mason Jenkins</a>
-                        </div>
-                        <p class="post-excerpt">Integer luctus diam ac scelerisque consectetur. Vivamus nec lacus sit amet. Aenean interdum mid vitae.</p>
-                    </div>
-                </div>
-            </div>
-
         </div>
     </div>
 </section>
+<!-- ##### Blog Area End ##### -->
