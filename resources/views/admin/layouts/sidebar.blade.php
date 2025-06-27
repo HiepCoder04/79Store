@@ -40,8 +40,18 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" href="{{route('admin.users.listUser')}}">
+                            <a class="nav-link text-dark" href="{{route('admin.users.list')}}">
                                 <span class="nav-link-text">Quản Lí Người dùng</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" href="{{route('admin.category_blogs.index')}}">
+                                <span class="nav-link-text">Quản Lí Danh Mục Blog</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" href="{{route('admin.blogs.index')}}">
+                                <span class="nav-link-text">Quản Lí Blog</span>
                             </a>
                         </li>
                         <li class="nav-item">
@@ -68,25 +78,25 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link text-dark" href="{{route('login')}}">
+                <a class="nav-link text-dark" href="{{route('auth.login')}}">
                     <i class="material-symbols-rounded opacity-5">login</i>
                     <span class="nav-link-text ms-1">Đăng Nhập</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link text-dark" href="{{route('loginPost')}}">
+                <a class="nav-link text-dark" href="{{route('auth.register')}}">
                     <i class="material-symbols-rounded opacity-5">assignment</i>
-                    <span class="nav-link-text ms-1">Sign Up</span>
+                    <span class="nav-link-text ms-1">Đăng Ký</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link text-dark" href="{{ route('logout') }}"
+                <a class="nav-link text-dark" href="{{ route('auth.logout') }}"
                 onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                     <i class="material-symbols-rounded opacity-5">logout</i>
                     <span class="nav-link-text ms-1">Đăng Xuất</span>
                 </a>
 
-                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                <form id="logout-form" action="{{ route('auth.logout') }}" method="POST" style="display: none;">
                     @csrf
                 </form>
             </li>

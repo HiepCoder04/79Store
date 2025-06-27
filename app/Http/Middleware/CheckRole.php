@@ -12,7 +12,7 @@ class CheckRole
      public function handle(Request $request, Closure $next, ...$roles)
     {
         if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'Bạn cần đăng nhập.');
+            return redirect()->route('auth.login')->with('error', 'Bạn cần đăng nhập.');
         }
 
         if (!in_array(Auth::user()->role, $roles)) {

@@ -34,7 +34,7 @@ class AuthController extends Controller
             return redirect()->route('home')->with('success','Đăng nhập thành công');
         } else {
             Auth::logout(); // tránh truy cập lạ
-            return redirect()->route('login')->withErrors([
+            return redirect()->route('auth.login')->withErrors([
                 'role' => 'Vai trò không hợp lệ.',
             ]);
         }
@@ -81,6 +81,6 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('login')->with('success','Đăng xuất thành công');
+        return redirect()->route('auth.login')->with('success','Đăng xuất thành công');
     }
 }

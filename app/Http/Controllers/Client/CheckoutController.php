@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Models\Cart;
 use App\Models\Order;
 use App\Models\OrderDetail;
@@ -23,7 +24,8 @@ class CheckoutController extends Controller
         if (!$cart || $cart->items->isEmpty()) {
             return redirect()->route('cart.index')->with('error', 'Giỏ hàng của bạn đang trống.');
         }
-        $addresses = $user->addresses;
+        // Lấy địa chỉ từ bảng user_addresses
+        $addresses = UserAddress::where('user_id', $user->id)->get();
 
         // Thêm 'user' vào compact
         return view('client.users.Checkout', compact('cart', 'addresses', 'user'));
@@ -54,22 +56,57 @@ class CheckoutController extends Controller
         DB::beginTransaction();
 
         try {
-            // Nếu nhập địa chỉ mới
+            // Log để debug thông tin request
+            Log::info('Checkout data:', [
+                'new_address' => $request->new_address,
+                'address_id' => $request->address_id,
+                'set_default' => $request->has('set_default')
+            ]);
+            
+            // Kiểm tra xem có địa chỉ mới không
             if ($request->filled('new_address')) {
-                // Nếu đánh dấu là mặc định thì gỡ mặc định cũ
-                if ($request->has('set_default')) {
-                    $user->addresses()->update(['is_default' => 0]); // sẽ chạy được nếu khai báo quan hệ đúng
+                Log::info('Processing new address:', ['address' => $request->new_address]);
+                
+                // Kiểm tra xem địa chỉ này đã tồn tại chưa
+                $existingAddress = UserAddress::where('user_id', $user->id)
+                    ->where('address', $request->new_address)
+                    ->first();
+                
+                if ($existingAddress) {
+                    // Nếu địa chỉ đã tồn tại và yêu cầu đặt làm mặc định
+                    if ($request->has('set_default')) {
+                        // Reset tất cả địa chỉ khác
+                        UserAddress::where('user_id', $user->id)
+                            ->where('id', '!=', $existingAddress->id)
+                            ->update(['is_default' => 0]);
+                        
+                        // Đặt địa chỉ này làm mặc định
+                        $existingAddress->is_default = 1;
+                        $existingAddress->save();
+                    }
+                    
+                    $addressId = $existingAddress->id;
+                    Log::info('Using existing address record:', ['id' => $addressId]);
+                } else {
+                    // Nếu đánh dấu là mặc định thì gỡ mặc định cũ
+                    if ($request->has('set_default')) {
+                        // Cập nhật tất cả địa chỉ của user này là không mặc định
+                        UserAddress::where('user_id', $user->id)->update(['is_default' => 0]);
+                    }
+                    
+                    // Tạo địa chỉ mới
+                    $newAddress = UserAddress::create([
+                        'user_id' => $user->id,
+                        'address' => $request->new_address,
+                        'is_default' => $request->has('set_default') ? 1 : 0,
+                    ]);
+                    
+                    $addressId = $newAddress->id;
+                    Log::info('Created new address:', ['id' => $newAddress->id, 'address' => $newAddress->address]);
                 }
-
-                $newAddress = UserAddress::create([
-                    'user_id' => $user->id,
-                    'address' => $request->new_address,
-                    'is_default' => $request->has('set_default') ? 1 : 0,
-                ]);
-
-                $addressId = $newAddress->id;
             } elseif ($request->filled('address_id')) {
                 $addressId = $request->address_id;
+                Log::info('Using selected address:', ['id' => $addressId]);
             } else {
                 return back()->with('error', 'Vui lòng chọn hoặc nhập địa chỉ giao hàng.');
             }
@@ -79,6 +116,16 @@ class CheckoutController extends Controller
                 return $item->productVariant->price * $item->quantity;
             });
 
+            // Xác định trạng thái đơn hàng dựa trên phương thức thanh toán
+            $orderStatus = 'pending';
+            $paymentStatus = 'unpaid';
+            
+            // Nếu thanh toán VNPAY đã hoàn tất
+            if ($request->payment_method == 'vnpay' && isset($request->payment_status) && $request->payment_status == 'paid') {
+                $paymentStatus = 'paid';
+                $orderStatus = 'confirmed'; // Đơn hàng được xác nhận nếu đã thanh toán
+            }
+            
             // Tạo đơn hàng
             $order = Order::create([
                 'user_id' => $user->id,
@@ -87,11 +134,12 @@ class CheckoutController extends Controller
                 'phone' => $request->phone,       
                 'note' => $request->note,
                 'payment_method' => $request->payment_method,
+                'payment_status' => $paymentStatus,
                 'shipping_method' => $request->shipping_method ?? 'Giao hàng tiêu chuẩn',
                 'total_before_discount' => $totalBefore,
                 'discount_amount' => 0,
                 'total_after_discount' => $totalBefore,
-                'status' => 'pending',
+                'status' => $orderStatus,
                 'sale_channel' => 'website',
             ]);
 

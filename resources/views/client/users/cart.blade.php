@@ -142,6 +142,7 @@
                     <div class="checkout-btn mt-3">
                         <a href="{{ route('checkout.index') }}" class="btn alazea-btn w-100">Đến Trang Thanh Toán</a>
                     </div>
+                    
                 </div>
             </div>
         </div>
