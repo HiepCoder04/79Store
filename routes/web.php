@@ -11,36 +11,20 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\Client\CartController;
 use App\Http\Controllers\Admin\BannerController;
+
+use App\Http\Controllers\VoucherController;
+
+
 use App\Http\Controllers\Client\CheckoutController;
 use App\Http\Controllers\Client\OrderController;
 
-use Illuminate\Support\Facades\Auth;
-/*
-|--------------------------------------------------------------------------
-| Public Pages
-|--------------------------------------------------------------------------
-*/
-Auth::routes();
-
-Route::get('/', [ProductController::class, 'thongke'])->name('thongke');
-Route::get('/home', fn() => view('client.home'))->name('home');
-Route::get('/about', fn() => view('client.users.about-detail'))->name('about');
-Route::get('/shop', fn() => view('client.shop'))->name('shop');
-Route::get('/shop-detail', fn() => view('client.shopDetail'))->name('shop-detail');
-
-
-Route::get('/', [App\Http\Controllers\Client\HomeController::class, 'indexBlog'])->name('home');
-// Blog routes
-Route::prefix('blogs')->name('client.blogs.')->group(function () {
-    Route::get('/', [App\Http\Controllers\Client\BlogController::class, 'index'])->name('index');
-    Route::get('/category/{slug?}', [App\Http\Controllers\Client\BlogController::class, 'category'])
-        ->name('category')
-        ->where('slug', '.*');
-    Route::get('/{slug}', [App\Http\Controllers\Client\BlogController::class, 'show'])->name('show');
-});
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::resource('products', ProductController::class);
     Route::resource('banners', BannerController::class);
+    //voucher admin
+   Route::resource('vouchers', \App\Http\Controllers\Admin\VoucherController::class);
+   //so ng da su dung voucher
+    Route::get('vouchers/{voucher}/users', [\App\Http\Controllers\Admin\VoucherController::class, 'users'])->name('vouchers.users');
 });
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
 
@@ -148,3 +132,5 @@ Route::get('/about', function () {
 
 Route::get('/shop', [App\Http\Controllers\Client\ProductVariant::class,'product'])->name('shop');
 Route::get('/shopDetail/{id}',[App\Http\Controllers\Client\ProductVariant::class,'productDetail'])->name('shop-detail');
+//route su dung voucher cua user
+ Route::post('/apply-voucher', [VoucherController::class, 'apply'])->name('apply.voucher');

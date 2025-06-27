@@ -11,19 +11,47 @@ use App\Models\ProductVariant;
 
 class CartController extends Controller
 {
-    public function index()
-    {
-        $user = Auth::user();
+ public function index()
+{
+    $user = Auth::user();
+    $voucher = null;
+    $cart = Cart::with('items.productVariant.product')
+        ->where('user_id', $user->id)
+        ->first();
+
+
+    $items = $cart ? $cart->items : collect();
+    $cartTotal = $items->sum(fn($item) => $item->productVariant->price * $item->quantity);
+    $finalTotal = $cartTotal;
+    $discount = 0;
 
         $cart = Cart::with('items.productVariant.product.galleries')
             ->where('user_id', $user->id)
             ->first();
 
-        $items = $cart ? $cart->items : collect();
-        $total = $items->sum(fn($item) => $item->productVariant->price * $item->quantity);
 
-        return view('client.users.cart', compact('items', 'total'));
+    $voucherId = session('applied_voucher');
+
+    if ($voucherId) {
+        $voucher = \App\Models\Voucher::find($voucherId);
+
+        if ($voucher &&
+            $voucher->is_active &&
+            now()->between($voucher->start_date, $voucher->end_date) &&
+            $cartTotal >= $voucher->min_order_amount) {
+
+            // Tính giảm giá
+            $discount = $cartTotal * ($voucher->discount_percent / 100);
+            if ($voucher->max_discount && $discount > $voucher->max_discount) {
+                $discount = $voucher->max_discount;
+            }
+
+            $finalTotal = $cartTotal - $discount;
+        }
     }
+
+    return view('client.users.cart', compact('items', 'cartTotal', 'finalTotal', 'discount', 'voucher'));
+}
 
 
     public function add(Request $request)
