@@ -72,9 +72,7 @@
     document.getElementById('addVariant').onclick = function () {
         const variantHtml = `
             <div class="variant mb-3 border p-3 rounded">
-                <label>Kích thước</label>
-                <input type="text" name="variants[${variantIndex}][size]" class="bg-gray-100 border border-gray-300 rounded px-4 py-2 w-full text-gray-700 focus:outline-none focus:border-blue-500">
-
+                
                 <label>Chậu</label>
                 <input type="text" name="variants[${variantIndex}][pot]" class="bg-gray-100 border border-gray-300 rounded px-4 py-2 w-full text-gray-700 focus:outline-none focus:border-blue-500">
 

@@ -40,6 +40,20 @@ class User extends Authenticatable
         'date_of_birth' => 'date',
     ];
 
+    public function cart()
+    {
+        return $this->hasOne(Cart::class);
+    }
+
+    public function addresses()
+    {
+        return $this->hasMany(UserAddress::class);
+    }
+
+    public function defaultAddress()
+    {
+        return $this->hasOne(UserAddress::class)->where('is_default', 1);
+    }
     /**
      * Một user có thể có nhiều địa chỉ.
      */
