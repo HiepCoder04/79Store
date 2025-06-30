@@ -37,7 +37,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
 
     // Trang thống kê
-    Route::get('/', function () {
+    Route::get('/thongke', function () {
         return view('admin.thongke.thongke');
     })->name('thongke');
 
@@ -142,3 +142,5 @@ Route::get('/shop', [App\Http\Controllers\Client\ProductVariant::class,'product'
 Route::get('/shopDetail/{id}',[App\Http\Controllers\Client\ProductVariant::class,'productDetail'])->name('shop-detail');
 //route su dung voucher cua user
  Route::post('/apply-voucher', [VoucherController::class, 'apply'])->name('apply.voucher');
+
+ Route::post('/comment/store', [App\Http\Controllers\CommentController::class, 'store'])->name('comment.store');
