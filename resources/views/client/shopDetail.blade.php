@@ -43,7 +43,8 @@
                     $price = $product->variants->first()->price ?? 0;
                 @endphp
 
-                <h4 class="text-success mb-3">{{ number_format($price, 0, ',', '.') }}đ</h4>
+                <h4 id="price-display" class="text-success mb-3">{{ number_format($price, 0, ',', '.') }}đ</h4>
+
 
                 <p class="mb-4">{{ $product->description }}</p>
 
@@ -54,10 +55,13 @@
     <div class="form-group">
         <label for="pot">Chọn chậu:</label>
         <select name="pot" id="pot" class="form-control" required>
-            @foreach ($product->variants->unique('pot') as $variant)
-                <option value="{{ $variant->pot }}">{{ $variant->pot }}</option>
-            @endforeach
-        </select>
+    @foreach ($product->variants as $variant)
+        <option value="{{ $variant->pot }}"
+            data-price="{{ $variant->price }}">
+            {{ $variant->pot }}
+        </option>
+    @endforeach
+</select>
     </div>
 
     <div class="d-flex align-items-center mt-3 mb-3">
@@ -255,4 +259,22 @@
             </div>
         </div>
 </section>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const selectElement = document.getElementById('pot');
+        const priceDisplay = document.getElementById('price-display');
+
+        function updatePrice() {
+            const selected = selectElement.options[selectElement.selectedIndex];
+            const price = selected.getAttribute('data-price');
+            priceDisplay.textContent = Number(price).toLocaleString('vi-VN') + 'đ';
+        }
+
+        // Lắng nghe khi user thay đổi select
+        selectElement.addEventListener('change', updatePrice);
+
+        // Gọi lần đầu nếu cần
+        updatePrice();
+    });
+</script>
 @endsection
