@@ -11,10 +11,12 @@ use App\Models\ProductVariant;
 
 class CartController extends Controller
 {
- public function index()
+public function index()
 {
     $user = Auth::user();
     $voucher = null;
+    $errorMessage = null;
+
     $cart = Cart::with('items.productVariant.product')
         ->where('user_id', $user->id)
         ->first();
@@ -29,23 +31,33 @@ class CartController extends Controller
     if ($voucherId) {
         $voucher = \App\Models\Voucher::find($voucherId);
 
-        if ($voucher &&
+        if (
+            $voucher &&
             $voucher->is_active &&
-            now()->between($voucher->start_date, $voucher->end_date) &&
-            $cartTotal >= $voucher->min_order_amount) {
+            now()->between($voucher->start_date, $voucher->end_date)
+        ) {
+            if ($cartTotal >= $voucher->min_order_amount) {
+                // ✅ Áp dụng giảm giá nếu đủ điều kiện
+                $discount = $cartTotal * ($voucher->discount_percent / 100);
+                if ($voucher->max_discount && $discount > $voucher->max_discount) {
+                    $discount = $voucher->max_discount;
+                }
 
-            // Tính giảm giá
-            $discount = $cartTotal * ($voucher->discount_percent / 100);
-            if ($voucher->max_discount && $discount > $voucher->max_discount) {
-                $discount = $voucher->max_discount;
+                $finalTotal = $cartTotal - $discount;
+            } else {
+                //Không đủ điều kiện ⇒ bỏ mã + báo lỗi
+                $errorMessage = 'Đơn hàng chưa đạt ' . number_format($voucher->min_order_amount, 0, ',', '.') . 'đ để áp dụng mã ' . $voucher->code;
+                session()->forget('applied_voucher');
+                $voucher = null;
             }
-
-            $finalTotal = $cartTotal - $discount;
         }
     }
 
-    return view('client.users.cart', compact('items', 'cartTotal', 'finalTotal', 'discount', 'voucher'));
+    return view('client.users.cart', compact(
+        'items', 'cartTotal', 'finalTotal', 'discount', 'voucher', 'errorMessage'
+    ));
 }
+
 
 
     public function add(Request $request)
