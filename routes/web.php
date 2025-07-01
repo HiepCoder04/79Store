@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\VoucherController as AdminVoucherController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\AdminStatisticsController;
 
 // -------------------- BLOG (CLIENT) --------------------
 Route::prefix('blogs')->name('client.blogs.')->group(function () {
@@ -34,7 +35,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     // Trang thống kê
 
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('thongke');
+    Route::get('/dashboard', [AdminStatisticsController::class, 'index'])->name('thongke');
 
     // Quản lý sản phẩm
     Route::resource('products', ProductController::class);
