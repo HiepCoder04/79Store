@@ -11,13 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('product_variants', function (Blueprint $table) {
+        Schema::create('order_products', function (Blueprint $table) {
             $table->id();
+
+            $table->foreignId('order_id')->constrained('orders')->onDelete('cascade');
             $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
 
-            $table->string('pot')->nullable();
-            $table->decimal('price', 10, 2);
-            $table->integer('stock_quantity');
+            $table->integer('qty')->default(1);
+            $table->decimal('price', 12, 2);
+            $table->string('product_name'); // lưu tên sản phẩm tại thời điểm mua
+            $table->json('variants')->nullable(); // lưu biến thể nếu là sản phẩm biến thể
+
             $table->timestamps();
         });
     }
@@ -27,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('product_variants');
+        Schema::dropIfExists('order_products');
     }
 };

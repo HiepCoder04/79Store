@@ -11,13 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('product_variants', function (Blueprint $table) {
+        Schema::create('order_returns', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
 
-            $table->string('pot')->nullable();
-            $table->decimal('price', 10, 2);
-            $table->integer('stock_quantity');
+            $table->foreignId('order_id')->constrained('orders')->onDelete('cascade');
+
+            $table->string('return_status')->default('pending'); // pending, approved, completed, rejected, canceled
+            $table->text('reason')->nullable(); // lý do hoàn trả (có thể không bắt buộc)
+
             $table->timestamps();
         });
     }
@@ -27,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('product_variants');
+        Schema::dropIfExists('order_returns');
     }
 };
