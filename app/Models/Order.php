@@ -4,11 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Order extends Model
 {
-    use HasFactory;
-     protected $table = 'orders';
+    use HasFactory, SoftDeletes;
+
+    protected $table = 'orders';
 
     protected $fillable = [
         'user_id',
@@ -47,5 +49,21 @@ class Order extends Model
     public function orderDetails()
     {
         return $this->hasMany(OrderDetail::class);
+    }
+
+    /**
+     * Mối quan hệ: Order có 1 đơn hoàn hàng
+     */
+    public function returnOrder()
+    {
+        return $this->hasOne(OrderReturn::class);
+    }
+
+    /**
+     * Mối quan hệ: Order có 1 giao dịch
+     */
+    public function transaction()
+    {
+        return $this->hasOne(Transaction::class);
     }
 }
