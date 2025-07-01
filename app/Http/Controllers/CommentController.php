@@ -10,9 +10,10 @@ class CommentController extends Controller
 {
     public function store(Request $re)
     {
+        
         $re->validate([
             'product_id' => 'required|exists:products,id',
-            'content' => 'required|string|max:3000',
+            'comment' => 'required|string|max:3000',
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
         ]);
