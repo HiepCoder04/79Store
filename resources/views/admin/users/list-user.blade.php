@@ -57,7 +57,46 @@ QUẢN LÍ TÀI KHOẢN
                     <td class="text-center">
 
                         @if($user->role != 'admin')
-                        <a href=""></a>
+                        <!-- Button trigger modal -->
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                            data-bs-target="#exampleModal">
+                            Phân quyền
+                        </button>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+                            aria-hidden="true">
+                            <div class="modal-dialog">
+                                <form action="{{ route('update-role') }}" method="POST"> {{-- Form BẮT ĐẦU từ đây --}}
+                                    @csrf
+                                    @method('PUT')
+                                    <input type="hidden" value="{{ $user->id }}" name="id_user">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h1 class="modal-title fs-5" id="exampleModalLabel">Chọn quyền cho user này
+                                            </h1>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <input type="hidden" name="user_id" value="{{ $user->id }}">
+                                            {{-- Gửi user_id --}}
+                                            <select name="role" class="form-control">
+                                                <option value="1">Staff</option>
+                                                <option value="2">Customer</option>
+                                            </select>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary"
+                                                data-bs-dismiss="modal">Close</button>
+                                            <button type="submit" class="btn btn-primary">Lưu quyền</button>
+                                            {{-- Submit form --}}
+                                        </div>
+                                    </div>
+                                </form> {{-- Form KẾT THÚC tại đây --}}
+                            </div>
+                        </div>
+
                         @if($user->is_ban == false)
                         <form action="{{ route('ban-user') }}" method="post">
                             @csrf

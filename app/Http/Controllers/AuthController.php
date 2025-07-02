@@ -29,7 +29,7 @@ if ($user->is_ban==false) {
     if ($user->role === 'admin') {
         return redirect()->route('admin.thongke');
     } elseif ($user->role === 'staff') {
-        return redirect()->intended('/staff/dashboard');
+        return redirect()->route('admin.thongke');
     } elseif ($user->role === 'customer' || $user->role === 'guest') {
         return redirect()->route('home')->with('success','Đăng nhập thành công');
     } else {

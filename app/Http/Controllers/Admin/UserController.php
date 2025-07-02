@@ -34,6 +34,23 @@ public function unbanUser(Request $request)
 
     return back()->with('success', 'Tài khoản đã được mở cấm');
 }
+public function UpdateRole(Request $request){
+    $role = $request->role;
+    $user_id = $request->id_user;
+
+    $user = User::findOrFail($user_id);
+    if ($role== 1) {
+        $user->role = 'staff';
+        $user->save();
+        return back()->with('success','User đã lên nhân viên');
+    }elseif($role== 2){
+        $user->role = 'customer';
+        $user->save();
+        return back()->with('success','User đã là khách hàng');
+    }
+   
+}
+
 
 
 }

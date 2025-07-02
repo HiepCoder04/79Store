@@ -11,6 +11,9 @@ class CheckRole
 {
      public function handle(Request $request, Closure $next, ...$roles)
     {
+        $roles = [
+            'admin','staff'
+        ];
         if (!Auth::check()) {
             return redirect()->route('auth.login')->with('error', 'Bạn cần đăng nhập.');
         }
