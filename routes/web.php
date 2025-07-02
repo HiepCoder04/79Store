@@ -116,3 +116,8 @@ Route::get('/shopDetail/{id}', [ProductVariant::class, 'productDetail'])->name('
  Route::post('/comment/store', [App\Http\Controllers\CommentController::class, 'store'])->name('comment.store');
 // -------------------- SỬ DỤNG VOUCHER (USER) --------------------
 Route::post('/apply-voucher', [VoucherController::class, 'apply'])->name('apply.voucher');
+
+//phân quyền
+Route::put('/ban-user', [UserController::class, 'banUser'])->name('ban-user');
+Route::put('/unban-user', [UserController::class, 'unBanUser'])->name('unban-user');
+Route::put('/update-role', [UserController::class, 'UpdateRole'])->name('update-role');
