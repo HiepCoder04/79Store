@@ -81,10 +81,15 @@ QUẢN LÍ TÀI KHOẢN
                                         <div class="modal-body">
                                             <input type="hidden" name="user_id" value="{{ $user->id }}">
                                             {{-- Gửi user_id --}}
+                                            Chọn quyền
                                             <select name="role" class="form-control">
-                                                <option value="1">Staff</option>
-                                                <option value="2">Customer</option>
+                                                <option value="1" {{ $user->role == 'staff' ? 'selected' : '' }}>Staff
+                                                </option>
+                                                <option value="2" {{ $user->role == 'customer' ? 'selected' : '' }}>
+                                                    Customer
+                                                </option>
                                             </select>
+
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary"
