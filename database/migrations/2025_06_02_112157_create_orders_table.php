@@ -22,7 +22,7 @@ return new class extends Migration
             $table->decimal('total_before_discount', 10, 2);
             $table->decimal('discount_amount', 10, 2)->default(0);
             $table->decimal('total_after_discount', 10, 2);
-            $table->enum('status', ['pending', 'confirm ed', 'shipping', 'delivered', 'cancelled', 'returned'])->default('pending');
+            $table->enum('status', ['pending', 'confirmed', 'shipping', 'delivered', 'cancelled', 'returned'])->default('pending');
             $table->string('sale_channel')->default('website');
             $table->timestamps();
         });
