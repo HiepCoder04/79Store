@@ -14,7 +14,9 @@ return new class extends Migration
         Schema::create('user_addresses', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users');
+            $table->string('name')->nullable();
             $table->string('address');
+            $table->string('phone')->nullable();
             $table->boolean('is_default')->default(false);
             $table->timestamps();
         });

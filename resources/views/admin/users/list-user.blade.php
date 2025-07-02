@@ -1,13 +1,13 @@
 @extends('admin.layouts.dashboard')
 
 @section('title')
-@parent 
+@parent
 QUẢN LÍ TÀI KHOẢN
 @endsection
 
 @push('style')
 @endpush
-    
+
 @section('content')
 <div class="row">
     <div class="ms-3">
@@ -26,6 +26,7 @@ QUẢN LÍ TÀI KHOẢN
                     <th style="width: 90px;">Quyền</th>
                     <th style="width: 110px;">Ngày sinh</th>
                     <th style="width: 110px;">Xác minh</th>
+                    <th style="width: 110px;">Trạng thái</th>
                     <th style="width: 120px;">Thao tác</th>
                 </tr>
             </thead>
@@ -37,21 +38,45 @@ QUẢN LÍ TÀI KHOẢN
                     <td>{{ $user->email }}</td>
                     <td class="text-center">{{ $user->phone }}</td>
                     <td class="text-center">{{ ucfirst($user->role) }}</td>
-                    <td class="text-center">{{ $user->date_of_birth ? $user->date_of_birth->format('d/m/Y') : '---' }}</td>
+                    <td class="text-center">{{ $user->date_of_birth ? $user->date_of_birth->format('d/m/Y') : '---' }}
+                    </td>
                     <td class="text-center">
                         @if($user->email_verified_at)
-                            <span class="badge bg-success">✔</span>
+                        <span class="badge bg-success">✔</span>
                         @else
-                            <span class="badge bg-danger">✘</span>
+                        <span class="badge bg-danger">✘</span>
+                        @endif
+                    </td>
+                    <td>
+                        @if($user-> is_ban == true)
+                        <p> Đã bị cấm</p>
+                        @else
+                        Hoạt động
                         @endif
                     </td>
                     <td class="text-center">
-                     
-                        <form action="" method="POST" style="display:inline;">
+
+                        @if($user->role != 'admin')
+                        <a href=""></a>
+                        @if($user->is_ban == false)
+                        <form action="{{ route('ban-user') }}" method="post">
                             @csrf
-                            @method('DELETE')
-                            <button class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc muốn xóa?')">Xóa</button>
+                            @method('PUT')
+                            <input type="hidden" value="{{ $user->id }}" name="id_user">
+                            <button class="btn btn-sm btn-secondary">Cấm</button>
                         </form>
+                        @elseif($user->is_ban == true)
+                        <form action="{{ route('unban-user') }}" method="post">
+                            @csrf
+                            @method('PUT')
+                            <input type="hidden" value="{{ $user->id }}" name="id_user">
+                            <button class="btn btn-sm btn-secondary">Mở cấm</button>
+                        </form>
+                        @endif
+
+
+                        @endif
+
                     </td>
                 </tr>
                 @empty
@@ -72,5 +97,5 @@ QUẢN LÍ TÀI KHOẢN
 
 
 @push('script')
-    
+
 @endpush

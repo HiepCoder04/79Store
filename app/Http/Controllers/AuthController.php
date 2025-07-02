@@ -25,19 +25,23 @@ class AuthController extends Controller
 
     if (Auth::attempt($credentials)) {
         $user = Auth::user();
-
-        if ($user->role === 'admin') {
-            return redirect()->route('admin.thongke');
-        } elseif ($user->role === 'staff') {
-            return redirect()->intended('/staff/dashboard');
-        } elseif ($user->role === 'customer' || $user->role === 'guest') {
-            return redirect()->route('home')->with('success','Đăng nhập thành công');
-        } else {
-            Auth::logout(); // tránh truy cập lạ
-            return redirect()->route('auth.login')->withErrors([
-                'role' => 'Vai trò không hợp lệ.',
-            ]);
-        }
+if ($user->is_ban==false) {
+    if ($user->role === 'admin') {
+        return redirect()->route('admin.thongke');
+    } elseif ($user->role === 'staff') {
+        return redirect()->intended('/staff/dashboard');
+    } elseif ($user->role === 'customer' || $user->role === 'guest') {
+        return redirect()->route('home')->with('success','Đăng nhập thành công');
+    } else {
+        Auth::logout(); // tránh truy cập lạ
+        return redirect()->route('auth.login')->withErrors([
+            'role' => 'Vai trò không hợp lệ.',
+        ]);
+    }
+}else {
+    return redirect()->route('auth.login')->with('error','Tài khoản của bạn đã bị cấm vui lòng liên hệ admin để mở khóa');
+}
+        
     }
 
     return back()->withErrors([
