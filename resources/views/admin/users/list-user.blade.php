@@ -54,11 +54,11 @@ QUẢN LÍ TÀI KHOẢN
                         Hoạt động
                         @endif
                     </td>
-                    <td class="text-center">
+                    <td class="text-center row">
 
                         @if($user->role != 'admin')
                         <!-- Button trigger modal -->
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                        <button type="button" class="btn btn-primary  col-sm-6" data-bs-toggle="modal"
                             data-bs-target="#exampleModal">
                             Phân quyền
                         </button>
@@ -107,14 +107,14 @@ QUẢN LÍ TÀI KHOẢN
                             @csrf
                             @method('PUT')
                             <input type="hidden" value="{{ $user->id }}" name="id_user">
-                            <button class="btn btn-sm btn-secondary">Cấm</button>
+                            <button class="btn btn-sm btn-secondary  col-sm-6">Cấm</button>
                         </form>
                         @elseif($user->is_ban == true)
                         <form action="{{ route('unban-user') }}" method="post">
                             @csrf
                             @method('PUT')
                             <input type="hidden" value="{{ $user->id }}" name="id_user">
-                            <button class="btn btn-sm btn-secondary">Mở cấm</button>
+                            <button class="btn btn-sm btn-secondary  col-sm-6">Mở cấm</button>
                         </form>
                         @endif
 
