@@ -15,6 +15,9 @@
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}"><i class="fa fa-home"></i> Home</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('home') }}"><i class="fa fa-home"></i> Home</a>
+                            </li>
+
                             <li class="breadcrumb-item"><a href="{{ route('shop') }}">Shop</a></li>
                             <li class="breadcrumb-item active" aria-current="page">{{ $product->name }}</li>
                         </ol>
@@ -51,6 +54,20 @@
                     @endphp
 
                     <h4 class="text-success mb-3">{{ number_format($price, 0, ',', '.') }}đ</h4>
+                    @endphp
+                    <img class="d-block w-100" src="{{ asset(ltrim($image, '/')) }}" alt="{{ $product->name }}">
+                </div>
+
+                <!-- Product Info -->
+                <div class="col-12 col-md-6">
+                    <h4 class="product-title mb-2 text-uppercase">{{ $product->name }}</h4>
+
+                    @php
+                        $price = $product->variants->first()->price ?? 0;
+                    @endphp
+
+                    <h4 id="price-display" class="text-success mb-3">{{ number_format($price, 0, ',', '.') }}đ</h4>
+
 
                     <p class="mb-4">{{ $product->description }}</p>
 
@@ -63,7 +80,12 @@
                             <select name="pot" id="pot" class="form-control" required>
                                 @foreach ($product->variants->unique('pot') as $variant)
                                     <option value="{{ $variant->pot }}">{{ $variant->pot }}</option>
-                                @endforeach
+                                    =======
+                                    @foreach ($product->variants as $variant)
+                                        <option value="{{ $variant->pot }}" data-price="{{ $variant->price }}">
+                                            {{ $variant->pot }}
+                                        </option>
+                                    @endforeach
                             </select>
                         </div>
 
@@ -71,6 +93,8 @@
                             <div class="quantity">
                                 <span class="qty-minus" onclick="document.getElementById('quantity').stepDown();"><i
                                         class="fa fa-minus"></i></span>
+                                <input type="number" id="quantity" name="quantity" value="1" min="1"
+                                    class="qty-text mx-2" style="width: 60px;">
                                 <input type="number" id="quantity" name="quantity" value="1" min="1"
                                     class="qty-text mx-2" style="width: 60px;">
                                 <span class="qty-plus" onclick="document.getElementById('quantity').stepUp();"><i
@@ -113,6 +137,13 @@
                                         <ul>
                                             @foreach ($comments as $value)
                                                 <li><strong>{{ $value->name }}</strong> : {{ $value->content }}</li>
+                                                <li><strong>{{ $value->name }}</strong> : {{ $value->content }}<br>
+                                                    <small class="text-muted">
+                                                        {{ $value->created_at->format('H:i d/m/Y') }}
+                                                    </small>
+                                                    <hr>
+                                                </li>
+
                                             @endforeach
                                         </ul>
                                     </div>
@@ -125,8 +156,9 @@
                                             <div class="col-12 col-md-6">
                                                 <div class="form-group">
                                                     <label for="name">Nickname</label>
-                                                    <input type="name" class="form-control" id="name" name="name"
-                                                        placeholder="Nazrul" value="{{ auth()->user()->name ?? '' }}">
+                                                    <input type="name" class="form-control" id="name"
+                                                        name="name" placeholder="Nazrul"
+                                                        value="{{ auth()->user()->name ?? '' }}">
                                                 </div>
                                             </div>
                                             <div class="col-12 col-md-6">
@@ -135,12 +167,15 @@
                                                     <input type="email" class="form-control" id="name"
                                                         name="email" placeholder="Nazrul"
                                                         value="{{ auth()->user()->email ?? '' }}">
+                                                    <input type="email" class="form-control" id="name"
+                                                        name="email" placeholder="Nazrul"
+                                                        value="{{ auth()->user()->email ?? '' }}">
                                                 </div>
                                             </div>
                                             <div class="col-12">
                                                 <div class="form-group">
                                                     <label for="comments">Comments</label>
-                                                    <textarea class="form-control" id="comments" name ="comment" rows="5" data-max-length="150"></textarea>
+                                                    <textarea class="form-control" id="comments" name="comment" rows="5" data-max-length="150"></textarea>
                                                 </div>
                                             </div>
                                             <div class="col-12">
@@ -284,4 +319,23 @@
             </div>
         </div>
     </section>
+@endsection
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const selectElement = document.getElementById('pot');
+        const priceDisplay = document.getElementById('price-display');
+
+        function updatePrice() {
+            const selected = selectElement.options[selectElement.selectedIndex];
+            const price = selected.getAttribute('data-price');
+            priceDisplay.textContent = Number(price).toLocaleString('vi-VN') + 'đ';
+        }
+
+        // Lắng nghe khi user thay đổi select
+        selectElement.addEventListener('change', updatePrice);
+
+        // Gọi lần đầu nếu cần
+        updatePrice();
+    });
+</script>
 @endsection

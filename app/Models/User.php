@@ -19,7 +19,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $table = 'users';
-
+  
     protected $fillable = [
         'name',
         'email',
@@ -39,6 +39,7 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'date_of_birth' => 'date',
+        'is_ban' => 'boolean',
     ];
 
     public function cart()
