@@ -12,14 +12,11 @@ class Transaction extends Model
     protected $table = 'transactions';
 
     protected $fillable = [
-        'order_id',
+        'order_id',         // vẫn giữ lại ID để tra cứu hoặc lưu log nếu cần
         'amount',
         'payment_method',
         'status',
     ];
 
-    public function order()
-    {
-        return $this->belongsTo(Order::class);
-    }
+    // Đã xoá mối quan hệ belongsTo(Order::class) vì model Order không còn tồn tại
 }

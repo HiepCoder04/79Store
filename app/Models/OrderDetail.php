@@ -12,7 +12,7 @@ class OrderDetail extends Model
     protected $table = 'order_details';
 
     protected $fillable = [
-        'order_id',
+        'order_id',             // Vẫn giữ để lưu ID đơn hàng nếu cần
         'product_id',
         'product_variant_id',
         'product_name',
@@ -23,7 +23,7 @@ class OrderDetail extends Model
     ];
 
     /**
-     * Ép kiểu dữ liệu để đảm bảo xử lý số chính xác
+     * Ép kiểu dữ liệu để xử lý chính xác các trường số
      */
     protected $casts = [
         'price' => 'float',
@@ -32,15 +32,7 @@ class OrderDetail extends Model
     ];
 
     /**
-     * Mối quan hệ: OrderDetail thuộc về 1 đơn hàng
-     */
-    public function order()
-    {
-        return $this->belongsTo(Order::class);
-    }
-
-    /**
-     * Mối quan hệ: OrderDetail thuộc về 1 sản phẩm
+     * Mối quan hệ: OrderDetail thuộc về một sản phẩm
      */
     public function product()
     {
@@ -48,10 +40,12 @@ class OrderDetail extends Model
     }
 
     /**
-     * Mối quan hệ: OrderDetail thuộc về 1 biến thể sản phẩm (nếu có)
+     * Mối quan hệ: OrderDetail thuộc về một biến thể sản phẩm (nếu có)
      */
     public function productVariant()
     {
         return $this->belongsTo(ProductVariant::class, 'product_variant_id');
     }
+
+    // Không còn mối quan hệ với model Order vì bảng orders đã bị xoá
 }

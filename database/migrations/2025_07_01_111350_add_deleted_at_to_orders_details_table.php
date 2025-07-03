@@ -7,13 +7,13 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Thêm cột deleted_at vào bảng orders để hỗ trợ soft deletes.
+     * Thêm cột deleted_at vào bảng order_details để hỗ trợ soft deletes.
      */
     public function up(): void
     {
-        Schema::table('orders', function (Blueprint $table) {
-            if (!Schema::hasColumn('orders', 'deleted_at')) {
-                $table->softDeletes()->after('updated_at'); // thêm cột sau updated_at nếu muốn
+        Schema::table('order_details', function (Blueprint $table) {
+            if (!Schema::hasColumn('order_details', 'deleted_at')) {
+                $table->softDeletes()->after('updated_at');
             }
         });
     }
@@ -23,8 +23,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('orders', function (Blueprint $table) {
-            if (Schema::hasColumn('orders', 'deleted_at')) {
+        Schema::table('order_details', function (Blueprint $table) {
+            if (Schema::hasColumn('order_details', 'deleted_at')) {
                 $table->dropSoftDeletes();
             }
         });

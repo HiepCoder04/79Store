@@ -61,8 +61,11 @@
     @endphp
 
     @forelse ($items as $img)
-        <img src="{{ asset($img) }}" class="product-img border rounded shadow" style="width: 120px; height: 120px; object-fit: cover;">
-    @empty
+    <img src="{{ asset($img) }}"
+    onerror="this.onerror=null;this.src='{{ asset('assets/img/default.jpg') }}';"
+    class="product-img border rounded shadow"
+    style="width: 120px; height: 120px; object-fit: cover;">
+   @empty
         <img src="{{ asset('assets/img/bg-img/default.jpg') }}" class="product-img border rounded shadow" style="width: 120px; height: 120px; object-fit: cover;">
     @endforelse
         </div>
