@@ -18,8 +18,12 @@
                             <a href="{{ route('shop-detail', $product->id) }}">
                                 @php
                                     $image = $product->galleries->first()->image ?? 'assets/img/bg-img/default.jpg';
+                                    $imagePath = Str::startsWith($image, ['http', 'assets/', 'img/'])
+                                        ? asset($image)
+                                        : asset('uploads/products/' . $image);
                                 @endphp
-                                <img src="{{ asset(ltrim($image, '/')) }}" alt="{{ $product->name }}">
+                                <img src="{{ $imagePath }}" alt="{{ $product->name }}">
+
                             </a>
 
                             <!-- Optional Tag -->

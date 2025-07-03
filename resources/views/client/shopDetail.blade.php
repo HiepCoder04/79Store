@@ -14,8 +14,10 @@
                 <div class="col-12">
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{{ route('home') }}"><i class="fa fa-home"></i> Home</a></li>
                             <li class="breadcrumb-item"><a href="{{ route('home') }}"><i class="fa fa-home"></i> Home</a>
                             </li>
+
                             <li class="breadcrumb-item"><a href="{{ route('shop') }}">Shop</a></li>
                             <li class="breadcrumb-item active" aria-current="page">{{ $product->name }}</li>
                         </ol>
@@ -33,6 +35,25 @@
                 <div class="col-12 col-md-6">
                     @php
                         $image = $product->galleries->first()->image ?? 'assets/img/bg-img/default.jpg';
+                        $imagePath = Str::startsWith($image, ['http', 'assets/', 'img/'])
+                            ? asset($image)
+                            : asset('img/products/' . $image);
+                    @endphp
+                    <img class="d-block w-100" src="{{ $imagePath }}"
+                        onerror="this.onerror=null;this.src='{{ asset('assets/img/default.jpg') }}';"
+                        alt="{{ $product->name }}">
+
+                </div>
+
+                <!-- Product Info -->
+                <div class="col-12 col-md-6">
+                    <h4 class="product-title mb-2 text-uppercase">{{ $product->name }}</h4>
+
+                    @php
+                        $price = $product->variants->first()->price ?? 0;
+                    @endphp
+
+                    <h4 class="text-success mb-3">{{ number_format($price, 0, ',', '.') }}đ</h4>
                     @endphp
                     <img class="d-block w-100" src="{{ asset(ltrim($image, '/')) }}" alt="{{ $product->name }}">
                 </div>
@@ -57,11 +78,14 @@
                         <div class="form-group">
                             <label for="pot">Chọn chậu:</label>
                             <select name="pot" id="pot" class="form-control" required>
-                                @foreach ($product->variants as $variant)
-                                    <option value="{{ $variant->pot }}" data-price="{{ $variant->price }}">
-                                        {{ $variant->pot }}
-                                    </option>
-                                @endforeach
+                                @foreach ($product->variants->unique('pot') as $variant)
+                                    <option value="{{ $variant->pot }}">{{ $variant->pot }}</option>
+                                    =======
+                                    @foreach ($product->variants as $variant)
+                                        <option value="{{ $variant->pot }}" data-price="{{ $variant->price }}">
+                                            {{ $variant->pot }}
+                                        </option>
+                                    @endforeach
                             </select>
                         </div>
 
@@ -69,8 +93,10 @@
                             <div class="quantity">
                                 <span class="qty-minus" onclick="document.getElementById('quantity').stepDown();"><i
                                         class="fa fa-minus"></i></span>
-                                <input type="number" id="quantity" name="quantity" value="1" min="1" class="qty-text mx-2"
-                                    style="width: 60px;">
+                                <input type="number" id="quantity" name="quantity" value="1" min="1"
+                                    class="qty-text mx-2" style="width: 60px;">
+                                <input type="number" id="quantity" name="quantity" value="1" min="1"
+                                    class="qty-text mx-2" style="width: 60px;">
                                 <span class="qty-plus" onclick="document.getElementById('quantity').stepUp();"><i
                                         class="fa fa-plus"></i></span>
                             </div>
@@ -91,7 +117,8 @@
                         <!-- Tabs -->
                         <ul class="nav nav-tabs" role="tablist" id="product-details-tab">
                             <li class="nav-item">
-                                <a href="#description" class="nav-link active" data-toggle="tab" role="tab">Description</a>
+                                <a href="#description" class="nav-link active" data-toggle="tab"
+                                    role="tab">Description</a>
                             </li>
                             <li class="nav-item">
                                 <a href="#addi-info" class="nav-link" data-toggle="tab" role="tab">Additional
@@ -109,6 +136,7 @@
                                     <div class="reviews_area">
                                         <ul>
                                             @foreach ($comments as $value)
+                                                <li><strong>{{ $value->name }}</strong> : {{ $value->content }}</li>
                                                 <li><strong>{{ $value->name }}</strong> : {{ $value->content }}<br>
                                                     <small class="text-muted">
                                                         {{ $value->created_at->format('H:i d/m/Y') }}
@@ -128,26 +156,30 @@
                                             <div class="col-12 col-md-6">
                                                 <div class="form-group">
                                                     <label for="name">Nickname</label>
-                                                    <input type="name" class="form-control" id="name" name="name"
-                                                        placeholder="Nazrul" value="{{ auth()->user()->name ?? '' }}">
+                                                    <input type="name" class="form-control" id="name"
+                                                        name="name" placeholder="Nazrul"
+                                                        value="{{ auth()->user()->name ?? '' }}">
                                                 </div>
                                             </div>
                                             <div class="col-12 col-md-6">
                                                 <div class="form-group">
                                                     <label for="name">Email</label>
-                                                    <input type="email" class="form-control" id="name" name="email"
-                                                        placeholder="Nazrul" value="{{ auth()->user()->email ?? '' }}">
+                                                    <input type="email" class="form-control" id="name"
+                                                        name="email" placeholder="Nazrul"
+                                                        value="{{ auth()->user()->email ?? '' }}">
+                                                    <input type="email" class="form-control" id="name"
+                                                        name="email" placeholder="Nazrul"
+                                                        value="{{ auth()->user()->email ?? '' }}">
                                                 </div>
                                             </div>
                                             <div class="col-12">
                                                 <div class="form-group">
                                                     <label for="comments">Comments</label>
-                                                    <textarea class="form-control" id="comments" name="comment" rows="5"
-                                                        data-max-length="150"></textarea>
+                                                    <textarea class="form-control" id="comments" name="comment" rows="5" data-max-length="150"></textarea>
                                                 </div>
                                             </div>
                                             <div class="col-12">
-                                                <input type="hidden" value="{{$product->id }}" name="product_id">
+                                                <input type="hidden" value="{{ $product->id }}" name="product_id">
                                                 <button type="submit" class="btn alazea-btn">Submit Your Review</button>
                                             </div>
                                         </div>
@@ -229,15 +261,20 @@
                                                 <div class="form-group d-flex align-items-center">
                                                     <span class="mr-15">Your Ratings:</span>
                                                     <div class="stars">
-                                                        <input type="radio" name="star" class="star-1" id="star-1">
+                                                        <input type="radio" name="star" class="star-1"
+                                                            id="star-1">
                                                         <label class="star-1" for="star-1">1</label>
-                                                        <input type="radio" name="star" class="star-2" id="star-2">
+                                                        <input type="radio" name="star" class="star-2"
+                                                            id="star-2">
                                                         <label class="star-2" for="star-2">2</label>
-                                                        <input type="radio" name="star" class="star-3" id="star-3">
+                                                        <input type="radio" name="star" class="star-3"
+                                                            id="star-3">
                                                         <label class="star-3" for="star-3">3</label>
-                                                        <input type="radio" name="star" class="star-4" id="star-4">
+                                                        <input type="radio" name="star" class="star-4"
+                                                            id="star-4">
                                                         <label class="star-4" for="star-4">4</label>
-                                                        <input type="radio" name="star" class="star-5" id="star-5">
+                                                        <input type="radio" name="star" class="star-5"
+                                                            id="star-5">
                                                         <label class="star-5" for="star-5">5</label>
                                                         <span></span>
                                                     </div>
@@ -246,7 +283,8 @@
                                             <div class="col-12 col-md-6">
                                                 <div class="form-group">
                                                     <label for="name">Nickname</label>
-                                                    <input type="email" class="form-control" id="name" placeholder="Nazrul">
+                                                    <input type="email" class="form-control" id="name"
+                                                        placeholder="Nazrul">
                                                 </div>
                                             </div>
                                             <div class="col-12 col-md-6">
@@ -264,8 +302,7 @@
                                             <div class="col-12">
                                                 <div class="form-group">
                                                     <label for="comments">Comments</label>
-                                                    <textarea class="form-control" id="comments" rows="5"
-                                                        data-max-length="150"></textarea>
+                                                    <textarea class="form-control" id="comments" rows="5" data-max-length="150"></textarea>
                                                 </div>
                                             </div>
                                             <div class="col-12">
@@ -282,22 +319,23 @@
             </div>
         </div>
     </section>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const selectElement = document.getElementById('pot');
-            const priceDisplay = document.getElementById('price-display');
+@endsection
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const selectElement = document.getElementById('pot');
+        const priceDisplay = document.getElementById('price-display');
 
-            function updatePrice() {
-                const selected = selectElement.options[selectElement.selectedIndex];
-                const price = selected.getAttribute('data-price');
-                priceDisplay.textContent = Number(price).toLocaleString('vi-VN') + 'đ';
-            }
+        function updatePrice() {
+            const selected = selectElement.options[selectElement.selectedIndex];
+            const price = selected.getAttribute('data-price');
+            priceDisplay.textContent = Number(price).toLocaleString('vi-VN') + 'đ';
+        }
 
-            // Lắng nghe khi user thay đổi select
-            selectElement.addEventListener('change', updatePrice);
+        // Lắng nghe khi user thay đổi select
+        selectElement.addEventListener('change', updatePrice);
 
-            // Gọi lần đầu nếu cần
-            updatePrice();
-        });
-    </script>
+        // Gọi lần đầu nếu cần
+        updatePrice();
+    });
+</script>
 @endsection

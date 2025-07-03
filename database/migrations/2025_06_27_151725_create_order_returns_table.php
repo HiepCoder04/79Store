@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::create('order_returns', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('order_id')->constrained('orders')->onDelete('cascade');
-
+            $table->unsignedBigInteger('order_id')->nullable();
             $table->string('return_status')->default('pending'); // pending, approved, completed, rejected, canceled
             $table->text('reason')->nullable(); // lý do hoàn trả (có thể không bắt buộc)
 

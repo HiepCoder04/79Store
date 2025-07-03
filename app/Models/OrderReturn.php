@@ -12,13 +12,10 @@ class OrderReturn extends Model
     protected $table = 'order_returns';
 
     protected $fillable = [
-        'order_id',
+        'order_id',         // vẫn giữ để lưu ID đơn hàng nếu có
         'return_status',
         'reason',
     ];
 
-    public function order()
-    {
-        return $this->belongsTo(Order::class);
-    }
+    // Đã xoá quan hệ belongsTo với model Order vì model Order không còn tồn tại
 }
