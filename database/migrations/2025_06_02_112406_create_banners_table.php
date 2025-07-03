@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('banners_1', function (Blueprint $table) {
+        Schema::create('banners', function (Blueprint $table) {
             $table->id();
             $table->string('image');
             $table->string('link');
