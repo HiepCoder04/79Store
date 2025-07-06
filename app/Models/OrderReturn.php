@@ -1,21 +1,27 @@
 <?php
 
-namespace App\Models;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+return new class extends Migration {
+    public function up(): void
+    {
+        Schema::create('order_returns', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('order_id');
+            $table->unsignedBigInteger('order_detail_id');
+            $table->text('reason')->nullable();
+            $table->enum('status', ['requested', 'approved', 'rejected', 'refunded'])->default('requested');
+            $table->timestamps();
 
-class OrderReturn extends Model
-{
-    use HasFactory;
+            $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
+            $table->foreign('order_detail_id')->references('id')->on('order_details')->onDelete('cascade');
+        });
+    }
 
-    protected $table = 'order_returns';
-
-    protected $fillable = [
-        'order_id',         // vẫn giữ để lưu ID đơn hàng nếu có
-        'return_status',
-        'reason',
-    ];
-
-    // Đã xoá quan hệ belongsTo với model Order vì model Order không còn tồn tại
-}
+    public function down(): void
+    {
+        Schema::dropIfExists('order_returns');
+    }
+};

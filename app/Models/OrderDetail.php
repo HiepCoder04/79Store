@@ -1,51 +1,34 @@
 <?php
 
-namespace App\Models;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-
-class OrderDetail extends Model
-{
-    use HasFactory;
-
-    protected $table = 'order_details';
-
-    protected $fillable = [
-        'order_id',             // Vẫn giữ để lưu ID đơn hàng nếu cần
-        'product_id',
-        'product_variant_id',
-        'product_name',
-        'variant_name',
-        'price',
-        'quantity',
-        'total_price',
-    ];
-
-    /**
-     * Ép kiểu dữ liệu để xử lý chính xác các trường số
-     */
-    protected $casts = [
-        'price' => 'float',
-        'quantity' => 'integer',
-        'total_price' => 'float',
-    ];
-
-    /**
-     * Mối quan hệ: OrderDetail thuộc về một sản phẩm
-     */
-    public function product()
+return new class extends Migration {
+    public function up(): void
     {
-        return $this->belongsTo(Product::class);
+        Schema::create('order_details', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('order_id');
+            $table->unsignedBigInteger('product_id');
+            $table->unsignedBigInteger('product_variant_id')->nullable();
+
+            $table->string('product_name');
+            $table->string('variant_name')->nullable();
+            $table->decimal('price', 10, 2);
+            $table->integer('quantity');
+            $table->decimal('total_price', 10, 2);
+
+            $table->timestamps();
+
+            $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
+            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
+            $table->foreign('product_variant_id')->references('id')->on('product_variants')->onDelete('set null');
+        });
     }
 
-    /**
-     * Mối quan hệ: OrderDetail thuộc về một biến thể sản phẩm (nếu có)
-     */
-    public function productVariant()
+    public function down(): void
     {
-        return $this->belongsTo(ProductVariant::class, 'product_variant_id');
+        Schema::dropIfExists('order_details');
     }
-
-    // Không còn mối quan hệ với model Order vì bảng orders đã bị xoá
-}
+};
