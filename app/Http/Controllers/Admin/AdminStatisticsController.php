@@ -17,7 +17,7 @@ class AdminStatisticsController extends Controller
             ->get();
 
         // Tổng doanh thu các đơn đã thanh toán (VD: chỉ tính confirmed/completed)
-        $totalRevenue = Order::whereIn('status', ['confirmed', 'completed'])->sum('total');
+        $totalRevenue = Order::whereIn('status', ['confirmed', 'completed'])->sum('tota_amount');
 
         // Tổng số đơn đã thanh toán
         $paidOrdersCount = Order::whereIn('status', ['confirmed', 'completed'])->count();

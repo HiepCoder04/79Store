@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use Illuminate\Http\Request;
@@ -12,7 +13,7 @@ class OrderController extends Controller
     public function index()
     {
         $orders = Order::with('details')->latest()->paginate(10);
-        return view('orders.index', compact('orders'));
+        return view('admin.orders.index', compact('orders'));
     }
 
     // Xem chi tiết 1 đơn hàng
@@ -43,4 +44,9 @@ class OrderController extends Controller
         Order::destroy($id);
         return redirect()->route('orders.index')->with('success', 'Xoá đơn hàng thành công.');
     }
+    public function details()
+{
+    return $this->hasMany(OrderDetail::class);
+}
+
 }
