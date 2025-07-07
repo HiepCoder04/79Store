@@ -16,11 +16,14 @@ class UsersTableSeeder extends Seeder
     {
        User::factory()->count(10)->create();
 
-       User::create([
-        'name' => 'Admin',
-        'email' => 'admin@example.com',
-        'password' => Hash::make('admin123'), // Mật khẩu đã mã hoá
-        'role' => 'admin', // Nếu có cột role
-    ]);
+       User::updateOrCreate(
+        ['email' => 'admin@example.com'], // điều kiện: nếu trùng email thì update
+        [
+            'name' => 'Admin',
+            'password' => Hash::make('admin123'), // mã hoá
+            'role' => 'admin',
+        ]
+    );
+
     }
 }

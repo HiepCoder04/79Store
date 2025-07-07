@@ -12,7 +12,7 @@
 <h3 class="font-semibold mb-2">Đơn hàng theo trạng thái:</h3>
 <ul class="list-disc list-inside mb-6">
     @foreach ($statusCounts as $item)
-        <li>{{ $item->order_status }}: {{ $item->total }} đơn</li>
+        <li>{{ $item->status }}: {{ $item->total }} đơn</li>
     @endforeach
 </ul>
 
@@ -21,8 +21,8 @@
 
 @php
     $labels = $ordersByDay->pluck('date')->map(fn($d) => \Carbon\Carbon::parse($d)->format('d/m'))->toArray();
-    $dataCount = $ordersByDay->pluck('total')->toArray();
-    $dataAmount = $ordersByDay->pluck('total_amount')->toArray();
+    $dataCount = $ordersByDay->pluck('total_orders')->toArray();
+    $dataAmount = $ordersByDay->pluck('total_revenue')->toArray();
 @endphp
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

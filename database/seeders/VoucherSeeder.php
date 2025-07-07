@@ -9,8 +9,9 @@ class VoucherSeeder extends Seeder
 {
     public function run(): void
     {
-        Voucher::create([
-            'code' => 'GIAM10',
+        $voucher = Voucher::firstOrNew(['code' => 'GIAM10']);
+
+        $voucher->fill([
             'description' => 'Giảm 10% cho đơn hàng từ 100.000đ',
             'event_type' => 'discount 10%',
             'start_date' => now()->subDay(),
@@ -20,5 +21,7 @@ class VoucherSeeder extends Seeder
             'min_order_amount' => 100000,
             'is_active' => true,
         ]);
+
+        $voucher->save();
     }
 }
