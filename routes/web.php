@@ -19,7 +19,7 @@ use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\VoucherController as AdminVoucherController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\AdminStatisticsController;
+use App\Http\Controllers\Admin\AdminStatisticsController;
 
 // -------------------- BLOG (CLIENT) --------------------
 Route::prefix('blogs')->name('client.blogs.')->group(function () {
