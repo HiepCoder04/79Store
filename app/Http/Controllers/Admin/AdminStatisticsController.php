@@ -12,15 +12,15 @@ class AdminStatisticsController extends Controller
     public function index()
     {
         // Đếm số đơn theo trạng thái
-        $statusCounts = Order::select('status', DB::raw('COUNT(*) as total'))
-            ->groupBy('status')
+        $statusCounts = Order::select('order_status', DB::raw('COUNT(*) as total'))
+            ->groupBy('order_status')
             ->get();
 
         // Tổng doanh thu các đơn đã thanh toán (VD: chỉ tính confirmed/completed)
-        $totalRevenue = Order::whereIn('status', ['confirmed', 'completed'])->sum('tota_amount');
+        $totalRevenue = Order::whereIn('order_status', ['confirmed', 'completed'])->sum('total_price');
 
         // Tổng số đơn đã thanh toán
-        $paidOrdersCount = Order::whereIn('status', ['confirmed', 'completed'])->count();
+        $paidOrdersCount = Order::whereIn('order_status', ['confirmed', 'completed'])->count();
 
         // Tổng số đơn
         $totalOrders = Order::count();
