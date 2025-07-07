@@ -60,7 +60,7 @@ class ProductController extends Controller
                 if ($isValid) {
 
                     $product->variants()->create([
-                       
+                        'variant_name' => $product->name . ' - ' . ($variant['pot'] ?? 'Không rõ'),
                         'pot' => $variant['pot'] ?? null,
                         'price' => $variant['price'],
                         'stock_quantity' => $variant['stock_quantity']
@@ -147,7 +147,7 @@ class ProductController extends Controller
                         } else {
                             // Create new variant
                             $product->variants()->create([
-                                
+                                    'variant_name' => $product->name . ' - ' . ($variant['pot'] ?? 'Không rõ'),
                                 'pot' => $variant['pot'] ?? null,
                                 'price' => $variant['price'],
                                 'stock_quantity' => $variant['stock_quantity'],

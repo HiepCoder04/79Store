@@ -4,18 +4,9 @@
 <div class="container">
     <h2>Thêm sản phẩm mới</h2>
 
-    {{-- Thông báo lỗi --}}
-    @if ($errors->any())
-        <div class="alert alert-danger text-white-50">
-            <ul class="mb-0">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+   
 @if(session('error'))
-    <div class="alert alert-danger">{{ session('error') }}</div>
+    <div class="alert alert-danger text-white-50">{{ session('error') }}</div>
 @endif
     <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
