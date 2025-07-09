@@ -151,17 +151,11 @@
                                         <div class="product-img">
                                             <a href="{{ route('shop-detail', $product->id) }}">
                                                 @php
-                                                    $image =
-                                                        $product->galleries->first()->image ??
-                                                        'assets/img/bg-img/default.jpg';
-                                                    $imagePath = Str::startsWith($image, [
-                                                        'http',
-                                                        'assets/',
-                                                        'img/',
-                                                    ])
-                                                        ? asset($image)
-                                                        : asset('img/products/' . $image);
-                                                @endphp
+                                    $image = optional($product->galleries->first())->image;
+                                    $imagePath = $image
+                                        ? asset(ltrim($image, '/'))  // Loại bỏ dấu / đầu nếu có
+                                        : asset('assets/img/bg-img/default.jpg');
+                                @endphp
 
                                                 <img src="{{ $imagePath }}"                                                    onerror="this.onerror=null;this.src='{{ asset('assets/img/default.jpg') }}';"
                                                     alt="{{ $product->name }}" width="100%">
