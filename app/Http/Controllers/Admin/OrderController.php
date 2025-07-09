@@ -12,22 +12,22 @@ class OrderController extends Controller
     // Hiển thị danh sách đơn hàng
     public function index()
     {
-        $orders = Order::with('details')->latest()->paginate(10);
+        $orders = Order::with('orderDetails')->latest()->paginate(10);
         return view('admin.orders.index', compact('orders'));
     }
 
     // Xem chi tiết 1 đơn hàng
     public function show($id)
     {
-        $order = Order::with('details')->findOrFail($id);
-        return view('orders.show', compact('order'));
+        $order = Order::with('orderDetails')->findOrFail($id);
+        return view('admin.orders.show', compact('order'));
     }
 
     // Form chỉnh sửa đơn hàng
     public function edit($id)
     {
         $order = Order::findOrFail($id);
-        return view('orders.edit', compact('order'));
+        return view('admin.orders.edit', compact('order'));
     }
 
     // Cập nhật đơn hàng
@@ -44,9 +44,5 @@ class OrderController extends Controller
         Order::destroy($id);
         return redirect()->route('orders.index')->with('success', 'Xoá đơn hàng thành công.');
     }
-    public function details()
-{
-    return $this->hasMany(OrderDetail::class);
-}
 
 }
