@@ -13,7 +13,8 @@
     <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
         <ul class="navbar-nav">
             <li class="nav-item">
-                <a class="nav-link active bg-gradient-dark text-white" href="">
+                <a class="nav-link {{ request()->routeIs('admin.thongke') ? 'active bg-gradient-dark text-white' : 'text-dark' }}"
+                    href="{{ route('admin.thongke') }}">
                     <i class="material-symbols-rounded opacity-5">dashboard</i>
                     <span class="nav-link-text ms-1">Dashboard</span>
                 </a>
@@ -30,40 +31,47 @@
                 <div class="collapse" id="submenuQuanLi">
                     <ul class="nav flex-column ms-4">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" href="{{route('admin.products.index')}}">
+                            <a class="nav-link text-dark" href="{{ route('admin.products.index') }}">
                                 <span class="nav-link-text">Quản Lí Sản phẩm</span>
                             </a>
                         </li>
+
                         <li class="nav-item">
-                            <a class="nav-link text-dark" href="{{route('admin.categories.index')}}">
+                            <a class="nav-link text-dark" href="{{ route('admin.categories.index') }}">
                                 <span class="nav-link-text">Quản lí Danh Mục</span>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" href="{{route('admin.users.list')}}">
+                            <a class="nav-link text-dark" href="{{ route('admin.users.list') }}">
                                 <span class="nav-link-text">Quản Lí Người dùng</span>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" href="{{route('admin.category_blogs.index')}}">
+                            <a class="nav-link text-dark" href="{{ route('admin.category_blogs.index') }}">
                                 <span class="nav-link-text">Quản Lí Danh Mục Blog</span>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" href="{{route('admin.blogs.index')}}">
+                            <a class="nav-link text-dark" href="{{ route('admin.blogs.index') }}">
                                 <span class="nav-link-text">Quản Lí Blog</span>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" href="{{route('admin.banners.index')}}">
+                            <a class="nav-link text-dark" href="{{ route('admin.banners.index') }}">
                                 <span class="nav-link-text">Quản Lí Banner</span>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" href="{{route('admin.vouchers.index')}}">
+                            <a class="nav-link text-dark" href="{{ route('admin.vouchers.index') }}">
                                 <span class="nav-link-text">Quản Lí Voucher</span>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" href="{{ route('admin.orders.index') }}">
+                                <span class="nav-link-text">Quản Lí Đơn hàng</span>
+                            </a>
+                        </li>
+
                     </ul>
                 </div>
             </li>
@@ -78,20 +86,20 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link text-dark" href="{{route('auth.login')}}">
+                <a class="nav-link text-dark" href="{{ route('auth.login') }}">
                     <i class="material-symbols-rounded opacity-5">login</i>
                     <span class="nav-link-text ms-1">Đăng Nhập</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link text-dark" href="{{route('auth.register')}}">
+                <a class="nav-link text-dark" href="{{ route('auth.register') }}">
                     <i class="material-symbols-rounded opacity-5">assignment</i>
                     <span class="nav-link-text ms-1">Đăng Ký</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link text-dark" href="{{ route('auth.logout') }}"
-                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                     <i class="material-symbols-rounded opacity-5">logout</i>
                     <span class="nav-link-text ms-1">Đăng Xuất</span>
                 </a>
