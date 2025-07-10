@@ -15,6 +15,7 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
+
     // POST: /login
     public function loginPost(Request $request)
     {
@@ -39,7 +40,10 @@ class AuthController extends Controller
                     ]);
                 }
             } else {
-                return redirect()->route('auth.login')->with('error', 'Tài khoản của bạn đã bị cấm vui lòng liên hệ admin để mở khóa');
+                return redirect()->route('auth.login')->withErrors([
+                    'email' => 'Tài khoản của bạn đã bị cấm. Vui lòng liên hệ quản trị viên.'
+                ])->withInput();
+
             }
         }
 

@@ -77,32 +77,65 @@
                                 <form method="POST" action="{{ route('auth.loginPost') }}" class="text-start">
                                     @csrf
 
+                                    {{-- Hiển thị lỗi tổng quát --}}
+                                    @if ($errors->any())
+                                        <div class="alert alert-danger text-sm">
+                                            <ul class="mb-0 ps-3">
+                                                @foreach ($errors->all() as $error)
+                                                    <li>{{ $error }}</li>
+                                                @endforeach
+                                            </ul>
+                                        </div>
+                                    @endif
+
+                                    {{-- Hiển thị lỗi từ session (vd: tài khoản bị cấm) --}}
+                                    @if (session('error'))
+                                        <div class="alert alert-danger text-sm">
+                                            {{ session('error') }}
+                                        </div>
+                                    @endif
+
+                                    {{-- Email --}}
                                     <div class="input-group input-group-outline my-3">
                                         <label class="form-label">Email</label>
-                                        <input type="email" name="email" class="form-control" required>
+                                        <input type="email" name="email" value="{{ old('email') }}"
+                                            class="form-control @error('email') is-invalid border-danger text-danger @enderror"
+                                            required>
                                     </div>
+                                    @error('email')
+                                        <div class="text-danger text-sm ms-1">{{ $message }}</div>
+                                    @enderror
 
+                                    {{-- Mật khẩu --}}
                                     <div class="input-group input-group-outline mb-3">
                                         <label class="form-label">Mật Khẩu</label>
-                                        <input type="password" name="password" class="form-control" required>
+                                        <input type="password" name="password"
+                                            class="form-control @error('password') is-invalid border-danger text-danger @enderror"
+                                            required>
                                     </div>
+                                    @error('password')
+                                        <div class="text-danger text-sm ms-1">{{ $message }}</div>
+                                    @enderror
 
+                                    {{-- Ghi nhớ tài khoản --}}
                                     <div class="form-check form-switch d-flex align-items-center mb-3">
                                         <input class="form-check-input" type="checkbox" name="remember" id="rememberMe">
                                         <label class="form-check-label mb-0 ms-3" for="rememberMe">Nhớ Tài Khoản</label>
                                     </div>
 
+                                    {{-- Nút đăng nhập --}}
                                     <div class="text-center">
                                         <button type="submit" class="btn bg-gradient-dark w-100 my-4 mb-2">Đăng
                                             Nhập</button>
                                     </div>
 
                                     <p class="mt-4 text-sm text-center">
-                                        Bạn Đã Có Tài Khoản Chưa
+                                        Bạn Đã Có Tài Khoản Chưa?
                                         <a href="{{ route('auth.register') }}"
                                             class="text-primary text-gradient font-weight-bold">Đăng Ký</a>
                                     </p>
                                 </form>
+
 
                             </div>
                         </div>
@@ -114,8 +147,9 @@
                     <div class="row align-items-center justify-content-lg-between">
                         <div class="col-12 col-md-6 my-auto">
                             <div class="copyright text-center text-sm text-white text-lg-start">
-                                © <script>
-                                document.write(new Date().getFullYear())
+                                ©
+                                <script>
+                                    document.write(new Date().getFullYear())
                                 </script>,
                                 made with <i class="fa fa-heart" aria-hidden="true"></i> by
                                 <a href="https://www.creative-tim.com" class="font-weight-bold text-white"
@@ -154,13 +188,13 @@
     <script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>
     <script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
     <script>
-    var win = navigator.platform.indexOf('Win') > -1;
-    if (win && document.querySelector('#sidenav-scrollbar')) {
-        var options = {
-            damping: '0.5'
+        var win = navigator.platform.indexOf('Win') > -1;
+        if (win && document.querySelector('#sidenav-scrollbar')) {
+            var options = {
+                damping: '0.5'
+            }
+            Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
         }
-        Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
-    }
     </script>
     <!-- Github buttons -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>
