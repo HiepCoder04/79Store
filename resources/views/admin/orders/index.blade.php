@@ -22,7 +22,7 @@
             <tr>
                 <td>{{ $order->id }}</td>
                 <td>{{ $order->user->name ?? 'N/A' }}</td>
-                <td>{{ $order->phone }}</td>
+                <td>{{ $order->user->phone ?? '---' }}</td>
                 <td>{{ $order->created_at->format('d/m/Y') }}</td>
                 <td>{{ $order->status }}</td>
                 <td>{{ number_format($order->total_after_discount, 0, ',', '.') }} đ</td>

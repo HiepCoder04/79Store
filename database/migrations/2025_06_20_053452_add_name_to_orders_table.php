@@ -11,13 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('categories', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->foreignId('parent_id')->nullable()->constrained('categories')->nullOnDelete();
-            $table->timestamps();
+        Schema::table('orders', function (Blueprint $table) {
+            $table->string('name')->nullable()->after('user_id');
         });
-
     }
 
     /**
@@ -25,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('categories');
+        Schema::table('orders', function (Blueprint $table) {
+            //
+        });
     }
 };

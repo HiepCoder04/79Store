@@ -31,11 +31,11 @@
             <!-- Product Image -->
             <div class="col-12 col-md-6">
                 @php
-                    $image = $product->galleries->first()->image ?? 'assets/img/bg-img/default.jpg';
-                    $imagePath = Str::startsWith($image, ['http', 'assets/', 'img/'])
-                        ? asset($image)
-                        : asset('img/products/' . $image);
-                @endphp
+    $image = optional($product->galleries->first())->image;
+    $imagePath = $image
+        ? asset(ltrim($image, '/'))  // loại bỏ dấu / đầu nếu có, tránh asset("//")
+        : asset('assets/img/bg-img/default.jpg');
+@endphp
                 <img class="d-block w-100" src="{{ $imagePath }}"
                     onerror="this.onerror=null;this.src='{{ asset('assets/img/default.jpg') }}';"
                     alt="{{ $product->name }}">

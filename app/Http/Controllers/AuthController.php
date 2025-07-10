@@ -17,37 +17,36 @@ class AuthController extends Controller
 
     // POST: /login
     public function loginPost(Request $request)
-{
-    $credentials = $request->validate([
-        'email' => ['required', 'email'],
-        'password' => ['required'],
-    ]);
-
-    if (Auth::attempt($credentials)) {
-        $user = Auth::user();
-if ($user->is_ban==false) {
-    if ($user->role === 'admin') {
-        return redirect()->route('admin.thongke');
-    } elseif ($user->role === 'staff') {
-        return redirect()->route('admin.thongke');
-    } elseif ($user->role === 'customer' || $user->role === 'guest') {
-        return redirect()->route('home')->with('success','Đăng nhập thành công');
-    } else {
-        Auth::logout(); // tránh truy cập lạ
-        return redirect()->route('auth.login')->withErrors([
-            'role' => 'Vai trò không hợp lệ.',
+    {
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
         ]);
-    }
-}else {
-    return redirect()->route('auth.login')->with('error','Tài khoản của bạn đã bị cấm vui lòng liên hệ admin để mở khóa');
-}
-        
-    }
 
-    return back()->withErrors([
-        'email' => 'Sai tài khoản hoặc mật khẩu',
-    ])->withInput();
-}
+        if (Auth::attempt($credentials)) {
+            $user = Auth::user();
+            if ($user->is_ban == false) {
+                if ($user->role === 'admin') {
+                    return redirect()->route('admin.thongke');
+                } elseif ($user->role === 'staff') {
+                    return redirect()->intended('/staff/dashboard');
+                } elseif ($user->role === 'customer' || $user->role === 'guest') {
+                    return redirect()->route('home')->with('success', 'Đăng nhập thành công');
+                } else {
+                    Auth::logout(); // tránh truy cập lạ
+                    return redirect()->route('auth.login')->withErrors([
+                        'role' => 'Vai trò không hợp lệ.',
+                    ]);
+                }
+            } else {
+                return redirect()->route('auth.login')->with('error', 'Tài khoản của bạn đã bị cấm vui lòng liên hệ admin để mở khóa');
+            }
+        }
+
+        return back()->withErrors([
+            'email' => 'Sai tài khoản hoặc mật khẩu',
+        ])->withInput();
+    }
 
     // GET: /register
     public function register()
@@ -56,7 +55,8 @@ if ($user->is_ban==false) {
     }
 
     // POST: /register
-    public function registerPost(Request $request) {
+    public function registerPost(Request $request)
+    {
         $request->validate([
             'name' => 'required|string|max:100',
             'email' => 'required|email|unique:users',
@@ -67,15 +67,15 @@ if ($user->is_ban==false) {
 
         $user = User::create([
             'name' => $request->name,
-            'email'=> $request->email,
-            'phone'=> $request->phone,
-            'password'=> Hash::make($request->password),
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'password' => Hash::make($request->password),
             'role' => 'customer',
             'date_of_birth' => $request->date_of_birth,
         ]);
 
         Auth::login($user);
-        return redirect('auth/login')->with('success','Đăng kí thành công');
+        return redirect('auth/login')->with('success', 'Đăng kí thành công');
     }
 
     // POST: /logout
@@ -85,6 +85,6 @@ if ($user->is_ban==false) {
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('auth.login')->with('success','Đăng xuất thành công');
+        return redirect()->route('auth.login')->with('success', 'Đăng xuất thành công');
     }
 }
