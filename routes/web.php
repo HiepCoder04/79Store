@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminStatisticsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PaymentController;
@@ -67,6 +68,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         Route::delete('/{id}', [AdminOrderController::class, 'destroy'])->name('destroy');
         Route::post('/{id}/restore', [AdminOrderController::class, 'restore'])->name('restore');
     });
+
+    Route::get('/thongke', [AdminStatisticsController::class, 'index'])->name('admin.thongke');
+
 });
 
 // -------------------- AUTH ROUTES --------------------
