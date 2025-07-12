@@ -134,11 +134,14 @@
                                         <a href="{{ route('auth.register') }}"
                                             class="text-primary text-gradient font-weight-bold">Đăng Ký</a>
                                     </p>
+                                    <br>
+                                    <a href="{{ route('otp.request.form') }}">Quên mật khẩu?</a>
+
                                     <div class="text-center mt-3 mb-2">
-    <a href="{{ route('auth.google') }}" class="btn btn-outline-dark w-100">
-        <i class="fa fa-google me-2"></i> Đăng nhập với Google
-    </a>
-</div>
+                                        <a href="{{ route('auth.google') }}" class="btn btn-outline-dark w-100">
+                                            <i class="fa fa-google me-2"></i> Đăng nhập với Google
+                                        </a>
+                                    </div>
                                 </form>
 
 

@@ -20,6 +20,7 @@ use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\VoucherController as AdminVoucherController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\ForgotPasswordOtpController;
 
 
 // -------------------- BLOG (CLIENT) --------------------
@@ -132,5 +133,9 @@ Route::put('/ban-user', [UserController::class, 'banUser'])->name('ban-user');
 Route::put('/unban-user', [UserController::class, 'unBanUser'])->name('unban-user');
 Route::put('/update-role', [UserController::class, 'UpdateRole'])->name('update-role');
 
+Route::get('/forgot-password-otp', [ForgotPasswordOtpController::class, 'showEmailForm'])->name('otp.request.form');
+Route::post('/forgot-password-otp', [ForgotPasswordOtpController::class, 'sendOtp'])->name('otp.request');
 
+Route::get('/verify-otp', [ForgotPasswordOtpController::class, 'showVerifyForm'])->name('otp.verify.form');
+Route::post('/verify-otp', [ForgotPasswordOtpController::class, 'verifyOtp'])->name('otp.verify');
 
