@@ -10,7 +10,7 @@ use App\Http\Controllers\Client\HomeController;
 use App\Http\Controllers\Client\OrderController;
 use App\Http\Controllers\Client\CheckoutController;
 use App\Http\Controllers\Client\ProductVariant;
-
+use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\UserController;
@@ -80,10 +80,14 @@ Route::prefix('auth')->name('auth.')->controller(AuthController::class)->group(f
     Route::get('/register', 'register')->name('register');
     Route::post('/register', 'registerPost')->name('registerPost');
     Route::post('/logout', 'logout')->name('logout');
+
+});
+//gg login
     Route::get('/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
 Route::get('/google/callback', [AuthController::class, 'handleGoogleCallback']);
-});
 
+Route::get('/auth/google', [GoogleController::class, 'redirectToGoogle']);
+Route::get('/auth/google/callback', [GoogleController::class, 'handleGoogleCallback']);
 // -------------------- CLIENT (AUTHENTICATED) --------------------
 Route::middleware('auth')->group(function () {
     // Giỏ hàng
