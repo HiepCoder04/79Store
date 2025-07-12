@@ -138,12 +138,9 @@
 
                 <!-- Search Form -->
                 <div class="search-form">
-                    <form action="#" method="get">
-                        <input type="search" name="search" id="search" placeholder="Type keywords &amp; press enter...">
-                        <button type="submit" class="d-none"></button>
-                    </form>
-                    <!-- Close Icon -->
-                    <div class="closeIcon"><i class="fa fa-times" aria-hidden="true"></i></div>
+                    <form action="{{ route('shop') }}" method="GET">
+    <input type="search" name="keyword" placeholder="Tìm sản phẩm..." value="{{ request('keyword') }}">
+</form>
                 </div>
             </div>
         </div>

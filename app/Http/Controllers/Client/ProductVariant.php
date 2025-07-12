@@ -11,21 +11,32 @@ use Illuminate\Support\Facades\DB;
 
 class ProductVariant extends Controller
 {
-    public function product(Request $request)
-    {
-        $selectedCategories = $request->input('category', []);
+public function product(Request $request)
+{
+    $selectedCategories = $request->input('category', []);
+    $keyword = $request->input('keyword');
 
-        $products = Product::with('category', 'galleries')
-            ->when(!empty($selectedCategories), function ($query) use ($selectedCategories) {
-                $query->whereIn('category_id', $selectedCategories);
-            })
-            ->latest()
-            ->paginate(9);
+    // Tạo query ban đầu với quan hệ
+    $query = Product::with('category', 'galleries');
 
-        $categories = Category::all();
-
-        return view('client.shop', compact('products', 'categories', 'selectedCategories'));
+    // Lọc theo từ khóa trong tên sản phẩm
+    if ($request->filled('keyword')) {
+        $query->where('name', 'like', '%' . $keyword . '%');
     }
+
+    // Lọc theo danh mục nếu có
+    if (!empty($selectedCategories)) {
+        $query->whereIn('category_id', $selectedCategories);
+    }
+
+    // Phân trang, sắp xếp mới nhất và giữ query trên URL
+    $products = $query->latest()->paginate(9)->appends($request->query());
+
+    $categories = Category::all();
+
+    // Truyền cả biến keyword về view nếu muốn hiển thị lại từ khóa đã nhập
+    return view('client.shop', compact('products', 'categories', 'selectedCategories', 'keyword'));
+}
     public function productDetail($id)
     {
         $product = Product::with('category', 'galleries', 'variants')->findOrFail($id);

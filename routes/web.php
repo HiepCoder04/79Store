@@ -125,3 +125,6 @@ Route::post('/apply-voucher', [VoucherController::class, 'apply'])->name('apply.
 Route::put('/ban-user', [UserController::class, 'banUser'])->name('ban-user');
 Route::put('/unban-user', [UserController::class, 'unBanUser'])->name('unban-user');
 Route::put('/update-role', [UserController::class, 'UpdateRole'])->name('update-role');
+
+
+
