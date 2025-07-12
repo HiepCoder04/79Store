@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
-
+use Socialite;
 class AuthController extends Controller
 {
     // GET: /login
@@ -91,4 +91,32 @@ class AuthController extends Controller
 
         return redirect()->route('auth.login')->with('success', 'Đăng xuất thành công');
     }
+
+    
+public function redirectToGoogle()
+{
+    return Socialite::driver('google')->redirect();
+}
+
+public function handleGoogleCallback()
+{
+    try {
+        $googleUser = Socialite::driver('google')->user();
+
+        $user = User::firstOrCreate(
+            ['email' => $googleUser->getEmail()],
+            [
+                'name' => $googleUser->getName(),
+                'password' => bcrypt('google-login'), // placeholder
+                'email_verified_at' => now(),
+            ]
+        );
+
+        Auth::login($user);
+
+        return redirect()->route('home');
+    } catch (\Exception $e) {
+        return redirect()->route('auth.login')->with('error', 'Đăng nhập Google thất bại!');
+    }
+}
 }
