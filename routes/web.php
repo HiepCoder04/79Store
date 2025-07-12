@@ -1,5 +1,5 @@
 <?php
-
+use Laravel\Socialite\Facades\Socialite;
 use App\Http\Controllers\AdminStatisticsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -80,6 +80,8 @@ Route::prefix('auth')->name('auth.')->controller(AuthController::class)->group(f
     Route::get('/register', 'register')->name('register');
     Route::post('/register', 'registerPost')->name('registerPost');
     Route::post('/logout', 'logout')->name('logout');
+    Route::get('/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
+Route::get('/google/callback', [AuthController::class, 'handleGoogleCallback']);
 });
 
 // -------------------- CLIENT (AUTHENTICATED) --------------------
