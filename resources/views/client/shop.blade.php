@@ -141,9 +141,16 @@
                 </div>
 
                 <!-- All Products Area -->
+                
                 <div class="col-12 col-md-8 col-lg-9">
                     <div class="shop-products-area">
+                   @if (request('keyword'))
+    <h4>
+        Tìm thấy {{ $products->total() }} sản phẩm cho từ khóa: "{{ request('keyword') }}"
+    </h4>
+@endif
                         <div class="row">
+                        
                             @foreach ($products as $product)
                                 <div class="col-12 col-sm-6 col-lg-4">
                                     <div class="single-product-area mb-50">
