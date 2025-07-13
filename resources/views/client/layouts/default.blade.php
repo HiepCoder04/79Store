@@ -7,6 +7,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
+    <!-- CSRF Token -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <!-- Title -->
     <title>79Store</title>
 
@@ -23,7 +26,7 @@
     <div class="preloader d-flex align-items-center justify-content-center">
         <div class="preloader-circle"></div>
         <div class="preloader-img">
-            <img src="img/core-img/leaf.png" alt="">
+                <img src="{{ asset('assets/img/core-img/leaf.png') }}" alt="">
         </div>
     </div>
 
@@ -35,6 +38,9 @@
 
     @include('client.layouts.footer')
     <!-- ##### Footer Area End ##### -->
+
+    <!-- ##### Chatbot Widget ##### -->
+    @include('client.layouts.chatbot')
 
     <!-- ##### All Javascript Files ##### -->
     <!-- jQuery-2.2.4 js -->
