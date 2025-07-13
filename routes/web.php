@@ -68,6 +68,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         Route::get('/{id}', [AdminOrderController::class, 'show'])->name('show');
         Route::delete('/{id}', [AdminOrderController::class, 'destroy'])->name('destroy');
         Route::post('/{id}/restore', [AdminOrderController::class, 'restore'])->name('restore');
+        Route::put('/{id}/status', [AdminOrderController::class, 'updateStatus'])->name('updateStatus');
     });
 
     Route::get('/thongke', [AdminStatisticsController::class, 'index'])->name('admin.thongke');

@@ -45,4 +45,14 @@ class OrderController extends Controller
         return redirect()->route('orders.index')->with('success', 'Xoá đơn hàng thành công.');
     }
 
+    public function updateStatus(Request $request, $id)
+{
+    $order = Order::findOrFail($id);
+    $order->order_status = $request->input('status');
+    $order->save();
+
+    return back()->with('success', 'Cập nhật trạng thái đơn hàng thành công.');
+}
+
+
 }

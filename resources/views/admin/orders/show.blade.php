@@ -2,13 +2,38 @@
 @extends('admin.layouts.dashboard')
 @section('title', 'Chi tiết đơn hàng')
 
+@if(session('success'))
+    <div class="alert alert-success">
+        {{ session('success') }}
+    </div>
+@endif
+
 @section('content')
 <div class="container">
     <h2>Chi tiết đơn hàng #{{ $order->id }}</h2>
     <p><strong>Khách hàng:</strong> {{ $order->user->name ?? 'N/A' }}</p>
     <p><strong>SĐT:</strong> {{ $order->phone }}</p>
     <p><strong>Địa chỉ:</strong> {{ $order->address->full_address ?? 'N/A' }}</p>
-    <p><strong>Trạng thái:</strong> {{ $order->status }}</p>
+    <p>
+        <strong>Trạng thái:</strong>
+        <form action="{{ route('admin.orders.updateStatus', $order->id) }}" method="POST" class="d-inline-block">
+            @csrf
+            @method('PUT')
+            <select name="status" onchange="this.form.submit()" class="form-select d-inline-block w-auto">
+                @foreach([
+                    'pending' => 'Chờ xử lý',
+                    'processing' => 'Đang xử lý',
+                    'shipped' => 'Đang giao',
+                    'delivered' => 'Hoàn tất',
+                    'cancelled' => 'Đã huỷ'
+                ] as $value => $label)
+                    <option value="{{ $value }}" {{ $order->status === $value ? 'selected' : '' }}>
+                        {{ $label }}
+                    </option>
+                @endforeach
+            </select>
+        </form>
+    </p>
 
     <hr>
     <h4>Sản phẩm</h4>
