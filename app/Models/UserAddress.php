@@ -14,6 +14,11 @@ class UserAddress extends Model
         'is_default',
     ];
 
+    public function getFullAddressAttribute()
+    {
+        return $this->address;
+    }
+
     // Địa chỉ thuộc về user
     public function user()
     {
