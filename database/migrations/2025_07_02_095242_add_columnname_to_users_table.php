@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('user_addresses', function (Blueprint $table) {
-             $table->string('name')->nullable()->after('user_id');
+        Schema::table('users', function (Blueprint $table) {
+            $table->boolean('is_ban')->default(false)->after('email'); // hoặc after cột phù hợp
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('user_addresses', function (Blueprint $table) {
-             $table->dropColumn('name');
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('is_ban');
         });
     }
 };

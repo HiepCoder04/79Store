@@ -39,6 +39,7 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'date_of_birth' => 'date',
+        'is_ban' => 'boolean',
     ];
 
     public function cart()
@@ -50,6 +51,7 @@ class User extends Authenticatable
     {
         return $this->hasMany(UserAddress::class);
     }
+
 
     public function defaultAddress()
     {

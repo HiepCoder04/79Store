@@ -17,9 +17,12 @@
                         <div class="product-img">
                             <a href="{{ route('shop-detail', $product->id) }}">
                                 @php
-                                    $image = $product->galleries->first()->image ?? 'assets/img/bg-img/default.jpg';
+                                    $image = optional($product->galleries->first())->image;
+                                    $imagePath = $image
+                                        ? asset(ltrim($image, '/'))  // Loại bỏ dấu / đầu nếu có
+                                        : asset('assets/img/bg-img/default.jpg');
                                 @endphp
-                                <img src="{{ asset(ltrim($image, '/')) }}" alt="{{ $product->name }}">
+                                <img src="{{ $imagePath }}" alt="{{ $product->name }}">
                             </a>
 
                             <!-- Optional Tag -->
