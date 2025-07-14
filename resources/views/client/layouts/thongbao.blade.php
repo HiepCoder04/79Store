@@ -4,6 +4,7 @@
     if (session()->has('success')) {
         $typeSession = 'success';
         $typeClass = 'success';
+        $typeColor = 'white';
     } elseif (session()->has('error')) {
         $typeSession = 'error';
         $typeClass = 'danger';
@@ -23,29 +24,26 @@
         <div class="custom-alert-content">
             <div class="progress-circle-wrapper {{ $typeClass }}">
                 <svg class="progress-circle" viewBox="0 0 36 36" width="30" height="30" aria-hidden="true">
-                    <path class="circle-bg"
-                          d="M18 2.0845
+                    <path class="circle-bg" d="M18 2.0845
                              a 15.9155 15.9155 0 0 1 0 31.831
-                             a 15.9155 15.9155 0 0 1 0 -31.831"/>
-                    <path class="circle"
-                          stroke-dasharray="100, 100"
-                          d="M18 2.0845
+                             a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    <path class="circle" stroke-dasharray="100, 100" d="M18 2.0845
                              a 15.9155 15.9155 0 0 1 0 31.831
-                             a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                             a 15.9155 15.9155 0 0 1 0 -31.831" />
                 </svg>
 
-                <i class="
-                    @if($typeClass === 'success') bi bi-check-lg
+                <i
+                    class="
+                    @if ($typeClass === 'success') bi bi-check-lg
                     @elseif($typeClass === 'danger') bi bi-x-lg
-                    @elseif($typeClass === 'warning') bi bi-exclamation-lg
-                    @endif
+                    @elseif($typeClass === 'warning') bi bi-exclamation-lg @endif
                 icon-inside-circle"></i>
             </div>
             @php
-                $mauchu='text-'.$typeClass
+                $mauchu = session()->has('success') ? 'text-' . $typeColor : 'text-' . $typeClass;
             @endphp
 
-            <span class="{{$mauchu}}">{{ $message }}</span>
+            <span class="{{ $mauchu }}">{{ $message }}</span>
 
             <button class="custom-alert-close" onclick="closeAlert()">×</button>
         </div>
@@ -89,7 +87,7 @@
         .progress-circle-wrapper {
             position: relative;
             width: 30px;
-height: 30px;
+            height: 30px;
             flex-shrink: 0;
         }
 
@@ -127,6 +125,7 @@ height: 30px;
         .progress-circle-wrapper.success {
             color: #198754;
         }
+
         .progress-circle-wrapper.success .circle {
             stroke: #198754;
         }
@@ -134,6 +133,7 @@ height: 30px;
         .progress-circle-wrapper.danger {
             color: #dc3545;
         }
+
         .progress-circle-wrapper.danger .circle {
             stroke: #dc3545;
         }
@@ -141,6 +141,7 @@ height: 30px;
         .progress-circle-wrapper.warning {
             color: #ffc107;
         }
+
         .progress-circle-wrapper.warning .circle {
             stroke: #ffc107;
         }
@@ -150,6 +151,7 @@ height: 30px;
                 stroke-dasharray: 100, 100;
                 stroke-dashoffset: 0;
             }
+
             to {
                 stroke-dasharray: 100, 100;
                 stroke-dashoffset: 100;

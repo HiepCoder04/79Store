@@ -54,7 +54,7 @@
                             <td>{{ $item->productVariant->variant_name ?? '---' }}</td>
                             <td>{{ number_format($item->unit_price, 0, ',', '.') }} đ</td>
                             <td>{{ $item->quantity }}</td>
-                            <td>{{ number_format($item->unit_price * $item->quantity, 0, ',', '.') }} đ</td>
+                            <td>{{ number_format($item->price * $item->quantity, 0, ',', '.') }} đ</td>
                         </tr>
                     @endforeach
                 </tbody>
