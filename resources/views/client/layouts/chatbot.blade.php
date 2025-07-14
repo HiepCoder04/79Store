@@ -39,8 +39,8 @@
             <div class="suggestion-item" data-text="Cây nào phù hợp trồng trong nhà có ít ánh sáng?">
                 🌿 Cây cho nhà ít ánh sáng?
             </div>
-            <div class="suggestion-item" data-text="Làm thế nào để chăm sóc cây sen đá?">
-                🌵 Cách chăm sóc cây sen đá?
+            <div class="suggestion-item" data-text="Làm thế nào để chăm sóc cây cho người mới?">
+                🌵 Cách chăm sóc cây?
             </div>
             <div class="suggestion-item" data-text="Cây nào dễ trồng cho người mới bắt đầu?">
                 🌱 Cây dễ trồng cho người mới?
