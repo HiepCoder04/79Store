@@ -16,7 +16,7 @@ class OrderController extends Controller
 
         foreach ($orders as $order) {
             $order->total_amount = $order->orderDetails->sum(function ($item) {
-                return $item->quantity * $item->unit_price;
+                return $item->quantity * $item->price;
             });
         }
 
@@ -34,7 +34,7 @@ class OrderController extends Controller
         // Tổng tiền trước giảm
         $totalBeforeDiscount = 0;
         foreach ($order->orderDetails as $item) {
-            $totalBeforeDiscount += $item->unit_price * $item->quantity;
+            $totalBeforeDiscount += $item->price * $item->quantity;
         }
 
         $discount = $order->discount ?? 0;
@@ -70,7 +70,7 @@ class OrderController extends Controller
     {
         $order = Order::findOrFail($id);
         $order->order_status = $request->input('order_status');
-        $order->save(); 
+        $order->save();
 
         return back()->with('success', 'Cập nhật trạng thái đơn hàng thành công.');
     }
