@@ -1,6 +1,5 @@
 <?php
 use Laravel\Socialite\Facades\Socialite;
-use App\Http\Controllers\AdminStatisticsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PaymentController;
@@ -37,7 +36,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     // Trang thống kê
 
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('thongke');
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Quản lý sản phẩm
     Route::resource('products', ProductController::class);
@@ -71,7 +70,6 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         Route::put('/{id}/status', [AdminOrderController::class, 'updateStatus'])->name('updateStatus');
     });
 
-    Route::get('/thongke', [AdminStatisticsController::class, 'index'])->name('admin.thongke');
 
 });
 
