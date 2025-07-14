@@ -1,6 +1,6 @@
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 
 <head>
   <meta charset="utf-8" />
@@ -8,13 +8,15 @@
   <link rel="apple-touch-icon" sizes="76x76" href="{{ asset('assets/img/apple-icon.png') }}">
   <link rel="icon" type="image/png" href="{{ asset('assets/img/favicon.png') }}">
   <title>
-    @section('title')
-      79Store |
-    @show
+    @hasSection('title')
+      @yield('title') | 79Store
+    @else
+      79Store Admin
+    @endif
   </title>
 
   <!-- Fonts and icons -->
-  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700,900" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:300,400,500,600,700,900&display=swap" />
   <!-- Nucleo Icons -->
   <link href="{{ asset('assets/css/nucleo-icons.css') }}" rel="stylesheet" />
   <link href="{{ asset('assets/css/nucleo-svg.css') }}" rel="stylesheet" />
@@ -35,7 +37,7 @@
     <!-- Navbar -->
     @include('admin.layouts.header')
     <!-- End Navbar -->
-    <div class="container-fluid py-2">
+    <div class="container-fluid py-3">
       @yield('content')
        @include('admin.layouts.footer')
       <!-- footer -->
