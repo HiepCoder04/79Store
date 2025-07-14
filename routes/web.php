@@ -19,9 +19,8 @@ use App\Http\Controllers\Admin\BlogCategoryController;
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\VoucherController as AdminVoucherController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
-use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\ForgotPasswordOtpController;
 
+use App\Http\Controllers\ForgotPasswordOtpController;
 
 // -------------------- BLOG (CLIENT) --------------------
 Route::prefix('blogs')->name('client.blogs.')->group(function () {
@@ -34,6 +33,7 @@ Route::prefix('blogs')->name('client.blogs.')->group(function () {
 
 // -------------------- ADMIN ROUTES (CÓ AUTH & ROLE) --------------------
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+
 
     // Trang thống kê
 
@@ -62,6 +62,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         Route::get('/', [UserController::class, 'listUser'])->name('list');
     });
 
+
+
     // Quản lý đơn hàng
     Route::prefix('orders')->name('orders.')->group(function () {
         Route::get('/', [AdminOrderController::class, 'index'])->name('index');
@@ -70,7 +72,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         Route::post('/{id}/restore', [AdminOrderController::class, 'restore'])->name('restore');
         Route::put('/{id}/status', [AdminOrderController::class, 'updateStatus'])->name('updateStatus');
     });
-
+  
     Route::get('/thongke', [AdminStatisticsController::class, 'index'])->name('admin.thongke');
 
 });
@@ -139,4 +141,7 @@ Route::post('/forgot-password-otp', [ForgotPasswordOtpController::class, 'sendOt
 
 Route::get('/verify-otp', [ForgotPasswordOtpController::class, 'showVerifyForm'])->name('otp.verify.form');
 Route::post('/verify-otp', [ForgotPasswordOtpController::class, 'verifyOtp'])->name('otp.verify');
+// -------------------- CHATBOT AI --------------------
+Route::post('/chatbot/chat', [App\Http\Controllers\ChatbotController::class, 'chat'])->name('chatbot.chat');
+Route::get('/chatbot/suggestions', [App\Http\Controllers\ChatbotController::class, 'getSuggestions'])->name('chatbot.suggestions');
 
