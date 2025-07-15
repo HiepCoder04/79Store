@@ -40,6 +40,17 @@
                 <span class="badge bg-{{ $status['class'] }} py-2 px-3">{{ $status['label'] }}</span>
             </div>
 
+            @if (in_array($order->status, ['pending', 'confirmed']))
+    <form action="{{ route('client.orders.cancel', $order->id) }}" method="POST" class="mb-3" onsubmit="return confirm('Bạn có chắc chắn muốn hủy đơn hàng này không?')">
+        @csrf
+        @method('PUT')
+        <button type="submit" class="btn btn-sm btn-danger">
+             Hủy đơn hàng
+        </button>
+    </form>
+@endif
+
+
             <div class="card-body">
                 <p class="mb-1">🧍 <strong>Người nhận:</strong> {{ $order->name ?? $order->user->name }}</p>
                 <p class="mb-1">☎️ <strong>Điện thoại:</strong> {{ $order->phone }}</p>
@@ -69,7 +80,7 @@
                         <strong>Tổng cộng:</strong>
                         <span class="text-danger fs-5">{{ number_format($order->total_after_discount, 0, ',', '.') }}đ</span>
                     </div>
-                    <a href="{{ route('orders.show', $order->id) }}" class="btn btn-outline-dark btn-sm">📄 Xem chi tiết</a>
+                    <a href="{{ route('client.orders.show', $order->id) }}" class="btn btn-outline-dark btn-sm">📄 Xem chi tiết</a>
                 </div>
             </div>
         </div>
