@@ -21,4 +21,10 @@ class Voucher extends Model
         'min_order_amount',
         'is_active',
     ];
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'user_vouchers')
+            ->withPivot(['is_used', 'used_at'])
+            ->withTimestamps();
+    }
 }

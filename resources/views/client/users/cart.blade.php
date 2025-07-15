@@ -99,8 +99,10 @@
                             <h5>Mã giảm giá</h5>
                             <form action="{{ route('apply.voucher') }}" method="post">
                                 @csrf
-                                <input type="text" name="voucher_code" placeholder="Nhập mã giảm giá">
-                                <button type="submit" class="btn btn-primary">Áp dụng</button>
+                                <div class="input-group">
+                                    <input type="text" name="voucher_code" class="form-control" placeholder="Nhập mã giảm giá" aria-label="Voucher Code">
+                                    <button class="btn btn-primary" type="submit">Áp dụng</button>
+                                </div>
                             </form>
                             @if (session('success'))
                                 <div class="alert alert-success mt-2">{{ session('success') }}</div>
@@ -124,6 +126,13 @@
                                 <h5>Phí vận chuyển</h5>
                                 <h5 class="text-success">Miễn phí</h5>
                             </div>
+
+                            @if ($voucher)
+                                <div class="discount d-flex justify-content-between">
+                                    <h5>Mã giảm: {{ $voucher->code }}</h5>
+                                    <h5 class="text-danger">-{{ number_format($discount, 0, ',', '.') }}đ</h5>
+                                </div>
+                            @endif
 
                             <div class="total d-flex justify-content-between mt-3">
                                 <h5>Tổng cộng</h5>

@@ -28,7 +28,7 @@ class AuthController extends Controller
             $user = Auth::user();
             if ($user->is_ban == false) {
                 if ($user->role === 'admin') {
-                    return redirect()->route('admin.thongke');
+                    return redirect()->route('admin.dashboard');
                 } elseif ($user->role === 'staff') {
                     return redirect()->intended('/staff/dashboard');
                 } elseif ($user->role === 'customer' || $user->role === 'guest') {

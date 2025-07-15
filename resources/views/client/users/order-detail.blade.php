@@ -92,7 +92,7 @@
                 <div class="d-flex justify-content-end">
                     <div>
                         <div class="d-flex justify-content-between mb-2">
-                            <span>Tạm tính:</span>
+                            <span>Tạm tính:  </span>
                             <strong>{{ number_format($order->total_before_discount, 0, ',', '.') }}đ</strong>
                         </div>
                         <div class="d-flex justify-content-between mb-2">

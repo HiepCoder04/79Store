@@ -11,6 +11,8 @@ use App\Models\Cart;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\UserAddress;
+use App\Models\Voucher;
+use App\Models\UserVoucher;
 
 class CheckoutController extends Controller
 {
@@ -24,18 +26,36 @@ class CheckoutController extends Controller
         if (!$cart || $cart->items->isEmpty()) {
             return redirect()->route('cart.index')->with('error', 'Giỏ hàng của bạn đang trống.');
         }
-        // Lấy địa chỉ từ bảng user_addresses
+
         $addresses = UserAddress::where('user_id', $user->id)->get();
 
-        // Thêm 'user' vào compact
-        return view('client.users.Checkout', compact('cart', 'addresses', 'user'));
+        // Voucher (áp dụng nếu có trong session)
+        $voucher = null;
+        $discount = 0;
+        $cartTotal = $cart->items->sum(fn($item) => $item->productVariant->price * $item->quantity);
+        $finalTotal = $cartTotal;
+
+        $voucherId = session('applied_voucher');
+        if ($voucherId) {
+            $voucher = Voucher::find($voucherId);
+            if ($voucher && $voucher->is_active && now()->between($voucher->start_date, $voucher->end_date)) {
+                if ($cartTotal >= $voucher->min_order_amount) {
+                    $discount = $cartTotal * ($voucher->discount_percent / 100);
+                    if ($voucher->max_discount && $discount > $voucher->max_discount) {
+                        $discount = $voucher->max_discount;
+                    }
+                    $finalTotal = $cartTotal - $discount;
+                }
+            }
+        }
+
+        return view('client.users.Checkout', compact('cart', 'addresses', 'user', 'voucher', 'discount', 'cartTotal', 'finalTotal'));
     }
 
     public function store(Request $request)
     {
         $user = Auth::user();
 
-        // Validate các input cơ bản
         $request->validate([
             'name' => 'required|string|max:100',
             'phone' => 'required|string|max:20',
@@ -46,9 +66,7 @@ class CheckoutController extends Controller
             'address_id' => 'nullable|exists:user_addresses,id',
         ]);
 
-        // Lấy giỏ hàng
         $cart = Cart::with('items.productVariant.product')->where('user_id', $user->id)->first();
-
         if (!$cart || $cart->items->isEmpty()) {
             return redirect()->back()->with('error', 'Giỏ hàng của bạn đang trống.');
         }
@@ -56,94 +74,82 @@ class CheckoutController extends Controller
         DB::beginTransaction();
 
         try {
-            // Log để debug thông tin request
-            Log::info('Checkout data:', [
-                'new_address' => $request->new_address,
-                'address_id' => $request->address_id,
-                'set_default' => $request->has('set_default')
-            ]);
-            
-            // Kiểm tra xem có địa chỉ mới không
             if ($request->filled('new_address')) {
-                Log::info('Processing new address:', ['address' => $request->new_address]);
-                
-                // Kiểm tra xem địa chỉ này đã tồn tại chưa
-                $existingAddress = UserAddress::where('user_id', $user->id)
-                    ->where('address', $request->new_address)
-                    ->first();
-                
+                $existingAddress = UserAddress::where('user_id', $user->id)->where('address', $request->new_address)->first();
                 if ($existingAddress) {
-                    // Nếu địa chỉ đã tồn tại và yêu cầu đặt làm mặc định
                     if ($request->has('set_default')) {
-                        // Reset tất cả địa chỉ khác
-                        UserAddress::where('user_id', $user->id)
-                            ->where('id', '!=', $existingAddress->id)
-                            ->update(['is_default' => 0]);
-                        
-                        // Đặt địa chỉ này làm mặc định
+                        UserAddress::where('user_id', $user->id)->where('id', '!=', $existingAddress->id)->update(['is_default' => 0]);
                         $existingAddress->is_default = 1;
                         $existingAddress->save();
                     }
-                    
                     $addressId = $existingAddress->id;
-                    Log::info('Using existing address record:', ['id' => $addressId]);
                 } else {
-                    // Nếu đánh dấu là mặc định thì gỡ mặc định cũ
                     if ($request->has('set_default')) {
-                        // Cập nhật tất cả địa chỉ của user này là không mặc định
                         UserAddress::where('user_id', $user->id)->update(['is_default' => 0]);
                     }
-                    
-                    // Tạo địa chỉ mới
                     $newAddress = UserAddress::create([
                         'user_id' => $user->id,
                         'address' => $request->new_address,
                         'is_default' => $request->has('set_default') ? 1 : 0,
                     ]);
-                    
                     $addressId = $newAddress->id;
-                    Log::info('Created new address:', ['id' => $newAddress->id, 'address' => $newAddress->address]);
                 }
             } elseif ($request->filled('address_id')) {
                 $addressId = $request->address_id;
-                Log::info('Using selected address:', ['id' => $addressId]);
             } else {
                 return back()->with('error', 'Vui lòng chọn hoặc nhập địa chỉ giao hàng.');
             }
 
-            // Tính tổng tiền
-            $totalBefore = $cart->items->sum(function ($item) {
-                return $item->productVariant->price * $item->quantity;
-            });
+            $totalBefore = $cart->items->sum(fn($item) => $item->productVariant->price * $item->quantity);
 
-            // Xác định trạng thái đơn hàng dựa trên phương thức thanh toán
+            $discount = 0;
+            $voucherId = session('applied_voucher');
+            if ($voucherId) {
+                $voucher = Voucher::find($voucherId);
+                if ($voucher && $voucher->is_active && now()->between($voucher->start_date, $voucher->end_date)) {
+                    if ($totalBefore >= $voucher->min_order_amount) {
+                        $discount = $totalBefore * ($voucher->discount_percent / 100);
+                        if ($voucher->max_discount && $discount > $voucher->max_discount) {
+                            $discount = $voucher->max_discount;
+                        }
+
+                        // Ghi nhận là đã dùng mã
+                        UserVoucher::updateOrCreate([
+                            'user_id' => $user->id,
+                            'voucher_id' => $voucher->id
+                        ], [
+                            'is_used' => true,
+                            'used_at' => now()
+                        ]);
+                    }
+                }
+            }
+
+            $finalTotal = $totalBefore - $discount;
+
             $orderStatus = 'pending';
             $paymentStatus = 'unpaid';
-            
-            // Nếu thanh toán VNPAY đã hoàn tất
             if ($request->payment_method == 'vnpay' && isset($request->payment_status) && $request->payment_status == 'paid') {
                 $paymentStatus = 'paid';
-                $orderStatus = 'confirmed'; // Đơn hàng được xác nhận nếu đã thanh toán
+                $orderStatus = 'confirmed';
             }
-            
-            // Tạo đơn hàng
+
             $order = Order::create([
                 'user_id' => $user->id,
                 'address_id' => $addressId,
-                'name' => $request->name,        
-                'phone' => $request->phone,       
+                'name' => $request->name,
+                'phone' => $request->phone,
                 'note' => $request->note,
                 'payment_method' => $request->payment_method,
                 'payment_status' => $paymentStatus,
                 'shipping_method' => $request->shipping_method ?? 'Giao hàng tiêu chuẩn',
                 'total_before_discount' => $totalBefore,
-                'discount_amount' => 0,
-                'total_after_discount' => $totalBefore,
+                'discount_amount' => $discount,
+                'total_after_discount' => $finalTotal,
                 'status' => $orderStatus,
                 'sale_channel' => 'website',
             ]);
 
-            // Thêm chi tiết đơn hàng
             foreach ($cart->items as $item) {
                 OrderDetail::create([
                     'order_id' => $order->id,
@@ -156,17 +162,20 @@ class CheckoutController extends Controller
                     'total_price' => $item->productVariant->price * $item->quantity,
                 ]);
             }
+
             $images = $cart->items->map(function ($item) {
                 $gallery = $item->productVariant->product->galleries->first();
                 return $gallery ? $gallery->image : 'assets/img/bg-img/default.jpg';
-            })->filter()->toArray(); // filter() để loại null nếu có
-            // Xóa giỏ hàng
+            })->filter()->toArray();
+
             $cart->items()->delete();
             $cart->delete();
 
+            session()->forget('applied_voucher');
+
             DB::commit();
 
-            session()->flash('order_total', $totalBefore);
+            session()->flash('order_total', $finalTotal);
             session()->flash('order_id', $order->id);
             session()->flash('order_items', $images);
             return redirect()->route('checkout.thankyou');
