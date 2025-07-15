@@ -108,11 +108,11 @@
                 </div>
 
                 <div class="mt-4">
-                    <a href="{{ route('orders.index') }}" class="btn btn-outline-secondary">
+                    <a href="{{ route('client.orders.index') }}" class="btn btn-outline-secondary">
                         <i class="fa fa-arrow-left me-1"></i> Quay lại đơn hàng
                     </a>
                     @if ($order->status === 'pending')
-                        <form action="{{ route('orders.cancel', $order->id) }}" method="POST" class="d-inline-block ms-2">
+                        <form action="{{ route('client.orders.cancel', $order->id) }}" method="POST" class="d-inline-block ms-2">
                             @csrf
                             @method('PUT')
                             <button type="submit" class="btn btn-outline-danger"
@@ -121,6 +121,28 @@
                             </button>
                         </form>
                     @endif
+
+                    @if ($order->status === 'cancelled')
+    <form method="POST" action="{{ route('client.orders.reorder', $order->id) }}" class="d-inline-block ms-2">
+        @csrf
+        <button type="submit" class="btn btn-warning">
+            <i class="fa fa-shopping-cart me-1"></i> Mua lại đơn hàng
+        </button>
+    </form>
+@endif
+
+@if ($order->status === 'delivered')
+    <form action="{{ route('client.orders.return', $order->id) }}" method="POST" class="d-inline-block ms-2">
+        @csrf
+        @method('PUT')
+        <button type="submit" class="btn btn-outline-warning"
+            onclick="return confirm('Bạn có chắc muốn trả lại đơn hàng này?')">
+            <i class="fa fa-undo me-1"></i> Trả hàng
+        </button>
+    </form>
+@endif
+
+
                 </div>
             </div>
         </div>

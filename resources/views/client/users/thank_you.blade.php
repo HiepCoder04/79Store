@@ -80,7 +80,7 @@
         {{-- Nút điều hướng --}}
         <div class="mt-4 d-flex justify-content-center gap-3">
             <a href="{{ route('home') }}" class="btn btn-success px-4">🏠 Tiếp tục mua sắm</a>
-            <a href="{{ route('orders.index') }}" class="btn btn-outline-dark px-4">📦 Xem đơn hàng</a>
+            <a href="{{ route('client.orders.index') }}" class="btn btn-outline-dark px-4">📦 Xem đơn hàng</a>
         </div>
     </div>
 </div>

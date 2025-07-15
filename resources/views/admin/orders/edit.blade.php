@@ -10,8 +10,8 @@
 
         <div class="mb-3">
             <label>Trạng thái đơn hàng</label>
-            <select name="status" class="form-control">
-                @foreach(['pending', 'confirmed', 'shipping', 'completed', 'cancelled'] as $status)
+            <select name="status" class="form-control" required>
+                @foreach(['pending', 'confirmed', 'shipping', 'delivered', 'cancelled'] as $status)
                     <option value="{{ $status }}" {{ $order->status === $status ? 'selected' : '' }}>
                         {{ ucfirst($status) }}
                     </option>

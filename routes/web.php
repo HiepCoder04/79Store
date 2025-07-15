@@ -67,6 +67,7 @@ Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard
     Route::prefix('orders')->name('orders.')->group(function () {
         Route::get('/', [AdminOrderController::class, 'index'])->name('index');
         Route::get('/{id}', [AdminOrderController::class, 'show'])->name('show');
+        Route::put('/{id}', [AdminOrderController::class, 'update'])->name('update');
         Route::delete('/{id}', [AdminOrderController::class, 'destroy'])->name('destroy');
         Route::post('/{id}/restore', [AdminOrderController::class, 'restore'])->name('restore');
         Route::put('/{id}/status', [AdminOrderController::class, 'updateStatus'])->name('updateStatus');
@@ -104,11 +105,17 @@ Route::middleware('auth')->group(function () {
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
     Route::get('/thank-you', [CheckoutController::class, 'thankYou'])->name('checkout.thankyou');
 
-    // Quản lý đơn hàng cá nhân
-    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
-    Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show');
-    Route::put('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
-});
+     //  Quản lý đơn hàng người dùng (Client)
+   Route::prefix('orders')->name('client.orders.')->group(function () {
+        Route::get('/', [OrderController::class, 'index'])->name('index');
+        Route::get('/{id}', [OrderController::class, 'show'])->name('show');
+        Route::put('/{order}/cancel', [OrderController::class, 'cancel'])->name('cancel');
+Route::post('/{order}/reorder', [OrderController::class, 'reorder'])->name('reorder');
+Route::put('/{order}/return', [OrderController::class, 'returnOrder'])->name('return');
+
+
+    });
+    });
 
 // -------------------- CỔNG THANH TOÁN --------------------
 Route::post('/vnpay_payment', [PaymentController::class, 'vnpay_payment']);

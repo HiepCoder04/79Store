@@ -19,13 +19,14 @@
             <form action="{{ route('admin.orders.updateStatus', $order->id) }}" method="POST" class="d-inline-block">
                 @csrf
                 @method('PUT')
-                <select name="order_status" onchange="this.form.submit()" class="form-select d-inline-block w-auto">
+                <select name="status" onchange="this.form.submit()" class="form-select d-inline-block w-auto">
                     @foreach ([
             'pending' => 'Chờ xử lý',
-            'processing' => 'Đang xử lý',
-            'shipped' => 'Đang giao',
+            'confirmed' => 'Đang xử lý',
+            'shipping' => 'Đang giao',
             'delivered' => 'Hoàn tất',
             'cancelled' => 'Đã huỷ',
+            'returned' => 'Trả hàng'
         ] as $value => $label)
                         <option value="{{ $value }}" {{ $order->status === $value ? 'selected' : '' }}>
                             {{ $label }}
@@ -51,7 +52,7 @@
                     @foreach ($order->orderDetails as $item)
                         <tr>
                             <td>{{ $item->productVariant->product->name ?? '---' }}</td>
-                            <td>{{ $item->productVariant->variant_name ?? '---' }}</td>
+                            <td>{{ $item->productVariant->pot  ?? '---' }}</td>
                             <td>{{ number_format($item->unit_price, 0, ',', '.') }} đ</td>
                             <td>{{ $item->quantity }}</td>
                             <td>{{ number_format($item->price * $item->quantity, 0, ',', '.') }} đ</td>

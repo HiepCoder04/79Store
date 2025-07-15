@@ -12,7 +12,7 @@ class OrderController extends Controller
     // Hiển thị danh sách đơn hàng
     public function index()
     {
-        $orders = Order::with('orderDetails')->latest()->paginate(10);
+        $orders = Order::with(['orderDetails', 'user'])->latest()->paginate(10);
 
         foreach ($orders as $order) {
             $order->total_amount = $order->orderDetails->sum(function ($item) {
@@ -53,8 +53,14 @@ class OrderController extends Controller
     // Cập nhật đơn hàng
     public function update(Request $request, $id)
     {
+         $request->validate([
+        'status' => 'required|in:pending,confirmed,shipping,delivered,cancelled',
+        'payment_method' => 'nullable|string|max:255',
+        'shipping_method' => 'nullable|string|max:255',
+    ]);
         $order = Order::findOrFail($id);
-        $order->update($request->only(['order_status', 'shipping_method', 'payment_method']));
+        dd($request->all());
+        $order->update($request->only(['status', 'shipping_method', 'payment_method']));
         return redirect()->route('orders.index')->with('success', 'Cập nhật đơn hàng thành công.');
     }
 
@@ -69,7 +75,7 @@ class OrderController extends Controller
     public function updateStatus(Request $request, $id)
     {
         $order = Order::findOrFail($id);
-        $order->order_status = $request->input('order_status');
+        $order->status = $request->input('status');
         $order->save();
 
         return back()->with('success', 'Cập nhật trạng thái đơn hàng thành công.');

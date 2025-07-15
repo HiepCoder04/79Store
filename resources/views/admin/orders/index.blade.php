@@ -24,7 +24,7 @@
                         <td>{{ $order->user->name ?? 'N/A' }}</td>
                         <td>{{ $order->user->phone ?? '---' }}</td>
                         <td>{{ $order->created_at->format('d/m/Y') }}</td>
-                        <td>{{ $order->order_status }}</td>
+                        <td>{{ $order->status }}</td>
                         <td>{{ number_format($order->total_amount, 0, ',', '.') }} đ</td>
                         <td>
                             <a href="{{ route('admin.orders.show', $order->id) }}" class="btn btn-sm btn-info">Chi tiết</a>
