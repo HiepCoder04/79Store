@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
-use Socialite;
+use Laravel\Socialite\Facades\Socialite;
 class AuthController extends Controller
 {
     // GET: /login
@@ -28,7 +28,7 @@ class AuthController extends Controller
             $user = Auth::user();
             if ($user->is_ban == false) {
                 if ($user->role === 'admin') {
-                    return redirect()->route('admin.thongke');
+                    return redirect()->route('admin.dashboard');
                 } elseif ($user->role === 'staff') {
                     return redirect()->intended('/staff/dashboard');
                 } elseif ($user->role === 'customer' || $user->role === 'guest') {
@@ -43,7 +43,6 @@ class AuthController extends Controller
                 return redirect()->route('auth.login')->withErrors([
                     'email' => 'Tài khoản của bạn đã bị cấm. Vui lòng liên hệ quản trị viên.'
                 ])->withInput();
-
             }
         }
 
@@ -92,31 +91,31 @@ class AuthController extends Controller
         return redirect()->route('auth.login')->with('success', 'Đăng xuất thành công');
     }
 
-    
-public function redirectToGoogle()
-{
-    return Socialite::driver('google')->redirect();
-}
 
-public function handleGoogleCallback()
-{
-    try {
-        $googleUser = Socialite::driver('google')->user();
-
-        $user = User::firstOrCreate(
-            ['email' => $googleUser->getEmail()],
-            [
-                'name' => $googleUser->getName(),
-                'password' => bcrypt('google-login'), // placeholder
-                'email_verified_at' => now(),
-            ]
-        );
-
-        Auth::login($user);
-
-        return redirect()->route('home');
-    } catch (\Exception $e) {
-        return redirect()->route('auth.login')->with('error', 'Đăng nhập Google thất bại!');
+    public function redirectToGoogle()
+    {
+        return Socialite::driver('google')->redirect();
     }
-}
+
+    public function handleGoogleCallback()
+    {
+        try {
+            $googleUser = Socialite::driver('google')->user();
+
+            $user = User::firstOrCreate(
+                ['email' => $googleUser->getEmail()],
+                [
+                    'name' => $googleUser->getName(),
+                    'password' => bcrypt('google-login'), // placeholder
+                    'email_verified_at' => now(),
+                ]
+            );
+
+            Auth::login($user);
+
+            return redirect()->route('home');
+        } catch (\Exception $e) {
+            return redirect()->route('auth.login')->with('error', 'Đăng nhập Google thất bại!');
+        }
+    }
 }

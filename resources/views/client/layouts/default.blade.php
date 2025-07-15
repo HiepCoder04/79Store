@@ -18,7 +18,7 @@
 
     <!-- Core Stylesheet -->
     <link rel="stylesheet" href="{{ asset('assets/style.css') }}">
-
+   @stack('scripts') 
 </head>
 
 <body>
@@ -62,7 +62,7 @@
 
     <!-- Custom page scripts -->
     @yield('page_scripts')
-
+    @stack('scripts') 
 
 </body>
 

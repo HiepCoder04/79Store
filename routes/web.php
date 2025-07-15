@@ -18,7 +18,7 @@ use App\Http\Controllers\Admin\BlogCategoryController;
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\VoucherController as AdminVoucherController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
-
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\ForgotPasswordOtpController;
 
 // -------------------- BLOG (CLIENT) --------------------
@@ -72,7 +72,7 @@ Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard
         Route::put('/{id}/status', [AdminOrderController::class, 'updateStatus'])->name('updateStatus');
     });
 
-    Route::get('/thongke', [AdminStatisticsController::class, 'index'])->name('admin.thongke');
+    // Route::get('/thongke', [AdminStatisticsController::class, 'index'])->name('admin.thongke');
 
 });
 
@@ -96,7 +96,7 @@ Route::middleware('auth')->group(function () {
     // Giỏ hàng
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
     Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
-    Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
+    Route::put('/cart/{id}', [CartController::class, 'update'])->name('cart.update');
     Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
 
     // Thanh toán
