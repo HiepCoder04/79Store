@@ -59,37 +59,35 @@
                 @endif
 
                 <div class="mb-4">
-                    <h5 class="fw-bold mb-3">🛍️ Sản phẩm đã mua</h5>
-                    @foreach ($order->orderDetails as $detail)
-                        @php
-                            $product = $detail->productVariant->product;
-                            $image = $product->galleries->first()->image ?? 'assets/img/bg-img/default.jpg';
-                            $imageUrl = Str::startsWith($image, ['http', 'assets/', 'img/'])
-                                ? asset($image)
-                                : asset('img/products/' . $image);
+    <h5 class="fw-bold mb-3">🛍️ Sản phẩm đã mua</h5>
 
-                            $total = $detail->price * $detail->quantity;
-                        @endphp
-                        <div class="row align-items-center border-bottom pb-3 mb-3">
-                            <div class="col-auto">
-                                <img src="{{ $imageUrl }}"
-                                onerror="this.onerror=null;this.src='{{ asset('assets/img/default.jpg') }}';"
-                                alt="{{ $product->name }}"
-                                class="rounded border">
+    @foreach ($order->orderDetails as $detail)
+        @php
+            $product = $detail->productVariant->product;
+            $image = optional($product->galleries->first())->image;
 
-                            </div>
-                            <div class="col">
-                                <h6 class="mb-1">{{ $product->name }}</h6>
-                                <div class="text-muted small">Chậu: {{ $detail->productVariant->pot }}</div>
-                                <div class="text-muted small">Số lượng: {{ $detail->quantity }}</div>
-                            </div>
-                            <div class="col text-end">
-                                <div>{{ number_format($detail->price, 0, ',', '.') }}đ</div>
-                                <div class="fw-bold">{{ number_format($total, 0, ',', '.') }}đ</div>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
+            $imageUrl = $image
+                ? (Str::startsWith($image, ['http', '/']) ? $image : asset($image))
+                : asset('assets/img/bg-img/default.jpg');
+
+            $total = $detail->price * $detail->quantity;
+        @endphp
+
+        <div class="row align-items-center border-bottom pb-3 mb-3">
+            <div class="col-auto">
+                <img src="{{ $imageUrl }}"
+                    onerror="this.onerror=null;this.src='{{ asset('assets/img/default.jpg') }}';"
+                    alt="{{ $product->name }}"
+                    class="rounded border" style="width: 60px; height: 60px; object-fit: cover;">
+            </div>
+            <div class="col">
+                <h6 class="mb-1">{{ $product->name }}</h6>
+                <div class="text-muted small">Chậu: {{ $detail->productVariant->pot }}</div>
+                <div class="text-muted small">Số lượng: {{ $detail->quantity }}</div>
+            </div>
+        </div>
+    @endforeach
+</div>
 
                 <div class="d-flex justify-content-end">
                     <div>

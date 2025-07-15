@@ -17,8 +17,7 @@
                 <div class="col-12">
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="{{ route('home') }}"><i class="fa fa-home"></i> Trang chủ</a>
-                            </li>
+                            <li class="breadcrumb-item"><a href="{{ route('home') }}"><i class="fa fa-home"></i> Trang chủ</a></li>
                             <li class="breadcrumb-item active" aria-current="page">Giỏ hàng</li>
                         </ol>
                     </nav>
@@ -55,47 +54,34 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($items as $item)
+                                   @foreach ($items as $item)
                                         @php
                                             $variant = $item->productVariant;
                                             $product = $variant->product;
                                             $gallery = $product->galleries->first();
                                             $image = $gallery->image ?? null;
                                             $imageUrl = $image
-                                                ? (Str::startsWith($image, 'http')
-                                                    ? $image
-                                                    : asset(ltrim($image, '/')))
+                                                ? (Str::startsWith($image, 'http') ? $image : asset(ltrim($image, '/')))
                                                 : asset('assets/img/bg-img/default.jpg');
-                                            $subtotal = $variant->price * $item->quantity;
                                         @endphp
-                                        <tr>
+                                        <tr data-item-id="{{ $item->id }}">
                                             <td class="text-start">
                                                 <div class="d-flex align-items-center gap-3">
-                                                    <img src="{{ $imageUrl }}"
-                                                        onerror="this.onerror=null;this.src='{{ asset('assets/img/default.jpg') }}';"
-                                                        alt="{{ $product->name }}" width="80" class="img-thumbnail">
+                                                    <img src="{{ $imageUrl }}" alt="{{ $product->name }}" width="80" class="img-thumbnail">
                                                     <strong>{{ $product->name }}</strong>
                                                 </div>
                                             </td>
                                             <td>{{ $variant->pot }}</td>
                                             <td>
-                                                <form method="POST" action="{{ route('cart.update', $item->id) }}">
-                                                    @csrf
-                                                    @method('PUT')
-                                                    <input type="number" name="quantity" value="{{ $item->quantity }}"
-                                                        min="1" class="form-control text-center" style="width: 80px;"
-                                                        onchange="this.form.submit()">
-                                                </form>
+                                                <input type="number" name="quantity" value="{{ $item->quantity }}" min="1"
+                                                    class="form-control quantity-input text-center" style="width: 80px;">
                                             </td>
-                                            <td>{{ number_format($variant->price, 0, ',', '.') }}đ</td>
-                                            <td>{{ number_format($subtotal, 0, ',', '.') }}đ</td>
+                                            <td class="unit-price" data-price="{{ $variant->price }}">{{ number_format($variant->price, 0, ',', '.') }}đ</td>
+                                            <td class="item-subtotal">{{ number_format($variant->price * $item->quantity, 0, ',', '.') }}đ</td>
                                             <td>
                                                 <form method="POST" action="{{ route('cart.remove', $item->id) }}">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button class="btn btn-sm btn-outline-danger" title="Xoá">
-                                                        <i class="fa fa-times"></i>
-                                                    </button>
+                                                    @csrf @method('DELETE')
+                                                    <button class="btn btn-sm btn-outline-danger" title="Xoá"><i class="fa fa-times"></i></button>
                                                 </form>
                                             </td>
                                         </tr>
@@ -116,7 +102,6 @@
                                 <input type="text" name="voucher_code" placeholder="Nhập mã giảm giá">
                                 <button type="submit" class="btn btn-primary">Áp dụng</button>
                             </form>
-                            {{-- Hiển thị thông báo --}}
                             @if (session('success'))
                                 <div class="alert alert-success mt-2">{{ session('success') }}</div>
                             @endif
@@ -132,7 +117,7 @@
 
                             <div class="subtotal d-flex justify-content-between">
                                 <h5>Tạm tính</h5>
-                                <h5>{{ number_format($cartTotal, 0, ',', '.') }}đ</h5>
+                                <h5 id="subtotal-value">{{ number_format($cartTotal, 0, ',', '.') }}đ</h5>
                             </div>
 
                             <div class="shipping d-flex justify-content-between">
@@ -142,12 +127,11 @@
 
                             <div class="total d-flex justify-content-between mt-3">
                                 <h5>Tổng cộng</h5>
-                                <h5>{{ number_format($finalTotal, 0, ',', '.') }}đ</h5>
+                                <h5 id="total-value">{{ number_format($finalTotal, 0, ',', '.') }}đ</h5>
                             </div>
 
                             <div class="checkout-btn mt-3">
-                                <a href="{{ route('checkout.index') }}" class="btn alazea-btn w-100">Đến Trang Thanh
-                                    Toán</a>
+                                <a href="{{ route('checkout.index') }}" class="btn alazea-btn w-100">Đến Trang Thanh Toán</a>
                             </div>
 
                         </div>
@@ -157,3 +141,38 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.quantity-input').forEach(input => {
+            input.addEventListener('change', async function () {
+                const row = this.closest('tr');
+                const itemId = row.dataset.itemId;
+                const quantity = parseInt(this.value);
+
+                try {
+                    const res = await fetch(`/cart/${itemId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        },
+                        body: JSON.stringify({ quantity })
+                    });
+
+                    if (!res.ok) throw new Error('Cập nhật thất bại');
+
+                    const data = await res.json();
+                    row.querySelector('.item-subtotal').textContent = data.itemSubtotalFormatted;
+                    document.querySelector('#subtotal-value').textContent = data.cartTotalFormatted;
+                    document.querySelector('#total-value').textContent = data.finalTotalFormatted;
+                } catch (error) {
+                    console.error(error);
+                    alert('Lỗi cập nhật giỏ hàng: ' + error.message);
+                }
+            });
+        });
+    });
+</script>
+@endpush

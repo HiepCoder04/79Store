@@ -42,54 +42,65 @@
 
                     <!-- Right: Order Summary -->
                     <div class="col-lg-5">
-                        <div class="p-4 border rounded shadow-sm bg-white">
-                            <h5 class="fw-bold mb-4">Tóm Tắt Đơn Hàng</h5>
-                            @php $total = 0; @endphp
-                            @foreach ($cart->items as $item)
-                                @php
-                                    $product = $item->productVariant->product;
-                                    $image = $product->galleries->first()->image ?? 'assets/img/bg-img/default.jpg';
-                                    $imageUrl = Str::startsWith($image, ['http', 'assets/', 'img/'])
-                                        ? asset($image)
-                                        : asset('img/products/' . $image);
+    <div class="p-4 border rounded shadow-sm bg-white">
+        <h5 class="fw-bold mb-4">Tóm Tắt Đơn Hàng</h5>
 
-                                    $subtotal = $item->productVariant->price * $item->quantity;
-                                    $total += $subtotal;
-                                @endphp
-                                <div class="d-flex mb-3 align-items-center pb-2 border-bottom">
-                                    <div class="flex-shrink-0">
-                                        <img src="{{ $imageUrl }}"
-                                            onerror="this.onerror=null;this.src='{{ asset('assets/img/default.jpg') }}';"
-                                            alt="{{ $product->name }}" class="rounded-2 border ">
-                                    </div>
-                                    <div class="flex-grow-1 ms-3">
-                                        <h6 class="mb-1 text-truncate" style="max-width: 200px; margin-left: 10px">
-                                            {{ $product->name }}</h6>
-                                        <small style="margin-left: 10px">Chậu: {{ $item->productVariant->pot }} | SL:
-                                            {{ $item->quantity }}</small>
-                                    </div>
-                                </div>
-                            @endforeach
+        @php $total = 0; @endphp
 
-                            <hr>
-                            <div class="d-flex justify-content-between">
-                                <span>Vận Chuyển</span>
-                                <strong class="text-success">Miễn Phí</strong>
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <span>Tổng Phụ</span>
-                                <strong>{{ number_format($total, 0, ',', '.') }}đ</strong>
-                            </div>
-                            <div class="d-flex justify-content-between mt-2">
-                                <span class="fw-bold">Tổng Cộng</span>
-                                <span class="fw-bold">{{ number_format($total, 0, ',', '.') }}đ</span>
-                            </div>
+        @foreach ($cart->items as $item)
+            @php
+                $product = $item->productVariant->product;
+                $gallery = $product->galleries->first();
+                $image = optional($gallery)->image;
 
-                            <button type="button" id="place-order-btn" class="btn btn-dark mt-4 w-100">
-                                Đặt Hàng
-                            </button>
-                        </div>
-                    </div>
+                $imageUrl = $image
+                    ? (Str::startsWith($image, ['http', '/']) ? $image : asset($image))
+                    : asset('assets/img/bg-img/default.jpg');
+
+                $subtotal = $item->productVariant->price * $item->quantity;
+                $total += $subtotal;
+            @endphp
+
+            <div class="d-flex mb-3 align-items-center pb-2 border-bottom">
+                <div class="flex-shrink-0">
+                    <img src="{{ $imageUrl }}"
+                        onerror="this.onerror=null;this.src='{{ asset('assets/img/default.jpg') }}';"
+                        alt="{{ $product->name }}" class="rounded-2 border" style="width: 60px; height: 60px; object-fit: cover;">
+                </div>
+                <div class="flex-grow-1 ms-3">
+                    <h6 class="mb-1 text-truncate" style="max-width: 200px; margin-left: 10px">
+                        {{ $product->name }}
+                    </h6>
+                    <small style="margin-left: 10px">
+                        Chậu: {{ $item->productVariant->pot }} |
+                        SL: {{ $item->quantity }}
+                    </small>
+                </div>
+            </div>
+        @endforeach
+
+        <hr>
+
+        <div class="d-flex justify-content-between">
+            <span>Vận Chuyển</span>
+            <strong class="text-success">Miễn Phí</strong>
+        </div>
+
+        <div class="d-flex justify-content-between">
+            <span>Tổng Phụ</span>
+            <strong>{{ number_format($total, 0, ',', '.') }}đ</strong>
+        </div>
+
+        <div class="d-flex justify-content-between mt-2">
+            <span class="fw-bold">Tổng Cộng</span>
+            <span class="fw-bold">{{ number_format($total, 0, ',', '.') }}đ</span>
+        </div>
+
+        <button type="button" id="place-order-btn" class="btn btn-dark mt-4 w-100">
+            Đặt Hàng
+        </button>
+    </div>
+</div>
                 </div>
             </form>
 
