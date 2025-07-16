@@ -68,12 +68,60 @@
                         <!-- Shop Widget -->
                         <div class="shop-widget price mb-50">
                             <h4 class="widget-title">Prices</h4>
-                            <div class="widget-desc">
-                                <div class="slider-range" data-min="8" data-max="30" data-unit="$" data-value-min="8"
-                                    data-value-max="30" data-label-result="Price:">
-                                    <div class="range-price">Price: $8 - $30</div>
-                                </div>
-                            </div>
+                            <!-- Shop Widget -->
+<div class="shop-widget sort-by mb-50">
+    <h4 class="widget-title">Sắp xếp theo</h4>
+    <div class="widget-desc">
+        <form method="GET" action="{{ route('shop') }}">
+            @foreach (request()->except('sort') as $key => $value)
+                @if (is_array($value))
+                    @foreach ($value as $item)
+                        <input type="hidden" name="{{ $key }}[]" value="{{ $item }}">
+                    @endforeach
+                @else
+                    <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                @endif
+            @endforeach
+
+            @php
+                $currentSorts = request('sort', []);
+            @endphp
+
+            <div class="custom-control custom-checkbox d-flex align-items-center mb-2">
+                <input type="checkbox" class="custom-control-input" id="sort-new" name="sort[]" value="new"
+                    {{ in_array('new', $currentSorts) ? 'checked' : '' }}>
+                <label class="custom-control-label" for="sort-new">Hàng mới</label>
+            </div>
+
+            <div class="custom-control custom-checkbox d-flex align-items-center mb-2">
+                <input type="checkbox" class="custom-control-input" id="sort-az" name="sort[]" value="a-z"
+                    {{ in_array('a-z', $currentSorts) ? 'checked' : '' }}>
+                <label class="custom-control-label" for="sort-az">Tên: A-Z</label>
+            </div>
+
+            <div class="custom-control custom-checkbox d-flex align-items-center mb-2">
+                <input type="checkbox" class="custom-control-input" id="sort-za" name="sort[]" value="z-a"
+                    {{ in_array('z-a', $currentSorts) ? 'checked' : '' }}>
+                <label class="custom-control-label" for="sort-za">Tên: Z-A</label>
+            </div>
+
+            <div class="custom-control custom-checkbox d-flex align-items-center mb-2">
+                <input type="checkbox" class="custom-control-input" id="sort-low" name="sort[]" value="low-high"
+                    {{ in_array('low-high', $currentSorts) ? 'checked' : '' }}>
+                <label class="custom-control-label" for="sort-low">Giá: thấp đến cao</label>
+            </div>
+
+            <div class="custom-control custom-checkbox d-flex align-items-center mb-3">
+                <input type="checkbox" class="custom-control-input" id="sort-high" name="sort[]" value="high-low"
+                    {{ in_array('high-low', $currentSorts) ? 'checked' : '' }}>
+                <label class="custom-control-label" for="sort-high">Giá: cao đến thấp</label>
+            </div>
+
+            <button type="submit" class="btn btn-sm alazea-btn mt-2">Áp dụng</button>
+        </form>
+    </div>
+</div>
+
                         </div>
 
                         <!-- Shop Widget -->
