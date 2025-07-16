@@ -22,7 +22,8 @@
                 <td>
                     <a href="{{ route('admin.products.show', $product->id) }}" class="btn btn-sm btn-info">Chi tiết</a>
                     <a href="{{ route('admin.products.edit', $product->id) }}" class="btn btn-sm btn-warning">Sửa</a>
-                    <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST" style="display:inline;">
+                    <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST"
+                        style="display:inline;">
                         @csrf
                         @method('DELETE')
                         <button class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc chắn?')">Xóa</button>
