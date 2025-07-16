@@ -35,6 +35,9 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             @endif
+            @if (session('error'))
+                                <div class="alert alert-danger mt-2">{{ session('error') }}</div>
+                            @endif
 
             @if ($items->isEmpty())
                 <div class="alert alert-info text-center">Giỏ hàng của bạn đang trống.</div>
@@ -104,12 +107,7 @@
                                     <button class="btn btn-primary" type="submit">Áp dụng</button>
                                 </div>
                             </form>
-                            @if (session('success'))
-                                <div class="alert alert-success mt-2">{{ session('success') }}</div>
-                            @endif
-                            @if (session('error'))
-                                <div class="alert alert-danger mt-2">{{ session('error') }}</div>
-                            @endif
+                            
                         </div>
                     </div>
 
