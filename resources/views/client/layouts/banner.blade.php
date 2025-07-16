@@ -3,27 +3,33 @@
 
         @foreach ($banners as $banner)
             @if ($banner->is_active)
-                <!-- Single Hero Post -->
                 <div class="single-hero-post bg-overlay">
-                    <!-- Post Image -->
-                    <div class="slide-img bg-img" style="background-image: url('{{ asset($banner->image) }}');"></div>
+                    <!-- Ảnh nền -->
+                    <div class="slide-img bg-img" style="background-image: url('{{ asset($banner->image) }}'); position: relative;">
+                        <!-- Logo nhỏ nổi góc trái -->
+                        {{-- <img src="{{ asset('http://127.0.0.1:8000/assets/img/core-img/leaf.png') }}" alt="Logo"
+                             style="position: absolute; top: 20px; left: 20px; width: 80px; z-index: 10;">
+                    </div> --}}
+
                     <div class="container h-100">
-                        <div class="row h-100 align-items-center">
-                            <div class="col-12">
-                                <!-- Post Content -->
-                                <div class="hero-slides-content text-center">
-                                    <h2>{{ $banner->description }}</h2>
-                                    <p></p> {{-- Nếu có nội dung thêm thì bổ sung tại đây --}}
-                                    <div class="welcome-btn-group">
+                        <div class="row h-100 align-items-center justify-content-center">
+                            <div class="col-12 text-center">
+                                <!-- Nội dung banner -->
+                                <div class="hero-slides-content">
+                                    <h2 class="text-white" style="font-size: 36px; font-weight: bold;">{{ $banner->description }}</h2>
+                                    {{-- Có thể thêm dòng phụ ở đây nếu muốn --}}
+                                    <div class="welcome-btn-group mt-4">
                                         <a href="{{ $banner->link }}" class="btn alazea-btn active">XEM NGAY</a>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+
                 </div>
             @endif
         @endforeach
 
     </div>
 </section>
+
