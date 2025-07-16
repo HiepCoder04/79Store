@@ -41,11 +41,15 @@
                                 <span class="nav-link-text">Quản lí Danh Mục</span>
                             </a>
                         </li>
+
+                        @if(Auth::user()->role === 'admin')
                         <li class="nav-item">
                             <a class="nav-link text-dark" href="{{ route('admin.users.list') }}">
                                 <span class="nav-link-text">Quản Lí Người dùng</span>
                             </a>
                         </li>
+                        @endif
+
                         <li class="nav-item">
                             <a class="nav-link text-dark" href="{{ route('admin.category_blogs.index') }}">
                                 <span class="nav-link-text">Quản Lí Danh Mục Blog</span>

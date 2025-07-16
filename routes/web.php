@@ -151,3 +151,7 @@ Route::post('/verify-otp', [ForgotPasswordOtpController::class, 'verifyOtp'])->n
 Route::post('/chatbot/chat', [App\Http\Controllers\ChatbotController::class, 'chat'])->name('chatbot.chat');
 Route::get('/chatbot/suggestions', [App\Http\Controllers\ChatbotController::class, 'getSuggestions'])->name('chatbot.suggestions');
 
+Route::middleware(['auth', 'check.role:admin'])->group(function () {
+    Route::get('/admin/users', [UserController::class, 'index'])->name('admin.users.list');
+    // hoặc bất kỳ route nào liên quan tới quản lý user
+});
