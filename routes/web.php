@@ -22,7 +22,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\ForgotPasswordOtpController;
 
 // -------------------- BLOG (CLIENT) --------------------
-Route::prefix('blogs')->name('client.blogs.')->group(function () {
+Route::prefix('blogs')->middleware('ban')->name('client.blogs.')->group(function () {
     Route::get('/', [App\Http\Controllers\Client\BlogController::class, 'index'])->name('index');
     Route::get('/category/{slug?}', [App\Http\Controllers\Client\BlogController::class, 'category'])
         ->name('category')
@@ -31,7 +31,7 @@ Route::prefix('blogs')->name('client.blogs.')->group(function () {
 });
 
 // -------------------- ADMIN ROUTES (CÓ AUTH & ROLE) --------------------
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'role:admin','ban'])->prefix('admin')->name('admin.')->group(function () {
 
 
     // Trang thống kê
@@ -56,10 +56,6 @@ Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard
     Route::resource('vouchers', AdminVoucherController::class);
     Route::get('vouchers/{voucher}/users', [AdminVoucherController::class, 'users'])->name('vouchers.users');
 
-    // Quản lý người dùng
-    Route::prefix('users')->name('users.')->group(function () {
-        Route::get('/', [UserController::class, 'listUser'])->name('list');
-    });
 
 
 
@@ -77,6 +73,10 @@ Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard
 
 });
 
+    // Quản lý người dùng
+    Route::middleware(['admin','ban'])->prefix('admin/users')->group(function () {
+        Route::get('/', [UserController::class, 'listUser'])->name('admin.users.list');
+    });
 // -------------------- AUTH ROUTES --------------------
 Route::prefix('auth')->name('auth.')->controller(AuthController::class)->group(function () {
     Route::get('/login', 'login')->name('login');
@@ -93,7 +93,7 @@ Route::get('/google/callback', [AuthController::class, 'handleGoogleCallback']);
 Route::get('/auth/google', [GoogleController::class, 'redirectToGoogle']);
 Route::get('/auth/google/callback', [GoogleController::class, 'handleGoogleCallback']);
 // -------------------- CLIENT (AUTHENTICATED) --------------------
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth','ban'])->group(function () {
     // Giỏ hàng
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
     Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
@@ -122,36 +122,31 @@ Route::post('/vnpay_payment', [PaymentController::class, 'vnpay_payment']);
 Route::get('/vnpay-callback', [PaymentController::class, 'vnpayCallback'])->name('vnpay.callback');
 
 // -------------------- TRANG CHÍNH & GIỚI THIỆU --------------------
-Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/', [HomeController::class, 'index'])->name('home')->middleware('ban');
 Route::get('/home', [HomeController::class, 'index']);
-Route::get('/about', fn() => view('client.users.about-detail'))->name('about');
+Route::get('/about', fn() => view('client.users.about-detail'))->middleware('ban')->name('about');
 
 // -------------------- SHOP --------------------
-Route::get('/shop', [ProductVariant::class, 'product'])->name('shop');
+Route::get('/shop', [ProductVariant::class, 'product'])->middleware('ban')->name('shop');
 
-Route::get('/shopDetail/{id}', [ProductVariant::class, 'productDetail'])->name('shop-detail');
+Route::get('/shopDetail/{id}', [ProductVariant::class, 'productDetail'])->middleware('ban')->name('shop-detail');
 
 //route su dung voucher cua user
 
- Route::post('/comment/store', [App\Http\Controllers\CommentController::class, 'store'])->name('comment.store');
+ Route::post('/comment/store', [App\Http\Controllers\CommentController::class, 'store'])->middleware('ban')->name('comment.store');
 // -------------------- SỬ DỤNG VOUCHER (USER) --------------------
-Route::post('/apply-voucher', [VoucherController::class, 'apply'])->name('apply.voucher');
+Route::post('/apply-voucher', [VoucherController::class, 'apply'])->middleware('ban')->name('apply.voucher');
 
 //phân quyền
-Route::put('/ban-user', [UserController::class, 'banUser'])->name('ban-user');
-Route::put('/unban-user', [UserController::class, 'unBanUser'])->name('unban-user');
-Route::put('/update-role', [UserController::class, 'UpdateRole'])->name('update-role');
+Route::put('/ban-user', [UserController::class, 'banUser'])->name('ban-user')->middleware(['admin','ban']);
+Route::put('/unban-user', [UserController::class, 'unBanUser'])->name('unban-user')->middleware(['admin','ban']);
+Route::put('/update-role', [UserController::class, 'UpdateRole'])->name('update-role')->middleware(['admin','ban']);
 
-Route::get('/forgot-password-otp', [ForgotPasswordOtpController::class, 'showEmailForm'])->name('otp.request.form');
-Route::post('/forgot-password-otp', [ForgotPasswordOtpController::class, 'sendOtp'])->name('otp.request');
+Route::get('/forgot-password-otp', [ForgotPasswordOtpController::class, 'showEmailForm'])->name('otp.request.form')->middleware('ban');
+Route::post('/forgot-password-otp', [ForgotPasswordOtpController::class, 'sendOtp'])->name('otp.request')->middleware('ban');
 
-Route::get('/verify-otp', [ForgotPasswordOtpController::class, 'showVerifyForm'])->name('otp.verify.form');
-Route::post('/verify-otp', [ForgotPasswordOtpController::class, 'verifyOtp'])->name('otp.verify');
+Route::get('/verify-otp', [ForgotPasswordOtpController::class, 'showVerifyForm'])->name('otp.verify.form')->middleware('ban');
+Route::post('/verify-otp', [ForgotPasswordOtpController::class, 'verifyOtp'])->name('otp.verify')->middleware('ban');
 // -------------------- CHATBOT AI --------------------
 Route::post('/chatbot/chat', [App\Http\Controllers\ChatbotController::class, 'chat'])->name('chatbot.chat');
 Route::get('/chatbot/suggestions', [App\Http\Controllers\ChatbotController::class, 'getSuggestions'])->name('chatbot.suggestions');
-
-Route::middleware(['auth', 'check.role:admin'])->group(function () {
-    Route::get('/admin/users', [UserController::class, 'index'])->name('admin.users.list');
-    // hoặc bất kỳ route nào liên quan tới quản lý user
-});
