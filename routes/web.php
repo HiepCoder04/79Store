@@ -56,10 +56,6 @@ Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard
     Route::resource('vouchers', AdminVoucherController::class);
     Route::get('vouchers/{voucher}/users', [AdminVoucherController::class, 'users'])->name('vouchers.users');
 
-    // Quản lý người dùng
-    Route::prefix('users')->name('users.')->group(function () {
-        Route::get('/', [UserController::class, 'listUser'])->name('list');
-    });
 
 
 
@@ -77,6 +73,10 @@ Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard
 
 });
 
+    // Quản lý người dùng
+    Route::middleware('admin')->prefix('admin/users')->group(function () {
+        Route::get('/', [UserController::class, 'listUser'])->name('admin.users.list');
+    });
 // -------------------- AUTH ROUTES --------------------
 Route::prefix('auth')->name('auth.')->controller(AuthController::class)->group(function () {
     Route::get('/login', 'login')->name('login');
@@ -138,9 +138,9 @@ Route::get('/shopDetail/{id}', [ProductVariant::class, 'productDetail'])->name('
 Route::post('/apply-voucher', [VoucherController::class, 'apply'])->name('apply.voucher');
 
 //phân quyền
-Route::put('/ban-user', [UserController::class, 'banUser'])->name('ban-user');
-Route::put('/unban-user', [UserController::class, 'unBanUser'])->name('unban-user');
-Route::put('/update-role', [UserController::class, 'UpdateRole'])->name('update-role');
+Route::put('/ban-user', [UserController::class, 'banUser'])->name('ban-user')->middleware('admin');
+Route::put('/unban-user', [UserController::class, 'unBanUser'])->name('unban-user')->middleware('admin');
+Route::put('/update-role', [UserController::class, 'UpdateRole'])->name('update-role')->middleware('admin');
 
 Route::get('/forgot-password-otp', [ForgotPasswordOtpController::class, 'showEmailForm'])->name('otp.request.form');
 Route::post('/forgot-password-otp', [ForgotPasswordOtpController::class, 'sendOtp'])->name('otp.request');
@@ -150,8 +150,3 @@ Route::post('/verify-otp', [ForgotPasswordOtpController::class, 'verifyOtp'])->n
 // -------------------- CHATBOT AI --------------------
 Route::post('/chatbot/chat', [App\Http\Controllers\ChatbotController::class, 'chat'])->name('chatbot.chat');
 Route::get('/chatbot/suggestions', [App\Http\Controllers\ChatbotController::class, 'getSuggestions'])->name('chatbot.suggestions');
-
-Route::middleware(['auth', 'check.role:admin'])->group(function () {
-    Route::get('/admin/users', [UserController::class, 'index'])->name('admin.users.list');
-    // hoặc bất kỳ route nào liên quan tới quản lý user
-});
