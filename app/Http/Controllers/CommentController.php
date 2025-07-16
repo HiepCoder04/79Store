@@ -16,6 +16,7 @@ class CommentController extends Controller
             'comment' => 'required|string|max:3000',
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
+            'parent_id' => 'nullable|exists:comments,id',
         ]);
         $user_id = Auth::user()->id;
         $data = [
@@ -24,6 +25,8 @@ class CommentController extends Controller
             "email" => $re->email,
             "content" => $re->comment,
             "user_id" => $user_id,
+            'parent_id' => $re->parent_id,
+            'is_admin' => Auth::user()->is_admin ?? false,
         ];
         Comment::create($data);
         return redirect()->back();
