@@ -278,7 +278,7 @@
                                     // Prev
                                     const prev = document.createElement("li");
                                     prev.className = "page-item" + (currentPage === 1 ? " disabled" : "");
-                                    prev.innerHTML = `<a class="page-link" href="#"><span>&laquo;</span></a>`;
+                                    prev.innerHTML = <a class="page-link" href="#"><span>&laquo;</span></a>;
                                     prev.addEventListener("click", () => {
                                         if (currentPage > 1) {
                                             window.location.href = baseUrl + '?page=' + (currentPage - 1);
@@ -290,7 +290,7 @@
                                     for (let i = 1; i <= totalPages; i++) {
                                         const li = document.createElement("li");
                                         li.className = "page-item" + (i === currentPage ? " active" : "");
-                                        li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+                                        li.innerHTML = <a class="page-link" href="#">${i}</a>;
                                         li.addEventListener("click", () => {
                                             window.location.href = baseUrl + '?page=' + i;
                                         });
@@ -300,7 +300,7 @@
                                     // Next
                                     const next = document.createElement("li");
                                     next.className = "page-item" + (currentPage === totalPages ? " disabled" : "");
-                                    next.innerHTML = `<a class="page-link" href="#"><span>&raquo;</span></a>`;
+                                    next.innerHTML = <a class="page-link" href="#"><span>&raquo;</span></a>;
                                     next.addEventListener("click", () => {
                                         if (currentPage < totalPages) {
                                             window.location.href = baseUrl + '?page=' + (currentPage + 1);
@@ -318,4 +318,8 @@
             </div>
         </div>
     </section>
-@endsection
+@endsection 
+sửa cho tôi "@php
+    $minPrice = $product->variants->min('price');
+    $maxPrice = $product->variants->max('price');
+@endphp
