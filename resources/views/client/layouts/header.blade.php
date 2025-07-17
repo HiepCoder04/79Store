@@ -17,7 +17,7 @@
                         <div class="top-header-meta d-flex align-items-center gap-3">
 
                             <!-- Ngôn ngữ -->
-                            <div class="language-dropdown dropdown mr-3">
+                            {{-- <div class="language-dropdown dropdown mr-3">
                                 <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
                                     id="languageDropdown" data-toggle="dropdown" aria-haspopup="true"
                                     aria-expanded="false">
@@ -27,9 +27,11 @@
                                     <a class="dropdown-item" href="#">Tiếng Việt</a>
                                     <a class="dropdown-item" href="#">English</a>
                                 </div>
-                            </div>
+                            </div> --}}
 
                             <!-- Đăng nhập / User -->
+<div class="top-header-right d-flex align-items-center justify-content-end gap-1">
+
                             <div class="login">
                                 @if (Auth::check())
                                     <div class="user-dropdown">
@@ -52,7 +54,7 @@
                                     <a href="{{ route('auth.login') }}">
                                         <i class="fa fa-user"></i> <span>Đăng nhập</span>
                                     </a>
-                                    <span class="mx-1">/</span>
+                                    <span class="mx-1"></span>
                                     <a href="{{ route('auth.register') }}">
                                         <span>Đăng ký</span>
                                     </a>
@@ -70,6 +72,7 @@
                 </div>
             </div>
         </div>
+    </div>
     </div>
 
     <!-- Navbar -->
@@ -168,6 +171,41 @@
 .user-dropdown-menu li a:hover {
     color: #000;
 }
+.user-dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border: 1px solid #ccc;
+    padding: 10px;
+    list-style: none;
+    z-index: 999;
+}
+
+.user-dropdown:hover .user-dropdown-menu {
+    display: block;
+}
+
+.user-toggle {
+    text-decoration: none;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.login a, .cart a {
+    text-decoration: none;
+    color: #fff;
+}
+
+.cart-quantity {
+    font-weight: bold;
+    color: #ffc107;
+}
+
+
 
 </style>
 
