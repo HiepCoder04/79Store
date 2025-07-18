@@ -37,7 +37,7 @@ class ProductController extends Controller
             'variants.*.stock_quantity' => 'nullable|integer|min:0',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
         ]);
-
+        
         DB::beginTransaction();
 
         try {

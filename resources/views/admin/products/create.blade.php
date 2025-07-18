@@ -71,7 +71,7 @@
                 <label>Chậu</label>
                 <input type="text" name="variants[${variantIndex}][pot]" class="bg-gray-100 border border-gray-300 rounded px-4 py-2 w-full text-gray-700 focus:outline-none focus:border-blue-500">
 
-                 <label>height</label>
+                 <label>Chiều cao (height)</label>
                 <input type="text" name="variants[${variantIndex}][height]" class="bg-gray-100 border border-gray-300 rounded px-4 py-2 w-full text-gray-700 focus:outline-none focus:border-blue-500">
 
                 <label>Giá</label>
