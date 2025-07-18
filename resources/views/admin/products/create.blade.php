@@ -36,10 +36,14 @@
                 <button type="button" class="btn btn-danger btn-sm remove-variant position-absolute" style="right: 10px; top: 10px;">X</button>
                 <label>Chậu</label>
                 <input type="text" name="variants[0][pot]" class="bg-gray-100 border border-gray-300 rounded px-4 py-2 w-full text-gray-700 focus:outline-none focus:border-blue-500">
+                
+                <label for="height">Chiều cao (height)</label>
+                <input type="text" name="variants[0][height]" class="bg-gray-100 border border-gray-300 rounded px-4 py-2 w-full text-gray-700 focus:outline-none focus:border-blue-500">
 
                 <label>Giá</label>
                 <input type="number" name="variants[0][price]" class="bg-gray-100 border border-gray-300 rounded px-4 py-2 w-full text-gray-700 focus:outline-none focus:border-blue-500">
 
+                <br>
                 <label>Số lượng tồn</label>
                 <input type="number" name="variants[0][stock_quantity]" class="bg-gray-100 border border-gray-300 rounded px-4 py-2 w-full text-gray-700 focus:outline-none focus:border-blue-500">
             </div>
@@ -66,6 +70,9 @@
                
                 <label>Chậu</label>
                 <input type="text" name="variants[${variantIndex}][pot]" class="bg-gray-100 border border-gray-300 rounded px-4 py-2 w-full text-gray-700 focus:outline-none focus:border-blue-500">
+
+                 <label>height</label>
+                <input type="text" name="variants[${variantIndex}][height]" class="bg-gray-100 border border-gray-300 rounded px-4 py-2 w-full text-gray-700 focus:outline-none focus:border-blue-500">
 
                 <label>Giá</label>
                 <input type="number" name="variants[${variantIndex}][price]" class="bg-gray-100 border border-gray-300 rounded px-4 py-2 w-full text-gray-700 focus:outline-none focus:border-blue-500">

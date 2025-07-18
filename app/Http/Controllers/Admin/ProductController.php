@@ -32,6 +32,7 @@ class ProductController extends Controller
             'category_id' => 'required|exists:categories,id',
             'variants' => 'required|array|min:1',
             'variants.*.pot' => 'nullable|max:50',
+            'variants.*.height' => 'nullable|string|max:100',
             'variants.*.price' => 'nullable|numeric|min:0',
             'variants.*.stock_quantity' => 'nullable|integer|min:0',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
@@ -62,6 +63,7 @@ class ProductController extends Controller
                     $product->variants()->create([
                         'variant_name' => $product->name . ' - ' . ($variant['pot'] ?? 'Không rõ'),
                         'pot' => $variant['pot'] ?? null,
+                        'height' => $variant['height'] ?? null,
                         'price' => $variant['price'],
                         'stock_quantity' => $variant['stock_quantity']
                     ]);
@@ -113,6 +115,7 @@ class ProductController extends Controller
             'variants' => 'nullable|array',
             
            'variants.*.pot' => 'nullable|max:50',
+           'variants.*.height' => 'nullable|string|max:100',
             'variants.*.price' => 'nullable|numeric|min:0',
             'variants.*.stock_quantity' => 'nullable|integer|min:0',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
@@ -141,6 +144,7 @@ class ProductController extends Controller
                             $product->variants()->where('id', $variant['id'])->update([
                                
                                 'pot' => $variant['pot'] ?? null,
+                                'height' => $variant['height'] ?? null,
                                 'price' => $variant['price'],
                                 'stock_quantity' => $variant['stock_quantity'],
                             ]);
@@ -149,6 +153,7 @@ class ProductController extends Controller
                             $product->variants()->create([
                                     'variant_name' => $product->name . ' - ' . ($variant['pot'] ?? 'Không rõ'),
                                 'pot' => $variant['pot'] ?? null,
+                                'height' => $variant['height'] ?? null,
                                 'price' => $variant['price'],
                                 'stock_quantity' => $variant['stock_quantity'],
                             ]);

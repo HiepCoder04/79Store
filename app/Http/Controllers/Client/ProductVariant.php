@@ -52,14 +52,23 @@ class ProductVariant extends Controller
         return view('client.shop', compact('products', 'categories', 'selectedCategories', 'keyword'));
     }
     public function productDetail($id)
-    {
-        $product = Product::with('category', 'galleries', 'variants')->findOrFail($id);
+{
+    $product = Product::with('category', 'galleries', 'variants')->findOrFail($id);
 
-        $comments = Comment::with('user', 'product')
-            ->where('product_id', $id)
-            ->whereNull('parent_id')
-            ->latest()
-            ->get();
-        return view('client.shopDetail', compact('product', 'comments'));
-    }
+    $comments = Comment::with('user', 'product')
+        ->where('product_id', $id)
+        ->whereNull('parent_id')
+        ->latest()
+        ->get();
+
+    // Thêm đoạn này để truyền biến variants cho JavaScript xử lý
+    $variants = $product->variants->map(fn ($v) => [
+        'pot' => $v->pot,
+        'height' => $v->height,
+        'price' => $v->price
+    ]);
+
+    return view('client.shopDetail', compact('product', 'comments', 'variants'));
+}
+
 }
