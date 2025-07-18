@@ -25,79 +25,69 @@ class ProductController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'name' => 'required|max:255',
-            'description' => 'required|string|max:1500',
-            'category_id' => 'required|exists:categories,id',
-            'variants' => 'required|array|min:1',
-            'variants.*.pot' => 'nullable|max:50',
-            'variants.*.height' => 'nullable|string|max:100',
-            'variants.*.price' => 'nullable|numeric|min:0',
-            'variants.*.stock_quantity' => 'nullable|integer|min:0',
-            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
+{
+    $validated = $request->validate([
+        'name' => 'required|max:255',
+        'description' => 'required|string|max:1500',
+        'category_id' => 'required|exists:categories,id',
+        'variants' => 'required|array|min:1',
+        'variants.*.pot' => 'nullable|max:50',
+        'variants.*.height' => 'nullable|string|max:100', // Đã sửa: từ numeric → string
+        'variants.*.price' => 'nullable|numeric|min:0',
+        'variants.*.stock_quantity' => 'nullable|integer|min:0',
+        'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
+    ]);
+
+    DB::beginTransaction();
+
+    try {
+        $baseSlug = Str::slug($validated['name']);
+        $slug = $baseSlug;
+        $counter = 1;
+        while (Product::where('slug', $slug)->exists()) {
+            $slug = $baseSlug . '-' . $counter++;
+        }
+
+        $product = Product::create([
+            'name' => $validated['name'],
+            'slug' => $slug,
+            'category_id' => $validated['category_id'],
+            'description' => $validated['description'],
+            'is_active' => true,
         ]);
 
-        DB::beginTransaction();
+        foreach ($validated['variants'] as $variant) {
+            $isValid = is_numeric($variant['price'] ?? null) &&
+                is_numeric($variant['stock_quantity'] ?? null);
 
-        try {
-            $product = Product::create([
-                'name' => $validated['name'],
-                'slug' => Str::slug($validated['name']),
-                'category_id' => $validated['category_id'],
-                'description' => $validated['description'],
-                'is_active' => true,
-            ]);
-
-            foreach ($validated['variants'] as $variant) {
-                $isValid =
-                 
-                    is_numeric($variant['price'] ?? null) &&
-                    is_numeric($variant['stock_quantity'] ?? null);
-
-
-                \Log::debug($isValid ? '✅ Biến thể OK' : '❌ Bị loại', $variant);
-
-                if ($isValid) {
-
-                    $product->variants()->create([
-                        'variant_name' => $product->name . ' - ' . ($variant['pot'] ?? 'Không rõ'),
-                        'pot' => $variant['pot'] ?? null,
-                        'height' => $variant['height'] ?? null,
-                        'price' => $variant['price'],
-                        'stock_quantity' => $variant['stock_quantity']
-                    ]);
-                }
+            if ($isValid) {
+                $product->variants()->create([
+                    'variant_name' => $product->name . ' - ' . ($variant['pot'] ?? 'Không rõ'),
+                    'pot' => $variant['pot'] ?? null,
+                    'height' => $variant['height'] ?? null, // ✅ Đã thêm
+                    'price' => $variant['price'],
+                    'stock_quantity' => $variant['stock_quantity']
+                ]);
             }
-
-            if ($request->hasFile('images')) {
-                foreach ($request->file('images') as $image) {
-                    if ($image->isValid()) {
-                        $path = $image->store('products', 'public');
-
-                        if (!empty($path)) {
-                            $product->galleries()->create([
-                                'image' => '/storage/' . $path
-                            ]);
-                        } else {
-                            \Log::warning('Không thể lưu ảnh, $path rỗng.');
-                        }
-                    } else {
-                        \Log::warning(' File ảnh không hợp lệ.');
-                    }
-                }
-            }
-
-
-            DB::commit();
-
-            return redirect()->route('admin.products.index')->with('success', 'Sản phẩm đã được thêm thành công.');
-        } catch (\Throwable $e) {
-            DB::rollBack();
-            \Log::error('❌ Lỗi khi thêm sản phẩm: ' . $e->getMessage());
-            return back()->withInput()->with('error', 'Thêm sản phẩm thất bại: ' . $e->getMessage());
         }
+
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                if ($image->isValid()) {
+                    $path = $image->store('products', 'public');
+                    $product->galleries()->create(['image' => '/storage/' . $path]);
+                }
+            }
+        }
+
+        DB::commit();
+        return redirect()->route('admin.products.index')->with('success', 'Sản phẩm đã được thêm thành công.');
+    } catch (\Throwable $e) {
+        DB::rollBack();
+        Log::error('❌ Lỗi khi thêm sản phẩm: ' . $e->getMessage());
+        return back()->withInput()->with('error', 'Thêm sản phẩm thất bại: ' . $e->getMessage());
     }
+}
 
 
     public function edit(Product $product)
@@ -113,9 +103,9 @@ class ProductController extends Controller
             'description' => 'required|string|max:1500',
             'category_id' => 'required|exists:categories,id',
             'variants' => 'nullable|array',
-            
-           'variants.*.pot' => 'nullable|max:50',
-           'variants.*.height' => 'nullable|string|max:100',
+
+            'variants.*.pot' => 'nullable|max:50',
+            'variants.*.height' => 'nullable|string|max:100',
             'variants.*.price' => 'nullable|numeric|min:0',
             'variants.*.stock_quantity' => 'nullable|integer|min:0',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
@@ -134,7 +124,7 @@ class ProductController extends Controller
             if ($request->filled('variants')) {
                 foreach ($request->variants as $variant) {
                     if (
-                        
+
                         isset($variant['price'], $variant['stock_quantity']) &&
                         is_numeric($variant['price']) &&
                         is_numeric($variant['stock_quantity'])
@@ -142,7 +132,7 @@ class ProductController extends Controller
                         if (!empty($variant['id'])) {
                             // Update variant
                             $product->variants()->where('id', $variant['id'])->update([
-                               
+
                                 'pot' => $variant['pot'] ?? null,
                                 'height' => $variant['height'] ?? null,
                                 'price' => $variant['price'],
@@ -151,7 +141,7 @@ class ProductController extends Controller
                         } else {
                             // Create new variant
                             $product->variants()->create([
-                                    'variant_name' => $product->name . ' - ' . ($variant['pot'] ?? 'Không rõ'),
+                                'variant_name' => $product->name . ' - ' . ($variant['pot'] ?? 'Không rõ'),
                                 'pot' => $variant['pot'] ?? null,
                                 'height' => $variant['height'] ?? null,
                                 'price' => $variant['price'],
@@ -163,19 +153,19 @@ class ProductController extends Controller
             }
             //xóa ảnh đã chọn
             if ($request->filled('delete_images')) {
-    foreach ($request->delete_images as $galleryId) {
-        $gallery = $product->galleries()->find($galleryId);
-        if ($gallery) {
-            // Optionally: xóa file vật lý luôn
-            $imagePath = public_path($gallery->image);
-            if (file_exists($imagePath)) {
-                unlink($imagePath);
-            }
+                foreach ($request->delete_images as $galleryId) {
+                    $gallery = $product->galleries()->find($galleryId);
+                    if ($gallery) {
+                        // Optionally: xóa file vật lý luôn
+                        $imagePath = public_path($gallery->image);
+                        if (file_exists($imagePath)) {
+                            unlink($imagePath);
+                        }
 
-            $gallery->delete();
-        }
-    }
-}
+                        $gallery->delete();
+                    }
+                }
+            }
             // Thêm ảnh mới nếu có
             if ($request->hasFile('images')) {
                 foreach ($request->file('images') as $image) {
@@ -195,29 +185,29 @@ class ProductController extends Controller
 
 
     public function destroy(Product $product)
-{
-    try {
-        // Xoá ảnh vật lý nếu cần
-        foreach ($product->galleries as $gallery) {
-            $imagePath = public_path($gallery->image);
-            if (file_exists($imagePath)) {
-                unlink($imagePath); // Xoá file
+    {
+        try {
+            // Xoá ảnh vật lý nếu cần
+            foreach ($product->galleries as $gallery) {
+                $imagePath = public_path($gallery->image);
+                if (file_exists($imagePath)) {
+                    unlink($imagePath); // Xoá file
+                }
+                $gallery->delete(); // Xoá record DB
             }
-            $gallery->delete(); // Xoá record DB
+
+            // Xoá các biến thể sản phẩm
+            $product->variants()->delete();
+
+            // Xoá chính sản phẩm
+            $product->delete();
+
+            return redirect()->route('admin.products.index')->with('success', 'Sản phẩm đã được xóa!');
+        } catch (\Throwable $e) {
+            \Log::error('Lỗi khi xoá sản phẩm: ' . $e->getMessage());
+            return back()->with('error', 'Lỗi khi xóa sản phẩm!');
         }
-
-        // Xoá các biến thể sản phẩm
-        $product->variants()->delete();
-
-        // Xoá chính sản phẩm
-        $product->delete();
-
-        return redirect()->route('admin.products.index')->with('success', 'Sản phẩm đã được xóa!');
-    } catch (\Throwable $e) {
-        \Log::error('Lỗi khi xoá sản phẩm: ' . $e->getMessage());
-        return back()->with('error', 'Lỗi khi xóa sản phẩm!');
     }
-}
 
     public function show(Product $product)
     {
@@ -228,7 +218,4 @@ class ProductController extends Controller
     {
         return view('admin.thongke.thongke');
     }
-    
-
-
 }

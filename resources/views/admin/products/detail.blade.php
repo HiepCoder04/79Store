@@ -16,11 +16,10 @@
     <table class="table table-bordered">
         <thead>
             <tr>
-
                 <th>Chậu</th>
-                <th>chiều cao</th>
+                <th>Chiều Cao</th>
                 <th>Giá</th>
-                <th>Số lượng tồn kho</th>
+                <th>Số Lượng Tồn Kho</th>
             </tr>
         </thead>
         <tbody>
@@ -28,8 +27,10 @@
             <tr>
                 <td>{{ $variant->pot ?? 'Không có' }}</td>
                 <td>{{ $variant->height ?? 'Không có' }}</td>
-                <td>{{ $variant->price }}</td>
-                <td>{{ $variant->stock_quantity }}</td>
+                <td>
+                    {{ is_numeric($variant->price) ? number_format($variant->price, 0, ',', '.') . 'Đ' : 'N/A' }}
+                </td>
+                <td>{{ $variant->stock_quantity ?? 0 }}</td>
             </tr>
             @endforeach
         </tbody>

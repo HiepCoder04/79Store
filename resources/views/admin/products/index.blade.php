@@ -18,7 +18,13 @@
             <tr>
                 <td>{{ $product->name }}</td>
                 <td>{{ $product->category->name ?? 'N/A' }}</td>
-                <td>{{ $product->variants->first()->price ?? 'N/A' }}</td>
+                <td>
+                    @if ($product->variants->first())
+                        {{ number_format($product->variants->first()->price, 0, ',', '.') }} Đ
+                    @else
+                        N/A
+                    @endif
+                </td>
                 <td>
                     <a href="{{ route('admin.products.show', $product->id) }}" class="btn btn-sm btn-info">Chi tiết</a>
                     <a href="{{ route('admin.products.edit', $product->id) }}" class="btn btn-sm btn-warning">Sửa</a>
