@@ -35,9 +35,13 @@
                 <label>Chậu</label>
                 <input type="text" name="variants[{{ $index }}][pot]" class="bg-gray-100 border border-gray-300 rounded px-4 py-2 w-full text-gray-700 focus:outline-none focus:border-blue-500" value="{{ $variant->pot }}">
 
+                <label>Chiều cao (height)</label>
+                <input type="text" name="variants[{{ $index }}][height]" value="{{ $variant->height }}" class="bg-gray-100 border border-gray-300 rounded px-4 py-2 w-full text-gray-700 focus:outline-none focus:border-blue-500">
+
                 <label>Giá</label>
                 <input type="number" name="variants[{{ $index }}][price]" class="bg-gray-100 border border-gray-300 rounded px-4 py-2 w-full text-gray-700 focus:outline-none focus:border-blue-500" value="{{ $variant->price }}">
 
+                <br>
                 <label>Số lượng tồn</label>
                 <input type="number" name="variants[{{ $index }}][stock_quantity]" class="bg-gray-100 border border-gray-300 rounded px-4 py-2 w-full text-gray-700 focus:outline-none focus:border-blue-500" value="{{ $variant->stock_quantity }}">
             </div>
@@ -75,6 +79,9 @@
                 
                 <label>Chậu</label>
                 <input type="text" name="variants[${variantIndex}][pot]" class="bg-gray-100 border border-gray-300 rounded px-4 py-2 w-full text-gray-700 focus:outline-none focus:border-blue-500">
+
+                <label>height</label>
+                <input type="text" name="variants[${variantIndex}][height]" class="bg-gray-100 border border-gray-300 rounded px-4 py-2 w-full text-gray-700 focus:outline-none focus:border-blue-500">
 
                 <label>Giá</label>
                 <input type="number" name="variants[${variantIndex}][price]" class="bg-gray-100 border border-gray-300 rounded px-4 py-2 w-full text-gray-700 focus:outline-none focus:border-blue-500">

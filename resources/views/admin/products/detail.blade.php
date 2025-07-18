@@ -18,6 +18,7 @@
             <tr>
 
                 <th>Chậu</th>
+                <th>chiều cao</th>
                 <th>Giá</th>
                 <th>Số lượng tồn kho</th>
             </tr>
@@ -26,6 +27,7 @@
             @foreach($product->variants as $variant)
             <tr>
                 <td>{{ $variant->pot ?? 'Không có' }}</td>
+                <td>{{ $variant->height ?? 'Không có' }}</td>
                 <td>{{ $variant->price }}</td>
                 <td>{{ $variant->stock_quantity }}</td>
             </tr>
