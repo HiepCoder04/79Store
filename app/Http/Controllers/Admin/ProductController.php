@@ -25,20 +25,20 @@ class ProductController extends Controller
     }
 
     public function store(Request $request)
-{
-    $validated = $request->validate([
-        'name' => 'required|max:255',
-        'description' => 'required|string|max:1500',
-        'category_id' => 'required|exists:categories,id',
-        'variants' => 'required|array|min:1',
-        'variants.*.pot' => 'nullable|max:50',
-        'variants.*.height' => 'nullable|string|max:100', // Đã sửa: từ numeric → string
-        'variants.*.price' => 'nullable|numeric|min:0',
-        'variants.*.stock_quantity' => 'nullable|integer|min:0',
-        'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
-    ]);
-
-    DB::beginTransaction();
+    {
+        $validated = $request->validate([
+            'name' => 'required|max:255',
+            'description' => 'required|string|max:1500',
+            'category_id' => 'required|exists:categories,id',
+            'variants' => 'required|array|min:1',
+            'variants.*.pot' => 'nullable|max:50',
+            'variants.*.height' => 'nullable|string|max:100',
+            'variants.*.price' => 'nullable|numeric|min:0',
+            'variants.*.stock_quantity' => 'nullable|integer|min:0',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
+        ]);
+        
+        DB::beginTransaction();
 
     try {
         $baseSlug = Str::slug($validated['name']);
