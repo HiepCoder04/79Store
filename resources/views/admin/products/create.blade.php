@@ -37,7 +37,7 @@
                 <label>Chậu</label>
                 <input type="text" name="variants[0][pot]" class="bg-gray-100 border border-gray-300 rounded px-4 py-2 w-full text-gray-700 focus:outline-none focus:border-blue-500">
                 
-                <label for="height">Chiều cao (height)</label>
+                <label for="height">Chiều cao</label>
                 <input type="text" name="variants[0][height]" class="bg-gray-100 border border-gray-300 rounded px-4 py-2 w-full text-gray-700 focus:outline-none focus:border-blue-500">
 
                 <label>Giá</label>
