@@ -2,15 +2,34 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
-    protected $fillable = ['name','slug' ,'category_id','description'];
+    protected $fillable = [
+        'name',
+        'slug',
+        'description',
+        'category_id',
+        'is_active'
+    ];
 
+    protected $dates = [
+        'deleted_at',
+        'created_at',
+        'updated_at'
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
+        'deleted_at' => 'datetime'
+    ];
+
+    // Relationships
     public function category()
     {
         return $this->belongsTo(Category::class);
@@ -25,5 +44,33 @@ class Product extends Model
     {
         return $this->hasMany(ProductGallery::class);
     }
-    
+
+    // Scopes
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+
+    public function scopeWithActiveVariants($query)
+    {
+        return $query->whereHas('variants', function($q) {
+            $q->where('stock_quantity', '>', 0);
+        });
+    }
+
+    // Thêm scope cho soft delete
+    public function scopeOnlyActive($query)
+    {
+        return $query->whereNull('deleted_at')->where('is_active', true);
+    }
+
+    public function scopeWithTrashed($query)
+    {
+        return $query->withTrashed();
+    }
+
+    public function scopeOnlyTrashed($query)
+    {
+        return $query->onlyTrashed();
+    }
 }
