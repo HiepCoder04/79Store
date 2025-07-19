@@ -92,9 +92,7 @@
 
 @section('page_scripts')
 <script>
-    
     const allVariants = @json($variants);
-  
 
     window.addEventListener('DOMContentLoaded', function () {
         const potContainer = document.getElementById('pot-buttons');
@@ -110,10 +108,10 @@
             const heights = allVariants
                 .filter(v => v.pot.toLowerCase().trim() === pot.toLowerCase().trim())
                 .map(v => String(v.height).trim())
-                .filter((v, i, arr) => arr.indexOf(v) === i);
+                .filter((v, i, arr) => arr.indexOf(v) === i); // loại bỏ trùng
 
             heightContainer.innerHTML = '';
-            heights.forEach((height, idx) => {
+            heights.forEach((height) => {
                 const btn = document.createElement('button');
                 btn.type = 'button';
                 btn.className = 'btn btn-outline-dark m-1 height-option';
@@ -128,7 +126,7 @@
                 heightContainer.appendChild(btn);
             });
 
-            // Nếu có height, tự động chọn height đầu tiên
+            // Auto chọn chiều cao đầu tiên nếu có
             if (heights.length > 0) {
                 const firstBtn = heightContainer.querySelector('.height-option');
                 if (firstBtn) {
@@ -138,7 +136,7 @@
                 }
             } else {
                 heightInput.value = '';
-                priceDisplay.textContent = '0đ';
+                updatePrice('', '');
             }
         }
 
@@ -147,11 +145,16 @@
                 v.pot.toLowerCase().trim() === pot.toLowerCase().trim() &&
                 v.height.toLowerCase().trim() === height.toLowerCase().trim()
             );
-            priceDisplay.textContent = variant
-                ? Number(variant.price).toLocaleString('vi-VN') + 'đ'
-                : '0đ';
+            const price = variant ? Number(variant.price).toLocaleString('vi-VN') + 'đ' : '0đ';
+
+            priceDisplay.style.opacity = 0;
+            setTimeout(() => {
+                priceDisplay.textContent = price;
+                priceDisplay.style.opacity = 1;
+            }, 150);
         }
 
+        // Bắt sự kiện click chậu
         document.querySelectorAll('.pot-option').forEach(btn => {
             btn.addEventListener('click', function () {
                 document.querySelectorAll('.pot-option').forEach(b => b.classList.remove('active'));
@@ -162,9 +165,9 @@
             });
         });
 
-        // Ẩn chiều cao khi load trang
+        // Mặc định ẩn chiều cao và không chọn sẵn
         heightGroup.style.display = 'none';
-        // Không tự động chọn chậu đầu tiên nữa
     });
 </script>
 @endsection
+

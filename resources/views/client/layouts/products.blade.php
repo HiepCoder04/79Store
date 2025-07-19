@@ -54,7 +54,7 @@
                         $min = $product->variants->min('price');
                         $max = $product->variants->max('price');
                         @endphp
-                        <h6>
+                                                <h6 class="text-success fw-bold">
                             {{ number_format($min, 0, ',', '.') }}đ
                             @if ($min != $max)
                             – {{ number_format($max, 0, ',', '.') }}đ
