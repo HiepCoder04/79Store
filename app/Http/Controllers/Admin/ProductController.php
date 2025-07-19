@@ -36,7 +36,7 @@ class ProductController extends Controller
         }
 
         $products = $query->latest()->paginate(10);
-        
+
         // Thống kê số lượng
         $stats = [
             'total' => Product::withTrashed()->count(),
@@ -61,6 +61,7 @@ class ProductController extends Controller
             'category_id' => 'required|exists:categories,id',
             'variants' => 'required|array|min:1',
             'variants.*.pot' => 'nullable|max:50',
+            'variants.*.height' => 'nullable|string|max:100',
             'variants.*.price' => 'nullable|numeric|min:0',
             'variants.*.stock_quantity' => 'nullable|integer|min:0',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
@@ -68,14 +69,21 @@ class ProductController extends Controller
 
         DB::beginTransaction();
 
-        try {
-            $product = Product::create([
-                'name' => $validated['name'],
-                'slug' => Str::slug($validated['name']),
-                'category_id' => $validated['category_id'],
-                'description' => $validated['description'],
-                'is_active' => true,
-            ]);
+    try {
+        $baseSlug = Str::slug($validated['name']);
+        $slug = $baseSlug;
+        $counter = 1;
+        while (Product::where('slug', $slug)->exists()) {
+            $slug = $baseSlug . '-' . $counter++;
+        }
+
+        $product = Product::create([
+            'name' => $validated['name'],
+            'slug' => $slug,
+            'category_id' => $validated['category_id'],
+            'description' => $validated['description'],
+            'is_active' => true,
+        ]);
 
             foreach ($validated['variants'] as $variant) {
                 $isValid = is_numeric($variant['price'] ?? null) &&
@@ -135,6 +143,7 @@ class ProductController extends Controller
             'category_id' => 'required|exists:categories,id',
             'variants' => 'nullable|array',
             'variants.*.pot' => 'nullable|max:50',
+            'variants.*.height' => 'nullable|string|max:100',
             'variants.*.price' => 'nullable|numeric|min:0',
             'variants.*.stock_quantity' => 'nullable|integer|min:0',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
@@ -153,6 +162,7 @@ class ProductController extends Controller
             if ($request->filled('variants')) {
                 foreach ($request->variants as $variant) {
                     if (
+
                         isset($variant['price'], $variant['stock_quantity']) &&
                         is_numeric($variant['price']) &&
                         is_numeric($variant['stock_quantity'])
@@ -160,7 +170,9 @@ class ProductController extends Controller
                         if (!empty($variant['id'])) {
                             // Update variant
                             $product->variants()->where('id', $variant['id'])->update([
+
                                 'pot' => $variant['pot'] ?? null,
+                                'height' => $variant['height'] ?? null,
                                 'price' => $variant['price'],
                                 'stock_quantity' => $variant['stock_quantity'],
                             ]);
@@ -169,6 +181,7 @@ class ProductController extends Controller
                             $product->variants()->create([
                                 'variant_name' => $product->name . ' - ' . ($variant['pot'] ?? 'Không rõ'),
                                 'pot' => $variant['pot'] ?? null,
+                                'height' => $variant['height'] ?? null,
                                 'price' => $variant['price'],
                                 'stock_quantity' => $variant['stock_quantity'],
                             ]);
@@ -182,7 +195,7 @@ class ProductController extends Controller
                 foreach ($request->delete_images as $galleryId) {
                     $gallery = $product->galleries()->find($galleryId);
                     if ($gallery) {
-                        // Xóa file vật lý
+                        // Optionally: xóa file vật lý luôn
                         $imagePath = public_path($gallery->image);
                         if (file_exists($imagePath)) {
                             unlink($imagePath);
@@ -192,7 +205,6 @@ class ProductController extends Controller
                     }
                 }
             }
-
             // Thêm ảnh mới nếu có
             if ($request->hasFile('images')) {
                 foreach ($request->file('images') as $image) {
@@ -367,7 +379,7 @@ class ProductController extends Controller
 
         } catch (\Throwable $e) {
             DB::rollBack();
-            
+
             Log::error('Lỗi khi xóa vĩnh viễn sản phẩm', [
                 'product_id' => $product->id ?? 'unknown',
                 'error' => $e->getMessage(),
@@ -395,4 +407,7 @@ class ProductController extends Controller
     {
         return view('admin.thongke.thongke');
     }
+
+
+
 }

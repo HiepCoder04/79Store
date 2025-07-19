@@ -46,10 +46,12 @@
                     <div class="col-12">
                         <div class="table-responsive shadow-sm rounded-3">
                             <table class="table table-hover table-bordered align-middle text-center mb-0">
-                                <thead class="table-light">
+                                <thead class="table-light text-center align-middle">
                                     <tr>
+                                        <th><input type="checkbox" id="check-all"></th>
                                         <th>Sản phẩm</th>
                                         <th>Chậu</th>
+                                        <th>Chiều cao</th>
                                         <th>Số lượng</th>
                                         <th>Giá</th>
                                         <th>Thành tiền</th>
@@ -57,7 +59,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                   @foreach ($items as $item)
+                                    @foreach ($items as $item)
                                         @php
                                             $variant = $item->productVariant;
                                             $product = $variant->product;
@@ -68,6 +70,9 @@
                                                 : asset('assets/img/bg-img/default.jpg');
                                         @endphp
                                         <tr data-item-id="{{ $item->id }}">
+                                            <td>
+                                                <input type="checkbox" name="selected_items[]" value="{{ $item->id }}" class="item-checkbox">
+                                            </td>
                                             <td class="text-start">
                                                 <div class="d-flex align-items-center gap-3">
                                                     <img src="{{ $imageUrl }}" alt="{{ $product->name }}" width="80" class="img-thumbnail">
@@ -76,20 +81,30 @@
                                             </td>
                                             <td>{{ $variant->pot }}</td>
                                             <td>
+                                                {{ $variant->height ? $variant->height . ' cm' : 'Không rõ' }}
+                                            </td>
+                                            <td>
                                                 <input type="number" name="quantity" value="{{ $item->quantity }}" min="1"
                                                     class="form-control quantity-input text-center" style="width: 80px;">
                                             </td>
-                                            <td class="unit-price" data-price="{{ $variant->price }}">{{ number_format($variant->price, 0, ',', '.') }}đ</td>
-                                            <td class="item-subtotal">{{ number_format($variant->price * $item->quantity, 0, ',', '.') }}đ</td>
+                                            <td class="unit-price" data-price="{{ $variant->price }}">
+                                                {{ number_format($variant->price, 0, ',', '.') }}đ
+                                            </td>
+                                            <td class="item-subtotal">
+                                                {{ number_format($variant->price * $item->quantity, 0, ',', '.') }}đ
+                                            </td>
                                             <td>
                                                 <form method="POST" action="{{ route('cart.remove', $item->id) }}">
                                                     @csrf @method('DELETE')
-                                                    <button class="btn btn-sm btn-outline-danger" title="Xoá"><i class="fa fa-times"></i></button>
+                                                    <button class="btn btn-sm btn-outline-danger" title="Xoá">
+                                                        <i class="fa fa-times"></i>
+                                                    </button>
                                                 </form>
                                             </td>
                                         </tr>
                                     @endforeach
-                                </tbody>
+                                    </tbody>
+
                             </table>
                         </div>
                     </div>
@@ -117,8 +132,9 @@
 
                             <div class="subtotal d-flex justify-content-between">
                                 <h5>Tạm tính</h5>
-                                <h5 id="subtotal-value">{{ number_format($cartTotal, 0, ',', '.') }}đ</h5>
+                                <h5 id="subtotal-value">{{ number_format($cartTotal, 0, ',', '.') }}đ</h5> {{-- sẽ được cập nhật lại bằng JS --}}
                             </div>
+
 
                             <div class="shipping d-flex justify-content-between">
                                 <h5>Phí vận chuyển</h5>
@@ -137,9 +153,10 @@
                                 <h5 id="total-value">{{ number_format($finalTotal, 0, ',', '.') }}đ</h5>
                             </div>
 
-                            <div class="checkout-btn mt-3">
-                                <a href="{{ route('checkout.index') }}" class="btn alazea-btn w-100">Đến Trang Thanh Toán</a>
-                            </div>
+                            <form id="checkout-form-selected" action="{{ route('checkout.index') }}" method="GET">
+                                <input type="hidden" name="selected" id="selected-items-input">
+                                <button type="button" id="go-to-checkout" class="btn alazea-btn w-100">Đến Trang Thanh Toán</button>
+                            </form>
 
                         </div>
                     </div>
@@ -181,5 +198,86 @@
             });
         });
     });
+
+     function formatCurrency(amount) {
+        return new Intl.NumberFormat('vi-VN').format(amount) + 'đ';
+    }
+
+    function updateSelectedTotal() {
+        let subtotal = 0;
+
+        document.querySelectorAll('.item-checkbox:checked').forEach(checkbox => {
+            const row = checkbox.closest('tr');
+            const price = parseInt(row.querySelector('.unit-price').dataset.price);
+            const qty = parseInt(row.querySelector('.quantity-input').value);
+            subtotal += price * qty;
+        });
+
+        document.getElementById('subtotal-value').textContent = formatCurrency(subtotal);
+
+        let discount = 0;
+        @if ($voucher)
+            const percent = {{ $voucher->discount_percent }};
+            const maxDiscount = {{ $voucher->max_discount ?? 0 }};
+            const minOrderAmount = {{ $voucher->min_order_amount }};
+
+            if (subtotal >= minOrderAmount) {
+                discount = Math.floor(subtotal * percent / 100);
+                if (maxDiscount && discount > maxDiscount) {
+                    discount = maxDiscount;
+                }
+            }
+            document.getElementById('discount-value').textContent = '-' + formatCurrency(discount);
+        @endif
+
+        const finalTotal = subtotal - discount;
+        document.getElementById('total-value').textContent = formatCurrency(finalTotal);
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const checkAll = document.getElementById('check-all');
+        const checkboxes = document.querySelectorAll('.item-checkbox');
+        const quantityInputs = document.querySelectorAll('.quantity-input');
+
+        checkboxes.forEach(cb => cb.addEventListener('change', updateSelectedTotal));
+        quantityInputs.forEach(qty => {
+            qty.addEventListener('change', function () {
+                const row = qty.closest('tr');
+                const checkbox = row.querySelector('.item-checkbox');
+                if (checkbox.checked) {
+                    updateSelectedTotal();
+                }
+            });
+        });
+
+        if (checkAll) {
+            checkAll.addEventListener('change', function () {
+                checkboxes.forEach(cb => cb.checked = checkAll.checked);
+                updateSelectedTotal();
+            });
+        }
+
+        updateSelectedTotal(); // Gọi khi load
+    });
+
+     document.addEventListener('DOMContentLoaded', function () {
+    const checkoutBtn = document.getElementById('go-to-checkout');
+
+    checkoutBtn.addEventListener('click', function () {
+        const checkedItems = document.querySelectorAll('.item-checkbox:checked');
+
+        if (checkedItems.length === 0) {
+            alert('Vui lòng chọn ít nhất 1 sản phẩm để tiếp tục thanh toán!');
+            return;
+        }
+
+        // Lấy ID các sản phẩm đã chọn
+        const selectedIds = Array.from(checkedItems).map(cb => cb.value);
+        document.getElementById('selected-items-input').value = selectedIds.join(',');
+
+        // Submit form
+        document.getElementById('checkout-form-selected').submit();
+    });
+});
 </script>
 @endpush

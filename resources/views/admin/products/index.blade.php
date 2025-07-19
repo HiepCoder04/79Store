@@ -43,15 +43,15 @@
     {{-- Bộ lọc trạng thái --}}
     <div class="mb-3">
         <div class="btn-group" role="group">
-            <a href="{{ route('admin.products.index') }}" 
+            <a href="{{ route('admin.products.index') }}"
                class="btn {{ request('status', 'active') === 'active' ? 'btn-primary' : 'btn-outline-primary' }}">
                 Đang hoạt động
             </a>
-            <a href="{{ route('admin.products.index', ['status' => 'deleted']) }}" 
+            <a href="{{ route('admin.products.index', ['status' => 'deleted']) }}"
                class="btn {{ request('status') === 'deleted' ? 'btn-danger' : 'btn-outline-danger' }}">
                 Đã xóa
             </a>
-            <a href="{{ route('admin.products.index', ['status' => 'all']) }}" 
+            <a href="{{ route('admin.products.index', ['status' => 'all']) }}"
                class="btn {{ request('status') === 'all' ? 'btn-info' : 'btn-outline-info' }}">
                 Tất cả
             </a>
@@ -111,12 +111,12 @@
                             @if($product->deleted_at)
                                 {{-- Sản phẩm đã bị xóa mềm --}}
                                 <div class="btn-group" role="group">
-                                    <button class="btn btn-sm btn-success" 
+                                    <button class="btn btn-sm btn-success"
                                             onclick="restoreProduct({{ $product->id }})"
                                             title="Khôi phục sản phẩm">
                                         <i class="fa fa-undo"></i> Khôi phục
                                     </button>
-                                    <button class="btn btn-sm btn-danger" 
+                                    <button class="btn btn-sm btn-danger"
                                             onclick="forceDeleteProduct({{ $product->id }})"
                                             title="Xóa vĩnh viễn - Không thể hoàn tác">
                                         <i class="fa fa-trash-alt"></i> Xóa vĩnh viễn
@@ -125,17 +125,17 @@
                             @else
                                 {{-- Sản phẩm đang hoạt động --}}
                                 <div class="btn-group" role="group">
-                                    <a href="{{ route('admin.products.show', $product->id) }}" 
-                                       class="btn btn-sm btn-info text-white" 
+                                    <a href="{{ route('admin.products.show', $product->id) }}"
+                                       class="btn btn-sm btn-info text-white"
                                        title="Xem chi tiết sản phẩm">
                                         <i class="fa fa-eye"></i> Chi tiết
                                     </a>
-                                    <a href="{{ route('admin.products.edit', $product->id) }}" 
-                                       class="btn btn-sm btn-warning text-white" 
+                                    <a href="{{ route('admin.products.edit', $product->id) }}"
+                                       class="btn btn-sm btn-warning text-white"
                                        title="Chỉnh sửa thông tin sản phẩm">
                                         <i class="fa fa-edit"></i> Sửa
                                     </a>
-                                    <button class="btn btn-sm btn-danger" 
+                                    <button class="btn btn-sm btn-danger"
                                             onclick="deleteProduct({{ $product->id }})"
                                             title="Xóa sản phẩm (có thể khôi phục)">
                                         <i class="fa fa-trash"></i> Xóa
@@ -183,7 +183,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.deleteProduct = function(id) {
         if (confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) {
             const csrfToken = getCSRFToken();
-            
+
             if (!csrfToken) {
                 alert('Lỗi: Không tìm thấy CSRF token');
                 return;
@@ -222,7 +222,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.restoreProduct = function(id) {
         if (confirm('Bạn có chắc chắn muốn khôi phục sản phẩm này?')) {
             const csrfToken = getCSRFToken();
-            
+
             if (!csrfToken) {
                 alert('Lỗi: Không tìm thấy CSRF token');
                 return;
@@ -259,7 +259,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.forceDeleteProduct = function(id) {
         if (confirm('⚠️ CẢNH BÁO: Bạn có chắc chắn muốn xóa VĨNH VIỄN sản phẩm này?\n\n\nNhấn OK để tiếp tục hoặc Cancel để hủy.')) {
             const csrfToken = getCSRFToken();
-            
+
             if (!csrfToken) {
                 alert('Lỗi: Không tìm thấy CSRF token');
                 return;
@@ -352,13 +352,13 @@ document.addEventListener('DOMContentLoaded', function() {
         flex-direction: column;
         gap: 2px;
     }
-    
+
     .btn-sm {
         min-width: 70px;
         font-size: 0.75rem;
         padding: 0.25rem 0.5rem;
     }
-    
+
     .btn-sm i {
         margin-right: 3px;
     }
