@@ -38,8 +38,10 @@ Route::middleware(['auth', 'role:admin','ban'])->prefix('admin')->name('admin.')
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Quản lý sản phẩm
+    // Quản lý sản phẩm (cập nhật với soft delete)
     Route::resource('products', ProductController::class);
+    Route::post('products/{product}/restore', [ProductController::class, 'restore'])->name('products.restore')->withTrashed();
+    Route::delete('products/{product}/force-delete', [ProductController::class, 'forceDelete'])->name('products.forceDelete')->withTrashed();
 
     // Quản lý danh mục
     Route::resource('categories', CategoryController::class)->except(['show']);

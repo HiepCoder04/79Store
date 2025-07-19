@@ -126,6 +126,7 @@
         <form action="{{ url('/vnpay_payment') }}" method="POST" id="vnpay-form" style="display: none;">
             @csrf
             <input type="hidden" name="amount" value="{{ $finalTotal }}">
+            <input type="hidden" name="redirect" value="1">
             <input type="hidden" name="voucher_id" value="{{ $voucher?->id }}">
             <input type="hidden" name="discount" value="{{ $discount }}">
 
