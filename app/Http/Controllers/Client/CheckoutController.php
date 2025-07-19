@@ -16,41 +16,54 @@ use App\Models\UserVoucher;
 
 class CheckoutController extends Controller
 {
-    public function index()
-    {
-        $user = Auth::user();
+    public function index(Request $request)
+{
+    $user = Auth::user();
+    $selectedIds = collect(explode(',', $request->get('selected', '')))
+        ->filter(fn($id) => is_numeric($id))
+        ->map(fn($id) => (int) $id)
+        ->unique()
+        ->values();
 
-        $cart = Cart::with('items.productVariant.product')
-            ->where('user_id', $user->id)
-            ->first();
-        if (!$cart || $cart->items->isEmpty()) {
-            return redirect()->route('cart.index')->with('error', 'Giỏ hàng của bạn đang trống.');
-        }
+    $cart = Cart::with(['items.productVariant.product.galleries'])->where('user_id', $user->id)->first();
 
-        $addresses = UserAddress::where('user_id', $user->id)->get();
+    if (!$cart || $cart->items->isEmpty()) {
+        return redirect()->route('cart.index')->with('error', 'Giỏ hàng của bạn đang trống.');
+    }
 
-        // Voucher (áp dụng nếu có trong session)
-        $voucher = null;
-        $discount = 0;
-        $cartTotal = $cart->items->sum(fn($item) => $item->productVariant->price * $item->quantity);
-        $finalTotal = $cartTotal;
+    // Nếu có danh sách được chọn thì lọc lại item
+    if ($selectedIds->isNotEmpty()) {
+        $cart->setRelation('items', $cart->items->whereIn('id', $selectedIds));
+    }
 
-        $voucherId = session('applied_voucher');
-        if ($voucherId) {
-            $voucher = Voucher::find($voucherId);
-            if ($voucher && $voucher->is_active && now()->between($voucher->start_date, $voucher->end_date)) {
-                if ($cartTotal >= $voucher->min_order_amount) {
-                    $discount = $cartTotal * ($voucher->discount_percent / 100);
-                    if ($voucher->max_discount && $discount > $voucher->max_discount) {
-                        $discount = $voucher->max_discount;
-                    }
-                    $finalTotal = $cartTotal - $discount;
+    if ($cart->items->isEmpty()) {
+        return redirect()->route('cart.index')->with('error', 'Vui lòng chọn ít nhất một sản phẩm để thanh toán.');
+    }
+
+    $addresses = UserAddress::where('user_id', $user->id)->get();
+
+    // Voucher (áp dụng nếu có trong session)
+    $voucher = null;
+    $discount = 0;
+    $cartTotal = $cart->items->sum(fn($item) => $item->productVariant->price * $item->quantity);
+    $finalTotal = $cartTotal;
+
+    $voucherId = session('applied_voucher');
+    if ($voucherId) {
+        $voucher = Voucher::find($voucherId);
+        if ($voucher && $voucher->is_active && now()->between($voucher->start_date, $voucher->end_date)) {
+            if ($cartTotal >= $voucher->min_order_amount) {
+                $discount = $cartTotal * ($voucher->discount_percent / 100);
+                if ($voucher->max_discount && $discount > $voucher->max_discount) {
+                    $discount = $voucher->max_discount;
                 }
+                $finalTotal = $cartTotal - $discount;
             }
         }
-
-        return view('client.users.Checkout', compact('cart', 'addresses', 'user', 'voucher', 'discount', 'cartTotal', 'finalTotal'));
     }
+
+    return view('client.users.Checkout', compact('cart', 'addresses', 'user', 'voucher', 'discount', 'cartTotal', 'finalTotal'));
+}
 
     public function store(Request $request)
     {

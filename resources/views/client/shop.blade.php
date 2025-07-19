@@ -246,7 +246,7 @@
                                                 $maxPrice = $product->variants->max('price');
                                             @endphp
 
-                                            <h6>
+                                            <h6 class="text-success fw-bold">
                                                 {{ number_format($minPrice, 0, ',', '.') }}đ
                                                 @if ($minPrice != $maxPrice)
                                                     – {{ number_format($maxPrice, 0, ',', '.') }}đ
