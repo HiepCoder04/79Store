@@ -16,13 +16,14 @@
                                 <div class="testimonial-content">
                                     <!-- Section Heading -->
                                     <div class="section-heading">
-                                        <h2>TESTIMONIAL</h2>
-                                        <p>Some kind words from clients about Alazea</p>
+                                        <h2>CẢM NHẬN KHÁCH HÀNG</h2>
+                                        <p style="font-size: 20px; font-weight: 600;">
+                                   Những lời chia sẻ chân thành từ khách hàng về 79Store</p>
                                     </div>
-                                    <p>“Alazea is a pleasure to work with. Their ideas are creative, they came up with imaginative solutions to some tricky issues, their landscaping and planting contacts are equally excellent we have a beautiful but also manageable garden as a result. Thank you!”</p>
+                                    <p>“Làm việc với 79Store thật dễ chịu. Họ có nhiều ý tưởng sáng tạo và thực hiện rất chuyên nghiệp. Khu vườn giờ vừa đẹp vừa dễ chăm sóc. Cảm ơn!”</p>
                                     <div class="testimonial-author-info">
-                                        <h6>Mr. Nick Jonas</h6>
-                                        <p>CEO of NAVATECH</p>
+                                        <h6>Ông Nazrul Islam</h6>
+                                        <p>Giám đốc điều hành NAVATECH</p>
                                     </div>
                                 </div>
                             </div>
@@ -34,20 +35,21 @@
                         <div class="row align-items-center">
                             <div class="col-12 col-md-6">
                                 <div class="testimonial-thumb">
-                                    <img src="{{ asset('assets/img/bg-img/14.jpg') }}" alt="">
+                                    <img src="{{ asset('assets/img/bg-img/14.jpg') }}" alt="Khách hàng X">
                                 </div>
                             </div>
                             <div class="col-12 col-md-6">
                                 <div class="testimonial-content">
                                     <!-- Section Heading -->
                                     <div class="section-heading">
-                                        <h2>TESTIMONIAL</h2>
-                                        <p>Some kind words from clients about Alazea</p>
+                                        <h2>CẢM NHẬN KHÁCH HÀNG</h2>
+                                     <p style="font-size: 20px; font-weight: 600;">
+                                        Những lời chia sẻ chân thành từ khách hàng về 79Store</p>
                                     </div>
-                                    <p>“Alazea is a pleasure to work with. Their ideas are creative, they came up with imaginative solutions to some tricky issues, their landscaping and planting contacts are equally excellent we have a beautiful but also manageable garden as a result. Thank you!”</p>
+                                    <p>79Store là một đối tác tuyệt vời. Họ rất sáng tạo, đưa ra những giải pháp độc đáo cho các vấn đề khó. Khu vườn của chúng tôi giờ đây vừa đẹp mắt vừa dễ chăm sóc. Cảm ơn rất nhiều!”</p>
                                     <div class="testimonial-author-info">
-                                        <h6>Mr. Nazrul Islam</h6>
-                                        <p>CEO of NAVATECH</p>
+                                        <h6>Bà Nazrul Islam</h6>
+                                        <p>Giám đốc điều hành NAVATECH</p>
                                     </div>
                                 </div>
                             </div>
@@ -66,13 +68,14 @@
                                 <div class="testimonial-content">
                                     <!-- Section Heading -->
                                     <div class="section-heading">
-                                        <h2>TESTIMONIAL</h2>
-                                        <p>Some kind words from clients about Alazea</p>
+                                        <h2>CẢM NHẬN KHÁCH HÀNG</h2>
+                                       <p style="font-size: 20px; font-weight: 600;">
+                                        Những lời chia sẻ chân thành từ khách hàng về 79Store</p>
                                     </div>
-                                    <p>“Alazea is a pleasure to work with. Their ideas are creative, they came up with imaginative solutions to some tricky issues, their landscaping and planting contacts are equally excellent we have a beautiful but also manageable garden as a result. Thank you!”</p>
+                                    <p>79Store thực sự đáng tin cậy và sáng tạo. Nhờ họ, chúng tôi có một khu vườn lý tưởng – đẹp, tiện lợi và dễ bảo trì. Xin chân thành cảm ơn!”</p>
                                     <div class="testimonial-author-info">
-                                        <h6>Mr. Jonas Nick</h6>
-                                        <p>CEO of NAVATECH</p>
+                                        <h6>Ông Jonas Nick</h6>
+                                        <p>Giám đốc điều hành NAVATECH</p>
                                     </div>
                                 </div>
                             </div>

@@ -6,7 +6,9 @@
                 <!-- Section Heading -->
                 <div class="section-heading text-center">
                     <h2>TIN TỨC MỚI NHẤT</h2>
-                    <p>Các bài viết chia sẻ kiến thức mới nhất từ chúng tôi</p>
+<p style="font-size: 20px; font-weight: 600;">
+   Các bài viết chia sẻ kiến thức mới nhất từ chúng tôi.
+</p>
                 </div>
             </div>
         </div>
@@ -20,7 +22,7 @@
                         <div class="post-thumbnail mb-30">
                             <a href="{{ route('client.blogs.show', $blog->slug) }}">
                                 @if($blog->img)
-                                    <img src="{{ asset($blog->img) }}" alt="{{ $blog->title }}">
+                                    <img src="{{ asset($blog->img) }}" alt="{{ $blog->title }}" loading="lazy">
                                 @else
                                     <img src="{{ asset('client/img/bg-img/6.jpg') }}" alt="{{ $blog->title }}">
                                 @endif
@@ -31,7 +33,7 @@
                                 <h5>{{ Str::limit($blog->title, 60) }}</h5>
                             </a>
                             <div class="post-meta">
-                                <a href="#"><i class="fa fa-clock-o" aria-hidden="true"></i> {{ $blog->created_at->format('d M Y') }}</a>
+                                <a href="#"><i class="fa fa-clock-o" aria-hidden="true"></i> {{ $blog->created_at->format('d/m/Y') }}</a>
                                 @if($blog->category)
                                     {{-- Đảm bảo luôn truyền tham số slug khi tạo URL --}}
                                     <a href="{{ route('client.blogs.category', ['slug' => $blog->category->slug]) }}">
@@ -39,7 +41,10 @@
                                     </a>
                                 @endif
                             </div>
-                            <p class="post-excerpt">{{ Str::limit(strip_tags($blog->content), 100) }}</p>
+<p class="post-excerpt">
+    {{ Str::limit(strip_tags($blog->content), 100) }}
+    <a href="{{ route('client.blogs.show', $blog->slug) }}" class="text-success">Đọc thêm</a>
+</p>
                         </div>
                     </div>
                 </div>
@@ -50,10 +55,11 @@
                 </div>
             @endif
         </div>
-        
+
         <div class="row">
             <div class="col-12 text-center mb-100">
-                <a href="{{ route('client.blogs.index') }}" class="btn alazea-btn">Xem tất cả bài viết</a>
+                <a href="{{ route('client.blogs.index') }}" class="btn alazea-btn" title="Xem tất cả tin tức">Xem tất cả bài viết</a>
+
             </div>
         </div>
     </div>

@@ -354,7 +354,7 @@
         bottom: 70px;
         right: -10px;
     }
-    
+
     .chatbot-widget {
         bottom: 15px;
         right: 15px;
@@ -417,16 +417,16 @@ document.addEventListener('DOMContentLoaded', function() {
     function sendMessage(message) {
         // Add user message to chat
         addMessage(message, 'user');
-        
+
         // Clear input
         chatbotMessage.value = '';
-        
+
         // Hide suggestions
         chatbotSuggestions.style.display = 'none';
-        
+
         // Show typing indicator
         chatbotTyping.style.display = 'flex';
-        
+
         // Scroll to bottom
         scrollToBottom();
 
@@ -445,13 +445,13 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             // Hide typing indicator
             chatbotTyping.style.display = 'none';
-            
+
             if (data.success) {
                 addMessage(data.message, 'bot');
             } else {
                 addMessage('Xin lỗi, tôi đang gặp sự cố. Vui lòng thử lại sau.', 'bot');
             }
-            
+
             scrollToBottom();
         })
         .catch(error => {
@@ -465,23 +465,32 @@ document.addEventListener('DOMContentLoaded', function() {
     function addMessage(message, sender) {
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${sender}-message`;
-        
+
         const avatarDiv = document.createElement('div');
         avatarDiv.className = 'message-avatar';
-        
+
         if (sender === 'bot') {
             avatarDiv.innerHTML = '<img src="{{ asset("assets/img/core-img/leaf.png") }}" alt="Bot">';
         } else {
             avatarDiv.innerHTML = '<img src="{{ asset("assets/img/core-img/user-avatar.png") }}" alt="User" onerror="this.style.display=\'none\'">';
         }
-        
+
         const contentDiv = document.createElement('div');
         contentDiv.className = 'message-content';
-        contentDiv.innerHTML = `<p>${message}</p>`;
-        
+function escapeHtml(unsafe) {
+    return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+contentDiv.innerHTML = `<p>${escapeHtml(message)}</p>`;
+
         messageDiv.appendChild(avatarDiv);
         messageDiv.appendChild(contentDiv);
-        
+
         chatbotMessages.appendChild(messageDiv);
     }
 
