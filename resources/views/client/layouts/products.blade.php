@@ -4,8 +4,8 @@
             <div class="col-12">
                 <div class="section-heading text-center">
                     <h2>SẢN PHẨM MỚI</h2>
-<p style="font-size: 20px; font-weight: 600;">
-Chúng tôi liên tục cập nhật những sản phẩm mới nhất cho bạn.</p>
+                    <p style="font-size: 20px; font-weight: 600;">
+                        Chúng tôi liên tục cập nhật những sản phẩm mới nhất cho bạn.</p>
                 </div>
             </div>
         </div>
