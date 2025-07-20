@@ -5,11 +5,12 @@
                 <!-- Section Heading -->
                 <div class="section-heading">
                     <h2>VỀ CHÚNG TÔI</h2>
-<p style="font-size: 20px; font-weight: 600;">
-    Chúng tôi đi đầu trong lĩnh vực cung cấp cây trồng và thiết kế cảnh quan.
-</p>
+                    <p style="font-size: 20px; font-weight: 600;">
+                        Chúng tôi đi đầu trong lĩnh vực cung cấp cây trồng và thiết kế cảnh quan.
+                    </p>
                 </div>
-                <p>Chúng tôi tự hào mang đến các giải pháp cây xanh cho văn phòng, nhà ở và không gian công cộng. Đội ngũ chuyên nghiệp, tận tâm sẽ giúp bạn kiến tạo không gian sống xanh, sạch và bền vững.</p>
+                <p>Chúng tôi tự hào mang đến các giải pháp cây xanh cho văn phòng, nhà ở và không gian công cộng. Đội
+                    ngũ chuyên nghiệp, tận tâm sẽ giúp bạn kiến tạo không gian sống xanh, sạch và bền vững.</p>
 
                 <!-- Progress Bar Content Area -->
                 <div class="alazea-progress-bar mb-50">
@@ -56,7 +57,8 @@
                             <div class="single-benefits-area">
                                 <img src="{{ asset('assets/img/core-img/b1.png') }}" alt="">
                                 <h5>Sản phẩm chất lượng</h5>
-                                <p>Chúng tôi cam kết cung cấp cây trồng và sản phẩm trang trí chất lượng cao, tuyển chọn kỹ lưỡng.</p>
+                                <p>Chúng tôi cam kết cung cấp cây trồng và sản phẩm trang trí chất lượng cao, tuyển chọn
+                                    kỹ lưỡng.</p>
                             </div>
                         </div>
 
@@ -64,7 +66,8 @@
                             <div class="single-benefits-area">
                                 <img src="{{ asset('assets/img/core-img/b2.png') }}" alt="">
                                 <h5>Dịch vụ hoàn hảo</h5>
-                                <p>Hỗ trợ tận tình trước - trong - sau khi mua hàng, luôn đặt sự hài lòng của khách hàng lên hàng đầu.</p>
+                                <p>Hỗ trợ tận tình trước - trong - sau khi mua hàng, luôn đặt sự hài lòng của khách hàng
+                                    lên hàng đầu.</p>
                             </div>
                         </div>
 
@@ -72,7 +75,8 @@
                             <div class="single-benefits-area">
                                 <img src="{{ asset('assets/img/core-img/b3.png') }}" alt="">
                                 <h5>100% Tự nhiên</h5>
-                                <p>Tất cả cây trồng đều là cây thật, được chăm sóc theo quy trình chuẩn, thân thiện với môi trường.</p>
+                                <p>Tất cả cây trồng đều là cây thật, được chăm sóc theo quy trình chuẩn, thân thiện với
+                                    môi trường.</p>
                             </div>
                         </div>
 
@@ -80,7 +84,8 @@
                             <div class="single-benefits-area">
                                 <img src="{{ asset('assets/img/core-img/b4.png') }}" alt="">
                                 <h5>Bảo vệ môi trường</h5>
-                                <p>Chúng tôi luôn đề cao tính bền vững và góp phần xây dựng không gian sống xanh sạch đẹp.</p>
+                                <p>Chúng tôi luôn đề cao tính bền vững và góp phần xây dựng không gian sống xanh sạch
+                                    đẹp.</p>
                             </div>
                         </div>
                     </div>

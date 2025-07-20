@@ -8,7 +8,7 @@
         <!-- Top Breadcrumb Area -->
         <div class="top-breadcrumb-area bg-img bg-overlay d-flex align-items-center justify-content-center"
             style="background-image: url({{ asset('assets/img/bg-img/24.jpg') }});">
-            <h2>Shop</h2>
+            <h2>Cửa hàng</h2>
         </div>
 
         <div class="container">
@@ -16,9 +16,9 @@
                 <div class="col-12">
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="{{ route('home') }}"><i class="fa fa-home"></i> Home</a>
+                            <li class="breadcrumb-item"><a href="{{ route('home') }}"><i class="fa fa-home"></i>Trang chủ</a>
                             </li>
-                            <li class="breadcrumb-item active" aria-current="page">Shop</li>
+                            <li class="breadcrumb-item active" aria-current="page">Cửa hàng</li>
                         </ol>
                     </nav>
                 </div>
@@ -36,24 +36,24 @@
                     <div class="shop-sorting-data d-flex flex-wrap align-items-center justify-content-between">
                         <!-- Shop Page Count -->
                         <div class="shop-page-count">
-                            <p>Showing 1–9 of 72 results</p>
+                            <p>Hiển thị {{ $products->firstItem() }}–{{ $products->lastItem() }} trên tổng số {{ $products->total() }} sản phẩm</p>
                         </div>
                         <!-- Search by Terms -->
                         <div class="search_by_terms">
                             <form action="#" method="get" class="form-inline">
                                 <select class="custom-select widget-title" name="sort_by">
-                                    <option value="popularity" selected>Short by Popularity</option>
-                                    <option value="newest">Short by Newest</option>
-                                    <option value="sales">Short by Sales</option>
-                                    <option value="ratings">Short by Ratings</option>
+                                    <option value="popularity" selected>Sắp xếp theo: Phổ biến</option>
+                                    <option value="newest">Mới nhất</option>
+                                    <option value="sales">Bán chạy</option>
+                                    <option value="ratings">Đánh giá</option>
                                 </select>
                                 <select class="custom-select widget-title" name="per_page">
-                                    <option value="9" selected>Show: 9</option>
+                                    <option value="9" selected>Hiện: 9</option>
                                     <option value="12">12</option>
                                     <option value="18">18</option>
                                     <option value="24">24</option>
                                 </select>
-                                <button type="submit" class="btn btn-sm alazea-btn ml-2">Filter</button>
+                                <button type="submit" class="btn btn-sm alazea-btn ml-2">Lọc</button>
                             </form>
                         </div>
                     </div>
@@ -67,7 +67,7 @@
 
                         <!-- Shop Widget -->
                         <div class="shop-widget price mb-50">
-                            <h4 class="widget-title">Prices</h4>
+                            <h4 class="widget-title">Sắp xếp tùy chọn</h4>
                             <!-- Shop Widget -->
 <div class="shop-widget sort-by mb-50">
     <h4 class="widget-title">Sắp xếp theo</h4>
@@ -148,37 +148,37 @@
 
                         <!-- Shop Widget -->
                         <div class="shop-widget sort-by mb-50">
-                            <h4 class="widget-title">Sort by</h4>
+                            <h4 class="widget-title">Sắp xếp theo</h4>
                             <div class="widget-desc">
                                 <!-- Single Checkbox -->
                                 <div class="custom-control custom-checkbox d-flex align-items-center mb-2">
                                     <input type="checkbox" class="custom-control-input" id="customCheck7" name="sort[]"
                                         value="new">
-                                    <label class="custom-control-label" for="customCheck7">New arrivals</label>
+                                    <label class="custom-control-label" for="customCheck7">Hàng mới nhất</label>
                                 </div>
                                 <!-- Single Checkbox -->
                                 <div class="custom-control custom-checkbox d-flex align-items-center mb-2">
                                     <input type="checkbox" class="custom-control-input" id="customCheck8" name="sort[]"
                                         value="a-z">
-                                    <label class="custom-control-label" for="customCheck8">Alphabetically, A-Z</label>
+                                    <label class="custom-control-label" for="customCheck8">Từ A đến Z</label>
                                 </div>
                                 <!-- Single Checkbox -->
                                 <div class="custom-control custom-checkbox d-flex align-items-center mb-2">
                                     <input type="checkbox" class="custom-control-input" id="customCheck9" name="sort[]"
                                         value="z-a">
-                                    <label class="custom-control-label" for="customCheck9">Alphabetically, Z-A</label>
+                                    <label class="custom-control-label" for="customCheck9">Từ Z đến A</label>
                                 </div>
                                 <!-- Single Checkbox -->
                                 <div class="custom-control custom-checkbox d-flex align-items-center mb-2">
                                     <input type="checkbox" class="custom-control-input" id="customCheck10" name="sort[]"
                                         value="low-high">
-                                    <label class="custom-control-label" for="customCheck10">Price: low to high</label>
+                                    <label class="custom-control-label" for="customCheck10">Giá: Thấp đến Cao</label>
                                 </div>
                                 <!-- Single Checkbox -->
                                 <div class="custom-control custom-checkbox d-flex align-items-center">
                                     <input type="checkbox" class="custom-control-input" id="customCheck11"
                                         name="sort[]" value="high-low">
-                                    <label class="custom-control-label" for="customCheck11">Price: high to low</label>
+                                    <label class="custom-control-label" for="customCheck11">Giá: Cao đến Thấp</label>
                                 </div>
                             </div>
                         </div>
@@ -189,7 +189,7 @@
                 </div>
 
                 <!-- All Products Area -->
-                
+
                 <div class="col-12 col-md-8 col-lg-9">
                     <div class="shop-products-area">
                    @if (request('keyword'))
@@ -198,7 +198,7 @@
     </h4>
 @endif
                         <div class="row">
-                        
+
                             @foreach ($products as $product)
                                 <div class="col-12 col-sm-6 col-lg-4">
                                     <div class="single-product-area mb-50">
@@ -208,8 +208,8 @@
                                                 @php
                                     $image = optional($product->galleries->first())->image;
                                     $imagePath = $image
-                                        ? asset(ltrim($image, '/'))  // Loại bỏ dấu / đầu nếu có
-                                        : asset('assets/img/bg-img/default.jpg');
+                                        ? asset(ltrim($image, '/'))
+                                        : asset('assets/img/core-img/b1.png');
                                 @endphp
 
                                                 <img src="{{ $imagePath }}"                                                    onerror="this.onerror=null;this.src='{{ asset('assets/img/default.jpg') }}';"
@@ -218,7 +218,7 @@
                                             </a>
 
                                             <div class="product-tag">
-                                                <a href="#">Hot</a>
+                                                <a href="#">Nổi bật</a>
                                             </div>
 
                                             <div class="product-meta d-flex">
@@ -227,7 +227,7 @@
                                                 <form action="{{ route('cart.add') }}" method="POST">
                                                     @csrf
                                                     <input type="hidden" name="product_id" value="{{ $product->id }}">
-                                                    <button type="submit" class="add-to-cart-btn">Add to cart</button>
+                                                    <button type="submit" class="add-to-cart-btn">Thêm vào yêu thích</button>
                                                 </form>
 
                                                 <a href="#" class="compare-btn"><i
@@ -318,8 +318,8 @@
             </div>
         </div>
     </section>
-@endsection 
-sửa cho tôi "@php
+@endsection
+@php
     $minPrice = $product->variants->min('price');
     $maxPrice = $product->variants->max('price');
 @endphp

@@ -2,10 +2,10 @@
 
     <!-- Top Header Area -->
     <div class="top-header-area py-2  text-white">
-    <div class="container">
-        <div class="row">
-            <div class="col-12">
-                <div class="top-header-content d-flex align-items-center justify-content-between">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="top-header-content d-flex align-items-center justify-content-between">
 
                         <!-- Thông tin liên hệ -->
                         <div class="top-header-meta">
@@ -30,49 +30,50 @@
                             </div> --}}
 
                             <!-- Đăng nhập / User -->
-<div class="top-header-right d-flex align-items-center justify-content-end gap-1">
+                            <div class="top-header-right d-flex align-items-center justify-content-end gap-1">
 
-                            <div class="login">
-                                @if (Auth::check())
-                                    <div class="user-dropdown">
-                                        <a href="#" class="user-toggle">
-                                            <i class="fa fa-user"></i>
-                                            <span>{{ Auth::user()->name }}</span>
+                                <div class="login">
+                                    @if (Auth::check())
+                                        <div class="user-dropdown">
+                                            <a href="#" class="user-toggle">
+                                                <i class="fa fa-user"></i>
+                                                <span>{{ Auth::user()->name }}</span>
+                                            </a>
+                                            <ul class="user-dropdown-menu">
+                                                <li>
+                                                    <a href="{{ route('auth.logout') }}"
+                                                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                                        <i class="fa fa-sign-out-alt"></i> Đăng xuất
+                                                    </a> </a>
+                                                    <form id="logout-form" action="{{ route('auth.logout') }}"
+                                                        method="POST" style="display: none;">@csrf</form>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    @else
+                                        <a href="{{ route('auth.login') }}">
+                                            <i class="fa fa-user"></i> <span>Đăng nhập</span>
                                         </a>
-                                        <ul class="user-dropdown-menu">
-                                            <li>
-                                                <a href="{{ route('auth.logout') }}"
-                                                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                                    Đăng xuất
-                                                </a>
-                                                <form id="logout-form" action="{{ route('auth.logout') }}" method="POST"
-                                                    style="display: none;">@csrf</form>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                @else
-                                    <a href="{{ route('auth.login') }}">
-                                        <i class="fa fa-user"></i> <span>Đăng nhập</span>
-                                    </a>
-                                    <span class="mx-1"></span>
-                                    <a href="{{ route('auth.register') }}">
-                                        <span>Đăng ký</span>
-                                    </a>
-                                @endif
-                            </div>
+                                        <span class="mx-1"></span>
+                                        <a href="{{ route('auth.register') }}">
+                                            <span>Đăng ký</span>
+                                        </a>
+                                    @endif
+                                </div>
 
-                            <!-- Giỏ hàng -->
-                            <div class="cart ml-3">
-                                <a href="{{ route('cart.index') }}"><i class="fa fa-shopping-cart"></i>
-                                    <span>Giỏ hàng <span class="cart-quantity">({{ session('cart') ? count(session('cart')) : 0 }})</span></span></a>
-                            </div>
+                                <!-- Giỏ hàng -->
+                                <div class="cart ml-3">
+                                    <a href="{{ route('cart.index') }}"><i class="fa fa-shopping-cart"></i>
+                                        <span>Giỏ hàng <span
+                                                class="cart-quantity">({{ session('cart') ? count(session('cart')) : 0 }})</span></span></a>
+                                </div>
 
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
     </div>
 
     <!-- Navbar -->
@@ -83,7 +84,7 @@
 
                     <!-- Logo -->
                     <a href="{{ route('home') }}" class="nav-brand">
-                        <img src="{{ asset('http://127.0.0.1:8000/assets/img/core-img/leaf.png') }}" alt="79Store Logo" style="height: 50px;">
+                        <img src="{{ asset('assets/img/core-img/leaf.png') }}" alt="79Store Logo" style="height: 50px;">
                     </a>
 
                     <!-- Toggle (Responsive) -->
@@ -119,7 +120,8 @@
                 <!-- Form tìm kiếm -->
                 <div class="search-form">
                     <form action="{{ route('shop') }}" method="GET">
-                        <input type="search" name="keyword" placeholder="Tìm sản phẩm..." value="{{ request('keyword') }}">
+                        <input type="search" name="keyword" placeholder="Tìm sản phẩm..."
+                            value="{{ request('keyword') }}">
                     </form>
                 </div>
             </div>
@@ -129,84 +131,90 @@
 
 <!-- Style cho user dropdown và responsive -->
 <style>
-.user-dropdown {
-    position: relative;
-    display: inline-block;
-}
-.user-dropdown .user-toggle {
-    color: #5c5c5c;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    cursor: pointer;
-}
-.user-dropdown-menu {
-    display: none;
-    position: absolute;
-    right: 0;
-    list-style: none;
-    padding: 10px 0;
-    margin: 0;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    border-radius: 5px;
-    min-width: 140px;
-    background-color: white;
-    z-index: 999;
-}
-.user-dropdown:hover .user-dropdown-menu {
-    display: block;
-}
-.user-dropdown-menu li {
-    padding: 5px 20px;
-}
-.user-dropdown-menu li a {
-    color: #333;
-    text-decoration: none;
-    display: block;
-    text-align: center;
-    padding: 8px 10px;
-    transition: background-color 0.2s ease;
-}
-.user-dropdown-menu li a:hover {
-    color: #000;
-}
-.user-dropdown-menu {
-    display: none;
-    position: absolute;
-    top: 100%;
-    right: 0;
-    background: white;
-    border: 1px solid #ccc;
-    padding: 10px;
-    list-style: none;
-    z-index: 999;
-}
+    .user-dropdown {
+        position: relative;
+        display: inline-block;
+    }
 
-.user-dropdown:hover .user-dropdown-menu {
-    display: block;
-}
+    .user-dropdown .user-toggle {
+        color: #5c5c5c;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        cursor: pointer;
+    }
 
-.user-toggle {
-    text-decoration: none;
-    color: #333;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
+    .user-dropdown-menu {
+        display: none;
+        position: absolute;
+        right: 0;
+        list-style: none;
+        padding: 10px 0;
+        margin: 0;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        border-radius: 5px;
+        min-width: 140px;
+        background-color: rgb(245, 233, 233);
+        z-index: 999;
+    }
 
-.login a, .cart a {
-    text-decoration: none;
-    color: #fff;
-}
+    .user-dropdown:hover .user-dropdown-menu {
+        display: block;
+    }
 
-.cart-quantity {
-    font-weight: bold;
-    color: #ffc107;
-}
+    .user-dropdown-menu li {
+        padding: 5px 20px;
+    }
 
+    .user-dropdown-menu li a {
+        color: #333;
+        text-decoration: none;
+        display: block;
+        text-align: center;
+        padding: 8px 10px;
+        transition: background-color 0.2s ease;
+    }
 
+    .user-dropdown-menu li a:hover {
+        background-color: #13e68b;
+        color: #000 !important;
+    }
 
+    .user-dropdown-menu {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: rgb(17, 148, 26);
+        border: 1px solid #ccc;
+        padding: 10px;
+        list-style: none;
+        z-index: 999;
+    }
+
+    .user-dropdown:hover .user-dropdown-menu {
+        display: block;
+    }
+
+    .user-toggle {
+        text-decoration: none;
+        color: #333;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .login a,
+    .cart a {
+        text-decoration: none;
+        color: #fff;
+    }
+
+    .cart-quantity {
+        font-weight: bold;
+        color: #ffc107;
+    }
 </style>
 
 @include('client.layouts.thongbao')
