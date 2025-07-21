@@ -164,15 +164,21 @@ class CheckoutController extends Controller
             ]);
 
             foreach ($cart->items as $item) {
+                $variant = $item->productVariant;
+    $product = $variant->product;
+
+
                 OrderDetail::create([
-                    'order_id' => $order->id,
-                    'product_id' => $item->productVariant->product_id,
-                    'product_variant_id' => $item->product_variant_id,
-                    'product_name' => $item->productVariant->product->name,
-                    'variant_name' => $item->productVariant->size . ' / ' . $item->productVariant->pot,
-                    'price' => $item->productVariant->price,
-                    'quantity' => $item->quantity,
-                    'total_price' => $item->productVariant->price * $item->quantity,
+                   'order_id' => $order->id,
+        'product_id' => $product->id,
+        'product_variant_id' => $variant->id,
+        'product_name' => $product->name,
+        'variant_name' => $variant->size . ' / ' . $variant->pot,
+        'product_height' => $variant->height,         
+        'product_pot' => $variant->pot,               
+        'price' => $variant->price,
+        'quantity' => $item->quantity,
+        'total_price' => $variant->price * $item->quantity,
                 ]);
             }
 
