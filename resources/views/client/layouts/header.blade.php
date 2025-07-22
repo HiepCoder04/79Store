@@ -37,18 +37,30 @@
                                         <div class="user-dropdown">
                                             <a href="#" class="user-toggle">
                                                 <i class="fa fa-user"></i>
+                                                @if (Auth::user()->avatar)
+                                                    <img id="header-avatar"
+                                                        src="{{ asset('img/avatars/' . Auth::user()->avatar) }}"
+                                                        alt="Avatar"
+                                                        style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">
+                                                @endif
                                                 <span>{{ Auth::user()->name }}</span>
                                             </a>
                                             <ul class="user-dropdown-menu">
                                                 <li>
+                                                    <a href="{{ route('client.account.index') }}">
+                                                        <i class="fa fa-user-circle"></i> Tài khoản của tôi
+                                                    </a>
+                                                </li>
+                                                <li>
                                                     <a href="{{ route('auth.logout') }}"
                                                         onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                                         <i class="fa fa-sign-out-alt"></i> Đăng xuất
-                                                    </a> </a>
+                                                    </a>
                                                     <form id="logout-form" action="{{ route('auth.logout') }}"
                                                         method="POST" style="display: none;">@csrf</form>
                                                 </li>
                                             </ul>
+
                                         </div>
                                     @else
                                         <a href="{{ route('auth.login') }}">
@@ -84,7 +96,8 @@
 
                     <!-- Logo -->
                     <a href="{{ route('home') }}" class="nav-brand">
-                        <img src="{{ asset('assets/img/core-img/leaf.png') }}" alt="79Store Logo" style="height: 50px;">
+                        <img src="{{ asset('assets/img/core-img/leaf.png') }}" alt="79Store Logo"
+                            style="height: 50px;">
                     </a>
 
                     <!-- Toggle (Responsive) -->
