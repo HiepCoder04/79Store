@@ -82,7 +82,9 @@
             </div>
             <div class="col">
                 <h6 class="mb-1">{{ $product->name }}</h6>
-                <div class="text-muted small">Chậu: {{ $detail->productVariant->pot }}</div>
+                <div class="text-muted small">Chậu: {{ $detail->product_pot }}</div>
+                <div class="text-muted small">Chiều cao: {{ $detail->product_height }}</div>
+                <div class="text-muted small">Giá: {{ $detail->price }}</div>
                 <div class="text-muted small">Số lượng: {{ $detail->quantity }}</div>
             </div>
         </div>
