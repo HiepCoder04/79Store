@@ -9,6 +9,7 @@
 
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    
 
     <!-- Title -->
     <title>79Store</title>
@@ -18,7 +19,6 @@
 
     <!-- Core Stylesheet -->
     <link rel="stylesheet" href="{{ asset('assets/style.css') }}">
-   @stack('scripts') 
 </head>
 
 <body>
@@ -26,7 +26,7 @@
     <div class="preloader d-flex align-items-center justify-content-center">
         <div class="preloader-circle"></div>
         <div class="preloader-img">
-                <img src="{{ asset('assets/img/core-img/leaf.png') }}" alt="">
+            <img src="{{ asset('assets/img/core-img/leaf.png') }}" alt="">
         </div>
     </div>
 
@@ -36,34 +36,31 @@
 
     @yield('content')
 
+    <!-- ##### Footer Area ##### -->
     @include('client.layouts.footer')
-    <!-- ##### Footer Area End ##### -->
 
     <!-- ##### Chatbot Widget ##### -->
     @include('client.layouts.chatbot')
 
     <!-- ##### All Javascript Files ##### -->
-    <!-- jQuery-2.2.4 js -->
-    <!-- jQuery -->
     <!-- jQuery -->
     <script src="{{ asset('assets/js/jquery/jquery-2.2.4.min.js') }}"></script>
 
-    <!-- Popper js -->
+    <!-- Popper -->
     <script src="{{ asset('assets/js/bootstrap/popper.min.js') }}"></script>
 
-    <!-- Bootstrap js -->
+    <!-- Bootstrap -->
     <script src="{{ asset('assets/js/bootstrap/bootstrap.min.js') }}"></script>
 
-    <!-- All Plugins js -->
+    <!-- All Plugins -->
     <script src="{{ asset('assets/js/plugins/plugins.js') }}"></script>
 
-    <!-- Active js -->
+    <!-- Active JS -->
     <script src="{{ asset('assets/js/active.js') }}"></script>
 
-    <!-- Custom page scripts -->
+    <!-- Page-specific scripts -->
     @yield('page_scripts')
-    @stack('scripts') 
-
+    @stack('scripts')
 </body>
 
 </html>

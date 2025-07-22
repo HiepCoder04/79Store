@@ -115,9 +115,16 @@ Route::middleware(['auth','ban'])->group(function () {
 Route::post('/{order}/reorder', [OrderController::class, 'reorder'])->name('reorder');
 Route::put('/{order}/return', [OrderController::class, 'returnOrder'])->name('return');
 
+    });
+    });
+    // THÔNG TIN TÀI KHOẢN (CLIENT)
+Route::prefix('tai-khoan')->name('client.account.')->group(function () {
+    Route::get('/', [App\Http\Controllers\Client\AccountController::class, 'index'])->name('index');
+    Route::get('/chinh-sua', [App\Http\Controllers\Client\AccountController::class, 'edit'])->name('edit');
+    Route::post('/update', [App\Http\Controllers\Client\AccountController::class, 'update'])->name('update');
+    Route::post('/account/update', [AccountController::class, 'update'])->name('client.account.update');
 
-    });
-    });
+});
 
 // -------------------- CỔNG THANH TOÁN --------------------
 Route::post('/vnpay_payment', [PaymentController::class, 'vnpay_payment']);
