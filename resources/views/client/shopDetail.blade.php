@@ -8,6 +8,7 @@
         'pot' => (string)$v->pot,
         'height' => (string)$v->height,
         'price' => $v->price,
+         'stock_quantity' => $v->stock_quantity,
     ]);
 @endphp
 
@@ -65,6 +66,7 @@
                     <div class="form-group" id="height-group" style="display:none;">
                         <label>Chọn chiều cao:</label><br>
                         <div id="height-buttons"></div>
+                         <p id="stock-display" class="text-muted mt-2"></p>
                     </div>
 
                     <div class="d-flex align-items-center mt-3 mb-3">
@@ -141,18 +143,22 @@
         }
 
         function updatePrice(pot, height) {
-            const variant = allVariants.find(v =>
-                v.pot.toLowerCase().trim() === pot.toLowerCase().trim() &&
-                v.height.toLowerCase().trim() === height.toLowerCase().trim()
-            );
-            const price = variant ? Number(variant.price).toLocaleString('vi-VN') + 'đ' : '0đ';
+    const variant = allVariants.find(v =>
+        v.pot.toLowerCase().trim() === pot.toLowerCase().trim() &&
+        v.height.toLowerCase().trim() === height.toLowerCase().trim()
+    );
 
-            priceDisplay.style.opacity = 0;
-            setTimeout(() => {
-                priceDisplay.textContent = price;
-                priceDisplay.style.opacity = 1;
-            }, 150);
-        }
+    const price = variant ? Number(variant.price).toLocaleString('vi-VN') + 'đ' : '0đ';
+    const stock = variant ? variant.stock_quantity : 0;
+
+    priceDisplay.style.opacity = 0;
+    setTimeout(() => {
+        priceDisplay.textContent = price;
+        priceDisplay.style.opacity = 1;
+        const stockText = stock > 0 ? `Còn ${stock} sản phẩm` : 'Hết hàng';
+        document.getElementById('stock-display').textContent = stockText;
+    }, 150);
+}
 
         // Bắt sự kiện click chậu
         document.querySelectorAll('.pot-option').forEach(btn => {
