@@ -32,6 +32,7 @@
         <!-- Main checkout form -->
         <form action="{{ route('checkout.store') }}" method="POST" id="checkout-form">
             @csrf
+             <input type="hidden" name="selected_ids" value="{{ request('selected') }}">
             <div class="row g-4">
                 <div class="col-lg-7">
                     @include('client.users.customer_info')
