@@ -1,6 +1,78 @@
 @extends('admin.layouts.dashboard')
 
 @section('content')
+<style>
+.container {
+    background: #ffffff;
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fdfdfd;
+}
+
+.table thead {
+    background-color: #f1f1f1;
+}
+
+.table th,
+.table td {
+    text-align: left;
+    padding: 12px 16px;
+    border: 1px solid #ddd;
+}
+
+.table tbody tr:hover {
+    background-color: #f9f9f9;
+}
+
+.btn {
+    padding: 6px 12px;
+    font-size: 14px;
+    border-radius: 4px;
+    margin-right: 4px;
+}
+
+.btn-info {
+    background-color: #17a2b8;
+    border: none;
+    color: white;
+}
+
+.btn-warning {
+    background-color: #ffc107;
+    border: none;
+    color: black;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border: none;
+    color: white;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border: none;
+    color: white;
+}
+
+.btn:hover {
+    opacity: 0.85;
+    transition: 0.2s ease;
+}
+</style>
+
 <div class="container">
     <h2>Danh sách sản phẩm</h2>
     <a href="{{ route('admin.products.create') }}" class="btn btn-primary mb-3">Thêm sản phẩm</a>
