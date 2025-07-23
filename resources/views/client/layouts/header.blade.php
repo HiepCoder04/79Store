@@ -120,6 +120,8 @@
                                 <li><a href="{{ route('shop') }}">Sản phẩm</a></li>
                                 <li><a href="{{ route('client.blogs.index') }}">Tin tức</a></li>
                                 <li><a href="{{ route('cart.index') }}">Giỏ hàng</a></li>
+                                <li><a href="{{ route('client.contact.form') }}">Liên hệ</a></li>
+
                             </ul>
 
                             <!-- Search -->
