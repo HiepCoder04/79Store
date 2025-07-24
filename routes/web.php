@@ -20,6 +20,7 @@ use App\Http\Controllers\Admin\VoucherController as AdminVoucherController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\ForgotPasswordOtpController;
+use App\Http\Controllers\Client\ContactController;
 use App\Http\Controllers\Client\AccountController;
 // -------------------- BLOG (CLIENT) --------------------
 Route::prefix('blogs')->middleware('ban')->name('client.blogs.')->group(function () {
