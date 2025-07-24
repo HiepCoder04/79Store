@@ -206,11 +206,11 @@
                                         <div class="product-img">
                                             <a href="{{ route('shop-detail', $product->id) }}">
                                                 @php
-                                    $image = optional($product->galleries->first())->image;
-                                    $imagePath = $image
-                                        ? asset(ltrim($image, '/'))
-                                        : asset('assets/img/core-img/b1.png');
-                                @endphp
+                                                    $image = optional($product->galleries->first())->image;
+                                                    $imagePath = $image
+                                                        ? asset(ltrim($image, '/'))
+                                                        : asset('assets/img/core-img/b1.png');
+                                                @endphp
 
                                                 <img src="{{ $imagePath }}"                                                    onerror="this.onerror=null;this.src='{{ asset('assets/img/default.jpg') }}';"
                                                     alt="{{ $product->name }}" width="100%">
@@ -221,7 +221,7 @@
                                                 <a href="#">Nổi bật</a>
                                             </div>
 
-                                            <div class="product-meta d-flex">
+                                            {{-- <div class="product-meta d-flex">
                                                 <a href="#" class="wishlist-btn"><i class="icon_heart_alt"></i></a>
 
                                                 <form action="{{ route('cart.add') }}" method="POST">
@@ -232,7 +232,7 @@
 
                                                 <a href="#" class="compare-btn"><i
                                                         class="arrow_left-right_alt"></i></a>
-                                            </div>
+                                            </div> --}}
                                         </div>
 
                                         <!-- Product Info -->
