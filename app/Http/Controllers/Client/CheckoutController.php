@@ -96,7 +96,7 @@ class CheckoutController extends Controller
 
         DB::beginTransaction();
 
-        try {
+        // try {
             if ($request->filled('new_address')) {
                 $existingAddress = UserAddress::where('user_id', $user->id)->where('address', $request->new_address)->first();
                 if ($existingAddress) {
@@ -180,15 +180,16 @@ class CheckoutController extends Controller
 
                 OrderDetail::create([
                    'order_id' => $order->id,
-        'product_id' => $product->id,
-        'product_variant_id' => $variant->id,
-        'product_name' => $product->name,
-        'variant_name' => $variant->size . ' / ' . $variant->pot,
-        'product_height' => $variant->height,         
-        'product_pot' => $variant->pot,               
-        'price' => $variant->price,
-        'quantity' => $item->quantity,
-        'total_price' => $variant->price * $item->quantity,
+                    'product_id' => $product->id,
+                    'product_variant_id' => $variant->id,
+                    'product_name' => $product->name,
+                    'variant_name' => $variant->size . ' / ' . $variant->pot,
+                    'product_height' => $variant->height,         
+                    'product_pot' => $variant->pot,               
+                    'product_price' => $variant->price,
+                    'price' => $variant->price,
+                    'quantity' => $item->quantity,
+                    'total_price' => $variant->price * $item->quantity,
                 ]);
             }
 
@@ -208,10 +209,10 @@ class CheckoutController extends Controller
             session()->flash('order_id', $order->id);
             session()->flash('order_items', $images);
             return redirect()->route('checkout.thankyou');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->with('error', 'Đã xảy ra lỗi khi đặt hàng. Vui lòng thử lại!');
-        }
+        // // } catch (\Exception $e) {
+        //     DB::rollBack();
+        //     return back()->with('error', 'Đã xảy ra lỗi khi đặt hàng. Vui lòng thử lại!');
+        // }
     }
 
     public function thankYou()
