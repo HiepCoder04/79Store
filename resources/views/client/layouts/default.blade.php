@@ -9,7 +9,7 @@
 
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    
+
 
     <!-- Title -->
     <title>79Store</title>
@@ -19,6 +19,10 @@
 
     <!-- Core Stylesheet -->
     <link rel="stylesheet" href="{{ asset('assets/style.css') }}">
+    <!-- Toastr CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+
+
 </head>
 
 <body>
@@ -58,9 +62,24 @@
     <!-- Active JS -->
     <script src="{{ asset('assets/js/active.js') }}"></script>
 
+    <!-- Toastr JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
     <!-- Page-specific scripts -->
     @yield('page_scripts')
     @stack('scripts')
+<!-- Toastr hiển thị thông báo -->
+<script>
+    @foreach (['success', 'error', 'warning', 'info'] as $msg)
+        @if(session()->has($msg))
+            toastr.{{ $msg }}("{{ session($msg) }}");
+        @endif
+    @endforeach
+</script>
+
+
+
+
 </body>
 
 </html>

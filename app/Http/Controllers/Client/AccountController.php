@@ -12,6 +12,8 @@ class AccountController extends Controller
     {
         $user = Auth::user();
         return view('client.account.index', compact('user'));
+        return redirect()->back()->with('success', 'Cập nhật thành công!');
+
     }
 
     public function edit()
