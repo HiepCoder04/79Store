@@ -22,6 +22,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\ForgotPasswordOtpController;
 use App\Http\Controllers\Client\ContactController;
 use App\Http\Controllers\Client\AccountController;
+
 // -------------------- BLOG (CLIENT) --------------------
 Route::prefix('blogs')->middleware('ban')->name('client.blogs.')->group(function () {
     Route::get('/', [App\Http\Controllers\Client\BlogController::class, 'index'])->name('index');
@@ -120,12 +121,13 @@ Route::put('/{order}/return', [OrderController::class, 'returnOrder'])->name('re
     });
     // THÔNG TIN TÀI KHOẢN (CLIENT)
 Route::prefix('tai-khoan')->name('client.account.')->group(function () {
-    Route::get('/', [App\Http\Controllers\Client\AccountController::class, 'index'])->name('index');
-    Route::get('/chinh-sua', [App\Http\Controllers\Client\AccountController::class, 'edit'])->name('edit');
-    Route::post('/update', [App\Http\Controllers\Client\AccountController::class, 'update'])->name('update');
-    Route::post('/account/update', [AccountController::class, 'update'])->name('client.account.update');
-
+    Route::get('/', [AccountController::class, 'index'])->name('index');
+    Route::get('/chinh-sua', [AccountController::class, 'edit'])->name('edit');
+    Route::post('/update', [AccountController::class, 'update'])->name('update');
 });
+
+Route::get('/lien-he', [ContactController::class, 'showForm'])->name('client.contact.form');
+Route::post('/lien-he', [ContactController::class, 'submitForm'])->name('client.contact.submit');
 
 // -------------------- CỔNG THANH TOÁN --------------------
 Route::post('/vnpay_payment', [PaymentController::class, 'vnpay_payment']);
