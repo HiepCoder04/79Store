@@ -15,7 +15,7 @@
         "laravel/tinker": "^2.8",
         "laravel/ui": "^4.6",
         "pusher/pusher-php-server": "^7.2",
-        "yoeunes/toastr": "^2.3"
+        "yoeunes/toastr": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
