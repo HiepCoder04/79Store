@@ -5,68 +5,122 @@
 QUẢN LÍ TÀI KHOẢN
 @endsection
 
-@push('style')
-@endpush
-
 @section('content')
-<div class="row">
-    <div class="ms-3">
-        <h3 class="mb-0 h4 font-weight-bolder">Dashboard</h3>
-        <p class="mb-4">DANH SÁCH TÀI KHOẢN</p>
+<style>
+    .table-container {
+        background: #fff;
+        padding: 30px;
+        border-radius: 14px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+        margin-top: 30px;
+    }
+
+    .custom-table thead {
+        background-color: #e2e3e5;
+        color: #000;
+        font-weight: 600;
+    }
+
+    .custom-table th,
+    .custom-table td {
+        text-align: center;
+        vertical-align: middle;
+        padding: 14px;
+    }
+
+    .badge-status {
+        padding: 6px 12px;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+
+    .badge-active {
+        background-color: #28a745;
+        color: #fff;
+    }
+
+    .badge-banned {
+        background-color: #dc3545;
+        color: #fff;
+    }
+
+    .dropdown .btn {
+        border-radius: 8px;
+        padding: 6px 12px;
+    }
+
+    .btn-role {
+        padding: 4px 10px;
+    }
+
+    .modal .form-control {
+        border-radius: 10px;
+    }
+
+    .table-actions {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+</style>
+
+<div class="container table-container">
+    <div class="mb-4">
+        <h5 class="mb-0"><i class="bi bi-people-fill me-2 text-primary"></i>QUẢN LÍ TÀI KHOẢN</h5>
+        <p class="text-muted">Danh sách tài khoản người dùng</p>
     </div>
 
-    <div class="table-responsive px-4">
-        <table class="table table-sm table-bordered table-hover align-middle small">
-            <thead class="table-dark text-center">
+    <div class="table-responsive">
+        <table class="table custom-table table-bordered align-middle mb-0">
+            <thead>
                 <tr>
-                    <th style="width: 40px;">ID</th>
-                    <th style="width: 140px;">Họ tên</th>
-                    <th style="width: 180px;">Email</th>
-                    <th style="width: 120px;">SĐT</th>
-                    <th style="width: 90px;">Quyền</th>
-                    <th style="width: 110px;">Ngày sinh</th>
-                    <th style="width: 110px;">Xác minh</th>
-                    <th style="width: 110px;">Trạng thái</th>
-                    <th style="width: 120px;">Thao tác</th>
+                    <th>ID</th>
+                    <th>Họ tên</th>
+                    <th>Email</th>
+                    <th>SĐT</th>
+                    <th>Quyền</th>
+                    <th>Ngày sinh</th>
+                    <th>Xác minh</th>
+                    <th>Trạng thái</th>
+                    <th>Thao tác</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse ($users as $user)
                 <tr>
-                    <td class="text-center">{{ $user->id }}</td>
-                    <td>{{ $user->name }}</td>
+                    <td>{{ $user->id }}</td>
+                    <td class="text-start">{{ $user->name }}</td>
                     <td>{{ $user->email }}</td>
-                    <td class="text-center">{{ $user->phone }}</td>
-                    <td class="text-center">{{ ucfirst($user->role) }}</td>
-                    <td class="text-center">{{ $user->date_of_birth ? $user->date_of_birth->format('d/m/Y') : '---' }}
-                    </td>
-                    <td class="text-center">
+                    <td>{{ $user->phone }}</td>
+                    <td>{{ ucfirst($user->role) }}</td>
+                    <td>{{ $user->date_of_birth ? $user->date_of_birth->format('d/m/Y') : '—' }}</td>
+                    <td>
                         @if($user->email_verified_at)
-                        <span class="badge bg-success">✔</span>
+                            <span class="badge-status badge-active">✔ Xác minh</span>
                         @else
-                        <span class="badge bg-danger">✘</span>
+                            <span class="badge-status badge-banned">✘ Chưa xác minh</span>
                         @endif
                     </td>
                     <td>
-                        @if($user-> is_ban == true)
-                        <p> Đã bị cấm</p>
+                        @if($user->is_ban)
+                            <span class="badge-status badge-banned">Đã bị cấm</span>
                         @else
-                        Hoạt động
+                            <span class="badge-status badge-active">Hoạt động</span>
                         @endif
                     </td>
-                    <td class="text-center">
+                    <td>
                         @if($user->role != 'admin')
-                        <div class="d-flex justify-content-center gap-2 flex-wrap">
+                        <div class="table-actions">
 
-                            <!-- Nút Phân quyền (kích hoạt modal) -->
-                            <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                data-bs-target="#modal-{{ $user->id }}">
+                            {{-- Phân quyền --}}
+                            <button type="button" class="btn btn-sm btn-outline-primary btn-role" data-bs-toggle="modal" data-bs-target="#modal-{{ $user->id }}">
                                 Phân quyền
                             </button>
 
-                            <!-- Modal -->
-                            <div class="modal fade" id="modal-{{ $user->id }}" tabindex="-1"
-                                aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            {{-- Modal phân quyền --}}
+                            <div class="modal fade" id="modal-{{ $user->id }}" tabindex="-1" aria-labelledby="modalLabel{{ $user->id }}" aria-hidden="true">
                                 <div class="modal-dialog">
                                     <form action="{{ route('update-role') }}" method="POST">
                                         @csrf
@@ -74,68 +128,48 @@ QUẢN LÍ TÀI KHOẢN
                                         <input type="hidden" name="id_user" value="{{ $user->id }}">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h1 class="modal-title fs-5">Chọn quyền cho user này</h1>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                    aria-label="Close"></button>
+                                                <h5 class="modal-title" id="modalLabel{{ $user->id }}">Chọn quyền cho user</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
                                             </div>
                                             <div class="modal-body">
-                                                Chọn quyền:
                                                 <select name="role" class="form-control">
-                                                    <option value="1" {{ $user->role == 'staff' ? 'selected' : '' }}>
-                                                        Staff</option>
-                                                    <option value="2" {{ $user->role == 'customer' ? 'selected' : '' }}>
-                                                        Customer</option>
+                                                    <option value="1" {{ $user->role == 'staff' ? 'selected' : '' }}>Staff</option>
+                                                    <option value="2" {{ $user->role == 'customer' ? 'selected' : '' }}>Customer</option>
                                                 </select>
                                             </div>
                                             <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary"
-                                                    data-bs-dismiss="modal">Đóng</button>
-                                                <button type="submit" class="btn btn-primary">Lưu quyền</button>
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Huỷ</button>
+                                                <button type="submit" class="btn btn-primary">Lưu</button>
                                             </div>
                                         </div>
                                     </form>
                                 </div>
                             </div>
 
-                            <!-- Nút Ban/Unban -->
-                            @if(!$user->is_ban)
-                            <form action="{{ route('ban-user') }}" method="POST">
+                            {{-- Ban / Unban --}}
+                            <form action="{{ route($user->is_ban ? 'unban-user' : 'ban-user') }}" method="POST">
                                 @csrf
                                 @method('PUT')
                                 <input type="hidden" name="id_user" value="{{ $user->id }}">
-                                <button class="btn btn-sm btn-danger">Cấm</button>
+                                <button class="btn btn-sm {{ $user->is_ban ? 'btn-success' : 'btn-danger' }}">
+                                    {{ $user->is_ban ? 'Mở cấm' : 'Cấm' }}
+                                </button>
                             </form>
-                            @else
-                            <form action="{{ route('unban-user') }}" method="POST">
-                                @csrf
-                                @method('PUT')
-                                <input type="hidden" name="id_user" value="{{ $user->id }}">
-                                <button class="btn btn-sm btn-success">Mở cấm</button>
-                            </form>
-                            @endif
-
                         </div>
                         @endif
                     </td>
-
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="8" class="text-center">Không có tài khoản nào.</td>
+                    <td colspan="9" class="text-center">Không có tài khoản nào.</td>
                 </tr>
                 @endforelse
             </tbody>
         </table>
+    </div>
 
-        {{-- Phân trang --}}
-        <div class="d-flex justify-content-end">
-            {{ $users->links() }}
-        </div>
+    <div class="d-flex justify-content-end mt-3">
+        {{ $users->links() }}
     </div>
 </div>
 @endsection
-
-
-@push('script')
-
-@endpush

@@ -1,95 +1,154 @@
 @extends('admin.layouts.dashboard')
 
 @section('content')
-<div class="container-fluid py-4">
-  <div class="row">
-    <div class="col-12">
-      <div class="card my-4">
-        <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-          <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between align-items-center">
-            <h6 class="text-white text-capitalize ps-3">Danh sách bài viết</h6>
-            <a href="{{ route('admin.blogs.create') }}" class="btn btn-sm btn-light me-3">
-              <i class="material-icons text-sm">Thêm mới</i> 
-            </a>
-          </div>
-        </div>
-        <div class="card-body px-0 pb-2">
-          @if(session('success'))
-            <div class="alert alert-success mx-3">
-              {{ session('success') }}
-            </div>
-          @endif
-          
-          @if(session('error'))
-            <div class="alert alert-danger mx-3">
-              {{ session('error') }}
-            </div>
-          @endif
-          
-          <div class="table-responsive p-0">
-            <table class="table align-items-center mb-0">
-              <thead>
-                <tr>
-                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">ID</th>
-                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Hình ảnh</th>
-                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Tiêu đề</th>
-                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Danh mục</th>
-                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Ngày tạo</th>
-                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Trạng thái</th>
-                  <th class="text-secondary opacity-7 text-center">Thao tác</th>
-                </tr>
-              </thead>
-              <tbody>
-                @foreach($blogs as $blog)
-                <tr>
-                  <td class="ps-4">{{ $blog->id }}</td>
-                  <td>
-                    @if($blog->img)
-                      <img src="{{ asset($blog->img) }}" alt="{{ $blog->title }}" class="avatar avatar-sm rounded-circle me-2">
-                    @else
-                      <img src="{{ asset('assets/img/no-image.jpg') }}" alt="No Image" class="avatar avatar-sm rounded-circle me-2">
-                    @endif
-                  </td>
-                  <td>
-                    <div class="d-flex flex-column justify-content-center">
-                      <h6 class="mb-0 text-sm">{{ $blog->title }}</h6>
-                      <p class="text-xs text-secondary mb-0">{{ Str::limit($blog->slug, 30) }}</p>
-                    </div>
-                  </td>
-                  <td>{{ optional($blog->category)->name ?? 'Không có danh mục' }}</td>
-                  <td>{{ $blog->created_at->format('d/m/Y') }}</td>
-                  <td class="align-middle text-center text-sm">
-                    @if($blog->is_active)
-                      <span class="badge badge-sm bg-gradient-success">Kích hoạt</span>
-                    @else
-                      <span class="badge badge-sm bg-gradient-secondary">Bị ẩn</span>
-                    @endif
-                  </td>
-                  <td class="align-middle text-center">
-                    <a href="{{ route('admin.blogs.edit', $blog) }}" class="btn btn-sm btn-info" data-toggle="tooltip" data-original-title="Sửa">
-                      <i class="material-icons text-sm">edit</i>
-                    </a>
-                    <form action="{{ route('admin.blogs.destroy', $blog) }}" method="POST" class="d-inline">
-                      @csrf
-                      @method('DELETE')
-                      <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc muốn xóa bài viết này?')" data-toggle="tooltip" data-original-title="Xóa">
-                        <i class="material-icons text-sm">delete</i>
-                      </button>
-                    </form>
-                  </td>
-                </tr>
-                @endforeach
-              </tbody>
-            </table>
-          </div>
-          @if(method_exists($blogs, 'links'))
-            <div class="px-3 mt-3">
-              {{ $blogs->links() }}
-            </div>
-          @endif
-        </div>
-      </div>
-    </div>
+<style>
+    .table-container {
+        background: #fff;
+        padding: 30px;
+        border-radius: 14px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+        margin-top: 30px;
+    }
+
+    .custom-table thead {
+        background-color: #e2e3e5;
+        color: #000;
+        font-weight: 600;
+    }
+
+    .custom-table th,
+    .custom-table td {
+        text-align: center;
+        vertical-align: middle;
+        padding: 14px;
+    }
+
+    .badge-status {
+        background-color: #28a745;
+        color: #fff;
+        font-weight: 500;
+        font-size: 0.875rem;
+        padding: 6px 14px;
+        border-radius: 999px;
+        display: inline-block;
+    }
+
+    .badge-inactive {
+        background-color: #6c757d;
+        color: #fff;
+        font-weight: 500;
+        font-size: 0.875rem;
+        padding: 6px 14px;
+        border-radius: 999px;
+        display: inline-block;
+    }
+
+    .dropdown .btn {
+        border-radius: 8px;
+        padding: 6px 12px;
+    }
+
+    .avatar-sm {
+        width: 48px;
+        height: 48px;
+        object-fit: cover;
+        border-radius: 50%;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .btn-add {
+        border-radius: 10px;
+        font-weight: 500;
+    }
+
+    .title-icon {
+        color: #198754;
+        font-size: 1.3rem;
+        margin-right: 8px;
+    }
+</style>
+
+<div class="container table-container">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h5 class="mb-0"><i class="bi bi-file-text title-icon"></i>Danh sách bài viết</h5>
+    <a href="{{ route('admin.blogs.create') }}" class="btn btn-success btn-add">
+      <i class="bi bi-plus-circle me-1"></i> Thêm bài viết
+    </a>
   </div>
+
+  @if(session('success'))
+    <div class="alert alert-success">{{ session('success') }}</div>
+  @endif
+
+  @if(session('error'))
+    <div class="alert alert-danger">{{ session('error') }}</div>
+  @endif
+
+  <div class="table-responsive">
+    <table class="table custom-table table-bordered align-middle mb-0">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Hình ảnh</th>
+          <th>Tiêu đề</th>
+          <th>Danh mục</th>
+          <th>Ngày tạo</th>
+          <th>Trạng thái</th>
+          <th>Thao tác</th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach($blogs as $blog)
+        <tr>
+          <td>{{ $blog->id }}</td>
+          <td>
+            <img src="{{ asset($blog->img ?: 'assets/img/no-image.jpg') }}" alt="{{ $blog->title }}" class="avatar-sm">
+          </td>
+          <td class="text-start">
+            <strong>{{ $blog->title }}</strong><br>
+            <small class="text-muted">{{ Str::limit($blog->slug, 30) }}</small>
+          </td>
+          <td>{{ optional($blog->category)->name ?? '—' }}</td>
+          <td>{{ $blog->created_at->format('d/m/Y') }}</td>
+          <td>
+            @if($blog->is_active)
+              <span class="badge-status"><i class="bi bi-check-circle-fill me-1"></i>Kích hoạt</span>
+            @else
+              <span class="badge-inactive"><i class="bi bi-x-circle-fill me-1"></i>Ẩn</span>
+            @endif
+          </td>
+          <td>
+            <div class="dropdown">
+              <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <i class="bi bi-three-dots-vertical"></i>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                  <a class="dropdown-item" href="{{ route('admin.blogs.edit', $blog) }}">
+                    <i class="bi bi-pencil-square me-1"></i> Sửa
+                  </a>
+                </li>
+                <li>
+                  <form action="{{ route('admin.blogs.destroy', $blog) }}" method="POST" onsubmit="return confirm('Xóa bài viết này?')">
+                    @csrf @method('DELETE')
+                    <button class="dropdown-item text-danger" type="submit">
+                      <i class="bi bi-trash me-1"></i> Xóa
+                    </button>
+                  </form>
+                </li>
+              </ul>
+            </div>
+          </td>
+        </tr>
+        @endforeach
+      </tbody>
+    </table>
+  </div>
+
+  @if(method_exists($blogs, 'links'))
+    <div class="mt-3">
+      {{ $blogs->links() }}
+    </div>
+  @endif
 </div>
 @endsection
