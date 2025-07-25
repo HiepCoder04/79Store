@@ -5,6 +5,7 @@
         "This file is @generated automatically"
     ],
     "content-hash": "a053b854a8fe22c59b4dbf1016b6bbbd",
+
     "packages": [
         {
             "name": "brian2694/laravel-toastr",
