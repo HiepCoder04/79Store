@@ -16,11 +16,12 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\BlogController;
 use App\Http\Controllers\Admin\BlogCategoryController;
 use App\Http\Controllers\Admin\BannerController;
+use App\Http\Controllers\Admin\ContactController as AdminContactController;
+use App\Http\Controllers\Client\ContactController as ClientContactController;
 use App\Http\Controllers\Admin\VoucherController as AdminVoucherController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\ForgotPasswordOtpController;
-use App\Http\Controllers\Client\ContactController;
 use App\Http\Controllers\Client\AccountController;
 
 // -------------------- BLOG (CLIENT) --------------------
@@ -60,9 +61,6 @@ Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard
     Route::resource('vouchers', AdminVoucherController::class);
     Route::get('vouchers/{voucher}/users', [AdminVoucherController::class, 'users'])->name('vouchers.users');
 
-
-
-
     // Quản lý đơn hàng
     Route::prefix('orders')->name('orders.')->group(function () {
         Route::get('/', [AdminOrderController::class, 'index'])->name('index');
@@ -75,12 +73,22 @@ Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard
 
     // Route::get('/thongke', [AdminStatisticsController::class, 'index'])->name('admin.thongke');
 
+       // Quản lý liên hệ
+Route::resource('contacts', AdminContactController::class)->except(['create', 'edit', 'store']);
+
+    Route::get('contacts/trashed', [AdminContactController::class, 'trashed'])->name('contacts.trashed');
+    Route::post('contacts/{id}/restore', [AdminContactController::class, 'restore'])->name('contacts.restore');
+    Route::post('contacts/{id}/reply', [AdminContactController::class, 'sendReply'])->name('contacts.reply');
+    Route::put('contacts/{id}/note', [AdminContactController::class, 'updateNote'])->name('contacts.updateNote');
 });
 
     // Quản lý người dùng
     Route::middleware(['admin','ban'])->prefix('admin/users')->group(function () {
         Route::get('/', [UserController::class, 'listUser'])->name('admin.users.list');
     });
+
+
+
 // -------------------- AUTH ROUTES --------------------
 Route::prefix('auth')->name('auth.')->controller(AuthController::class)->group(function () {
     Route::get('/login', 'login')->name('login');
@@ -126,8 +134,8 @@ Route::prefix('tai-khoan')->name('client.account.')->group(function () {
     Route::post('/update', [AccountController::class, 'update'])->name('update');
 });
 
-Route::get('/lien-he', [ContactController::class, 'showForm'])->name('client.contact.form');
-Route::post('/lien-he', [ContactController::class, 'submitForm'])->name('client.contact.submit');
+Route::get('/lien-he', [ClientContactController::class, 'showForm'])->name('client.contact.form');
+Route::post('/lien-he', [ClientContactController::class, 'submitForm'])->name('client.contact.submit');
 
 // -------------------- CỔNG THANH TOÁN --------------------
 Route::post('/vnpay_payment', [PaymentController::class, 'vnpay_payment']);

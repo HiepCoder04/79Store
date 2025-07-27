@@ -1,4 +1,4 @@
-{{-- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -7,14 +7,14 @@
   <title>
     {{ config('app.name') }} - Admin Panel
   </title>
-  
+
   <!-- Fonts and icons -->
   <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900|Roboto+Slab:400,700" />
-  
+
   <!-- Material Icons -->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" rel="stylesheet" />
-  
+
   <!-- CSS Files -->
   <link id="pagestyle" href="{{ asset('assets/css/material-dashboard.min.css') }}" rel="stylesheet" />
 
@@ -23,9 +23,9 @@
 </head>
 
 <body class="g-sidenav-show bg-gray-200">
-  
+
   @include('admin.layouts.sidebar')
-  
+
   <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg">
     <!-- Navbar -->
     <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl position-sticky blur shadow-blur mt-4 left-auto top-1 z-index-sticky" id="navbarBlur" data-scroll="true">
@@ -65,16 +65,16 @@
       </div>
     </nav>
     <!-- End Navbar -->
-    
+
     <div class="container-fluid py-4">
       @yield('content')
-      
+
       <footer class="footer py-4">
         <div class="container-fluid">
           <div class="row align-items-center justify-content-lg-between">
             <div class="col-lg-6 mb-lg-0 mb-4">
               <div class="copyright text-center text-sm text-muted text-lg-start">
-                © {{ date('Y') }} 
+                © {{ date('Y') }}
                 <a href="{{ url('/') }}" class="font-weight-bold" target="_blank">79Store</a>
               </div>
             </div>
@@ -93,7 +93,7 @@
 
   <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
   <script src="{{ asset('assets/js/material-dashboard.min.js') }}"></script>
-  
+
   <script>
     var win = navigator.platform.indexOf('Win') > -1;
     if (win && document.querySelector('#sidenav-scrollbar')) {
@@ -103,8 +103,8 @@
       Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
     }
   </script>
-  
+
   @stack('scripts')
 </body>
 
-</html> --}}
+</html>
