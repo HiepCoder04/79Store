@@ -73,7 +73,11 @@
             </li>
             @endif
 
-
+            <li class="nav-item">
+    <a class="nav-link text-dark" href="{{ route('admin.contacts.index') }}">
+        <span class="nav-link-text">Quản Lí Liên hệ</span>
+    </a>
+</li>
 
             <li class="nav-item">
                 <a class="nav-link text-dark" href="{{ route('admin.banners.index') }}">
