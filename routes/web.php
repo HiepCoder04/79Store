@@ -1,4 +1,5 @@
 <?php
+use App\Http\Controllers\CommentController;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -170,3 +171,7 @@ Route::post('/verify-otp', [ForgotPasswordOtpController::class, 'verifyOtp'])->n
 // -------------------- CHATBOT AI --------------------
 Route::post('/chatbot/chat', [App\Http\Controllers\ChatbotController::class, 'chat'])->name('chatbot.chat');
 Route::get('/chatbot/suggestions', [App\Http\Controllers\ChatbotController::class, 'getSuggestions'])->name('chatbot.suggestions');
+
+Route::middleware(['auth'])->group(function () {
+    Route::post('/comments', [CommentController::class, 'store'])->name('comments.store');
+});
