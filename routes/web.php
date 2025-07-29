@@ -156,6 +156,8 @@ Route::get('/shopDetail/{id}', [ProductVariant::class, 'productDetail'])->middle
  Route::post('/comment/store', [App\Http\Controllers\CommentController::class, 'store'])->middleware('ban')->name('comment.store');
 // -------------------- SỬ DỤNG VOUCHER (USER) --------------------
 Route::post('/apply-voucher', [VoucherController::class, 'apply'])->middleware('ban')->name('apply.voucher');
+Route::middleware('auth')->post('/save-voucher/{id}', [VoucherController::class, 'save'])->name('voucher.save');
+
 
 //phân quyền
 Route::put('/ban-user', [UserController::class, 'banUser'])->name('ban-user')->middleware(['admin','ban']);
