@@ -19,6 +19,7 @@
 @include('client.layouts.about')
 @include('client.layouts.testimonial')
 @include('client.layouts.products')
+@include('client.layouts.vouchers')
 @include('client.layouts.blog')
 @include('client.layouts.subscribe')
 

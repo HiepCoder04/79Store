@@ -114,16 +114,17 @@
                 <div class="row">
                     <div class="col-12 col-lg-6">
                         <div class="coupon-discount mt-70">
-                            <h5>Mã giảm giá</h5>
-                            <form action="{{ route('apply.voucher') }}" method="post">
-                                @csrf
-                                <div class="input-group">
-                                    <input type="text" name="voucher_code" class="form-control" placeholder="Nhập mã giảm giá" aria-label="Voucher Code">
-                                    <button class="btn btn-primary" type="submit">Áp dụng</button>
-                                </div>
-                            </form>
-                            
+                    <h5>Mã giảm giá</h5>
+                    <div id="voucher-message"></div>
+                    <form id="apply-voucher-form" action="{{ route('apply.voucher') }}" method="post">
+                        @csrf
+                        <div class="input-group">
+                            <input type="text" id="voucher_code_input" name="voucher_code" class="form-control" placeholder="Nhập mã giảm giá">
+                            <input type="hidden" id="voucher-selected-items" name="selected">
+                            <button class="btn btn-primary" type="submit">Áp dụng</button>
                         </div>
+                    </form>
+                </div>
                     </div>
 
                     <div class="col-12 col-lg-6">
@@ -168,6 +169,51 @@
 
 @push('scripts')
 <script>
+    // Format tiền
+    function formatCurrency(amount) {
+        return new Intl.NumberFormat('vi-VN').format(amount) + 'đ';
+    }
+
+    // Tính lại tổng tiền khi chọn sản phẩm hoặc thay đổi số lượng
+    function updateSelectedTotal(discountInfo = null) {
+        let subtotal = 0;
+
+        document.querySelectorAll('.item-checkbox:checked').forEach(checkbox => {
+            const row = checkbox.closest('tr');
+            const price = parseInt(row.querySelector('.unit-price').dataset.price);
+            const qty = parseInt(row.querySelector('.quantity-input').value);
+            subtotal += price * qty;
+        });
+
+        document.getElementById('subtotal-value').textContent = formatCurrency(subtotal);
+
+        let discount = 0;
+        if (discountInfo !== null) {
+            const percent = parseFloat(discountInfo.discount_percent);
+            const maxDiscount = parseFloat(discountInfo.max_discount || 0);
+            const minOrderAmount = parseFloat(discountInfo.min_order_amount || 0);
+
+            if (subtotal >= minOrderAmount) {
+                discount = Math.floor(subtotal * percent / 100);
+                discount = Math.min(discount, maxDiscount);
+            }
+
+            const discountContainer = document.getElementById('discount-value');
+            if (discountContainer) {
+                discountContainer.textContent = '-' + formatCurrency(discount);
+            } else {
+                const discountRow = document.createElement('div');
+                discountRow.classList.add('discount', 'd-flex', 'justify-content-between');
+                discountRow.innerHTML = `<h5>Mã giảm:</h5><h5 id="discount-value" class="text-danger">-${formatCurrency(discount)}</h5>`;
+                document.querySelector('.cart-totals-area').insertBefore(discountRow, document.querySelector('.total'));
+            }
+        }
+
+        const finalTotal = subtotal - discount;
+        document.getElementById('total-value').textContent = formatCurrency(finalTotal);
+    }
+
+    // Cập nhật khi số lượng thay đổi
     document.addEventListener('DOMContentLoaded', function () {
         document.querySelectorAll('.quantity-input').forEach(input => {
             input.addEventListener('change', async function () {
@@ -189,8 +235,7 @@
 
                     const data = await res.json();
                     row.querySelector('.item-subtotal').textContent = data.itemSubtotalFormatted;
-                    document.querySelector('#subtotal-value').textContent = data.cartTotalFormatted;
-                    document.querySelector('#total-value').textContent = data.finalTotalFormatted;
+                    updateSelectedTotal(); // cập nhật lại tổng
                 } catch (error) {
                     console.error(error);
                     alert('Lỗi cập nhật giỏ hàng: ' + error.message);
@@ -199,47 +244,13 @@
         });
     });
 
-     function formatCurrency(amount) {
-        return new Intl.NumberFormat('vi-VN').format(amount) + 'đ';
-    }
-
-    function updateSelectedTotal() {
-        let subtotal = 0;
-
-        document.querySelectorAll('.item-checkbox:checked').forEach(checkbox => {
-            const row = checkbox.closest('tr');
-            const price = parseInt(row.querySelector('.unit-price').dataset.price);
-            const qty = parseInt(row.querySelector('.quantity-input').value);
-            subtotal += price * qty;
-        });
-
-        document.getElementById('subtotal-value').textContent = formatCurrency(subtotal);
-
-        let discount = 0;
-        @if ($voucher)
-            const percent = {{ $voucher->discount_percent }};
-            const maxDiscount = {{ $voucher->max_discount ?? 0 }};
-            const minOrderAmount = {{ $voucher->min_order_amount }};
-
-            if (subtotal >= minOrderAmount) {
-                discount = Math.floor(subtotal * percent / 100);
-                if (maxDiscount && discount > maxDiscount) {
-                    discount = maxDiscount;
-                }
-            }
-            document.getElementById('discount-value').textContent = '-' + formatCurrency(discount);
-        @endif
-
-        const finalTotal = subtotal - discount;
-        document.getElementById('total-value').textContent = formatCurrency(finalTotal);
-    }
-
+    // Checkbox chọn sản phẩm
     document.addEventListener('DOMContentLoaded', function () {
         const checkAll = document.getElementById('check-all');
         const checkboxes = document.querySelectorAll('.item-checkbox');
         const quantityInputs = document.querySelectorAll('.quantity-input');
 
-        checkboxes.forEach(cb => cb.addEventListener('change', updateSelectedTotal));
+        checkboxes.forEach(cb => cb.addEventListener('change', () => updateSelectedTotal()));
         quantityInputs.forEach(qty => {
             qty.addEventListener('change', function () {
                 const row = qty.closest('tr');
@@ -257,27 +268,83 @@
             });
         }
 
-        updateSelectedTotal(); // Gọi khi load
+        updateSelectedTotal();
     });
 
-     document.addEventListener('DOMContentLoaded', function () {
-    const checkoutBtn = document.getElementById('go-to-checkout');
+    // Áp dụng mã giảm giá bằng AJAX
+    document.addEventListener('DOMContentLoaded', function () {
+        const applyForm = document.getElementById('apply-voucher-form');
+        const voucherInput = document.getElementById('voucher_code_input');
+        const voucherMessage = document.getElementById('voucher-message');
 
-    checkoutBtn.addEventListener('click', function () {
-        const checkedItems = document.querySelectorAll('.item-checkbox:checked');
+        applyForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
 
-        if (checkedItems.length === 0) {
-            alert('Vui lòng chọn ít nhất 1 sản phẩm để tiếp tục thanh toán!');
-            return;
-        }
+            const selectedCheckboxes = document.querySelectorAll('.item-checkbox:checked');
+            const selectedIds = Array.from(selectedCheckboxes).map(cb => cb.value);
 
-        // Lấy ID các sản phẩm đã chọn
-        const selectedIds = Array.from(checkedItems).map(cb => cb.value);
-        document.getElementById('selected-items-input').value = selectedIds.join(',');
+            if (selectedIds.length === 0) {
+                voucherMessage.innerHTML = '<div class="alert alert-danger">Vui lòng chọn ít nhất 1 sản phẩm để áp dụng mã!</div>';
+                return;
+            }
 
-        // Submit form
-        document.getElementById('checkout-form-selected').submit();
+            const code = voucherInput.value.trim();
+            if (!code) {
+                voucherMessage.innerHTML = '<div class="alert alert-danger">Vui lòng nhập mã giảm giá.</div>';
+                return;
+            }
+
+            try {
+                const res = await fetch(applyForm.action, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({
+                        voucher_code: code,
+                        selected: selectedIds
+                    })
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    voucherMessage.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
+                    updateSelectedTotal({
+                        discount_percent: data.discount_percent,
+                        max_discount: data.max_discount,
+                        min_order_amount: data.min_order_amount
+                    });
+                } else {
+                    voucherMessage.innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
+                }
+            } catch (err) {
+                voucherMessage.innerHTML = `<div class="alert alert-danger">Có lỗi xảy ra!</div>`;
+                console.error(err);
+            }
+        });
     });
-});
+
+    // Đến trang thanh toán
+    document.addEventListener('DOMContentLoaded', function () {
+        const checkoutBtn = document.getElementById('go-to-checkout');
+
+        checkoutBtn.addEventListener('click', function () {
+            const checkedItems = document.querySelectorAll('.item-checkbox:checked');
+
+            if (checkedItems.length === 0) {
+                alert('Vui lòng chọn ít nhất 1 sản phẩm để tiếp tục thanh toán!');
+                return;
+            }
+
+            const selectedIds = Array.from(checkedItems).map(cb => cb.value);
+            document.getElementById('selected-items-input').value = selectedIds.join(',');
+
+            document.getElementById('checkout-form-selected').submit();
+        });
+    });
 </script>
 @endpush
+
+
