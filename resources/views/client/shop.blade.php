@@ -203,7 +203,7 @@
                                 <div class="col-12 col-sm-6 col-lg-4">
                                     <div class="single-product-area mb-50">
                                         <!-- Product Image -->
-                                        <div class="product-img">
+                                        <div class="product-img ">
                                             <a href="{{ route('shop-detail', $product->id) }}">
                                                 @php
                                                     $image = optional($product->galleries->first())->image;
@@ -213,7 +213,7 @@
                                                 @endphp
 
                                                 <img src="{{ $imagePath }}"                                                    onerror="this.onerror=null;this.src='{{ asset('assets/img/default.jpg') }}';"
-                                                    alt="{{ $product->name }}" width="100%">
+                                                    alt="{{ $product->name }}"  class="img-fluid fixed-img" >
 
                                             </a>
 
@@ -319,6 +319,23 @@
         </div>
     </section>
 @endsection
+<style>
+    .fixed-img {
+        width: 100%;
+        height: 220px; /* hoặc chiều cao khác bạn muốn */
+        object-fit: cover;
+        border-radius: 8px;
+        background-color: #f5f5f5;
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .fixed-img:hover {
+        transform: scale(1.05);
+    }
+    .product-img {
+    overflow: hidden;
+}
+</style>
 @php
     $minPrice = $product->variants->min('price');
     $maxPrice = $product->variants->max('price');
