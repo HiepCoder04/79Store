@@ -89,8 +89,65 @@
             </div>
         </div>
     </div>
+    
+    <!-- ==== Bình luận sản phẩm ==== -->
+<div class="container d-flex justify-content-center">
+    <div class="col-md-8 col-lg-6 mt-4">
+        <h5 class="mb-3 fw-semibold text-center">Bình luận sản phẩm</h5>
+
+        {{-- Form gửi bình luận --}}
+        @auth
+            <form action="{{ route('comments.store') }}" method="POST" class="mb-3">
+                @csrf
+                <input type="hidden" name="product_id" value="{{ $product->id }}">
+                <textarea name="content" rows="2" class="form-control form-control-sm mb-2" placeholder="Nhập bình luận..."></textarea>
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-sm btn-primary">Gửi</button>
+                </div>
+            </form>
+        @else
+            <p class="text-muted text-center">Vui lòng <a href="{{ route('login') }}">đăng nhập</a> để bình luận.</p>
+        @endauth
+
+        {{-- Danh sách bình luận --}}
+        @foreach($product->comments()->whereNull('parent_id')->latest()->get() as $comment)
+            <div class="border rounded p-2 mb-2 bg-light-subtle small">
+                <div class="d-flex justify-content-between mb-1">
+                    <strong>{{ $comment->user->name }}</strong>
+                    <small class="text-muted">{{ $comment->created_at->diffForHumans() }}</small>
+                </div>
+                <div class="text-muted">{{ $comment->content }}</div>
+
+                {{-- Trả lời --}}
+                @foreach($comment->replies as $reply)
+                    <div class="ms-3 mt-2 p-2 bg-white border rounded small">
+                        <div class="d-flex justify-content-between mb-1">
+                            <small class="fw-semibold">{{ $reply->user->name }}</small>
+                            <small class="text-muted">{{ $reply->created_at->diffForHumans() }}</small>
+                        </div>
+                        <div class="text-muted">{{ $reply->content }}</div>
+                    </div>
+                @endforeach
+
+                {{-- Form trả lời --}}
+                @auth
+                    <form action="{{ route('comments.store') }}" method="POST" class="mt-2 ms-3">
+                        @csrf
+                        <input type="hidden" name="product_id" value="{{ $product->id }}">
+                        <input type="hidden" name="parent_id" value="{{ $comment->id }}">
+                        <textarea name="content" rows="1" class="form-control form-control-sm mb-1" placeholder="Trả lời..."></textarea>
+                        <button class="btn btn-sm btn-outline-secondary">Trả lời</button>
+                    </form>
+                @endauth
+            </div>
+        @endforeach
+    </div>
+    
+</div>
+
 </section>
 @endsection
+
 
 @section('page_scripts')
 <script>
