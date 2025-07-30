@@ -28,6 +28,8 @@
                     <th>Khách hàng</th>
                     <th>SĐT</th>
                     <th>Ngày đặt</th>
+                    <th>Phương thức</th>
+                    <th>Thanh toán</th>
                     <th>Trạng thái</th>
                     <th>Tổng tiền</th>
                     <th>Thao tác</th>
@@ -40,8 +42,51 @@
                     <td>{{ $order->user->name ?? 'N/A' }}</td>
                     <td>{{ $order->user->phone ?? '---' }}</td>
                     <td>{{ $order->created_at->format('d/m/Y') }}</td>
-                    <td>{{ $order->status }}</td>
-                    <td>{{ number_format($order->total_amount, 0, ',', '.') }} đ</td>
+                    <td>
+                        @if($order->payment_method == 'cod')
+                            <span class="badge bg-secondary">COD</span>
+                        @elseif($order->payment_method == 'vnpay')
+                            <span class="badge bg-primary">VNPAY</span>
+                        @else
+                            <span class="badge bg-info">{{ strtoupper($order->payment_method) }}</span>
+                        @endif
+                    </td>
+                    <td>
+                        @if($order->payment_status == 'paid' || ($order->payment_method == 'vnpay' && $order->status != 'cancelled'))
+                            <span class="badge bg-success">Đã thanh toán</span>
+                        @elseif($order->payment_status == 'pending')
+                            <span class="badge bg-warning">Chờ thanh toán</span>
+                        @elseif($order->payment_status == 'failed')
+                            <span class="badge bg-danger">Thất bại</span>
+                        @else
+                            <span class="badge bg-secondary">Chưa thanh toán</span>
+                        @endif
+                    </td>
+                    <td>
+                        @switch($order->status)
+                            @case('pending')
+                                <span class="badge bg-warning">Chờ xử lý</span>
+                                @break
+                            @case('confirmed')
+                                <span class="badge bg-info">Đang xử lý</span>
+                                @break
+                            @case('shipping')
+                                <span class="badge bg-primary">Đang giao</span>
+                                @break
+                            @case('delivered')
+                                <span class="badge bg-success">Hoàn tất</span>
+                                @break
+                            @case('cancelled')
+                                <span class="badge bg-danger">Đã huỷ</span>
+                                @break
+                            @case('returned')
+                                <span class="badge bg-secondary">Trả hàng</span>
+                                @break
+                            @default
+                                <span class="badge bg-light">{{ $order->status }}</span>
+                        @endswitch
+                    </td>
+                    <td>{{ number_format($order->total_after_discount, 0, ',', '.') }} đ</td>
                     <td>
                         <a href="{{ route('admin.orders.show', $order->id) }}" class="btn btn-sm btn-info">Chi tiết</a>
                         <form method="POST" action="{{ route('admin.orders.destroy', $order->id) }}"

@@ -11,7 +11,7 @@ class VerifyCsrfToken extends Middleware
      *
      * @var array<int, string>
      */
-    protected $except = [
-        //
-    ];
+protected $except = [
+    '/vnpay-callback', // bỏ qua kiểm tra CSRF cho callback này
+];
 }

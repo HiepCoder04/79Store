@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('phone')->nullable();
             $table->text('note')->nullable();
             $table->enum('payment_method', ['cod', 'vnpay', 'banking'])->default('cod');
+            $table->enum('payment_status', ['unpaid', 'pending', 'paid', 'failed', 'refunded'])->default('unpaid');
             $table->string('shipping_method')->nullable();
             $table->decimal('total_before_discount', 10, 2);
             $table->decimal('discount_amount', 10, 2)->default(0);
