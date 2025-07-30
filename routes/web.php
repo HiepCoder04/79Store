@@ -117,6 +117,8 @@ Route::middleware(['auth','ban'])->group(function () {
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
     Route::get('/thank-you', [CheckoutController::class, 'thankYou'])->name('checkout.thankyou');
+    Route::get('/thank-youvnpay', [CheckoutController::class, 'thankYouvnpay'])->name('checkout.thankyouvnpay');
+
 
      //  Quản lý đơn hàng người dùng (Client)
    Route::prefix('orders')->name('client.orders.')->group(function () {

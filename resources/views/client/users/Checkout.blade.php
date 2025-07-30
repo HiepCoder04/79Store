@@ -130,6 +130,7 @@
             <input type="hidden" name="redirect" value="1">
             <input type="hidden" name="voucher_id" value="{{ $voucher?->id }}">
             <input type="hidden" name="discount" value="{{ $discount }}">
+            <input type="hidden" name="selected_ids" id="vnpay-selected_ids" value="{{ request('selected') }}">
             <!-- Thông tin chuyển từ form chính -->
             <input type="hidden" name="name" id="vnpay-name">
             <input type="hidden" name="phone" id="vnpay-phone">
