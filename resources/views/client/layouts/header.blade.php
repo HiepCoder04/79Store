@@ -75,9 +75,10 @@
 
                                 <!-- Giỏ hàng -->
                                 <div class="cart ml-3">
-                                    <a href="{{ route('cart.index') }}"><i class="fa fa-shopping-cart"></i>
-                                        <span>Giỏ hàng <span
-                                                class="cart-quantity">({{ session('cart') ? count(session('cart')) : 0 }})</span></span></a>
+                                    <a href="{{ route('cart.index') }}" id="cart-icon">
+                                        <i class="fa fa-shopping-cart"></i>
+                                        <span>Giỏ hàng <span id="cart-count">({{ $cartItemCount ?? 0 }})</span></span>
+                                    </a>
                                 </div>
 
                             </div>
