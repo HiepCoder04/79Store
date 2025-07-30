@@ -112,7 +112,15 @@ Route::middleware(['auth','ban'])->group(function () {
     Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
     Route::put('/cart/{id}', [CartController::class, 'update'])->name('cart.update');
     Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
+    Route::get('/cart/count', function () {
+        if (!auth()->check()) {
+            return response()->json(['count' => 0]);
+        }
 
+        $count = \App\Models\Cart::where('user_id', auth()->id())->withCount('items')->first()?->items_count ?? 0;
+        return response()->json(['count' => $count]);
+    });
+    Route::post('/cart/add-ajax', [CartController::class, 'addAjax'])->name('cart.add.ajax');
     // Thanh toán
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');

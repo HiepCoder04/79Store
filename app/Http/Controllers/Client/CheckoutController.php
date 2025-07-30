@@ -381,8 +381,12 @@ class CheckoutController extends Controller
                 return $gallery ? $gallery->image : 'assets/img/bg-img/default.jpg';
             })->filter()->toArray();
 
-            $cart->items()->delete();
-            $cart->delete();
+            $cart->items()->whereIn('id', $selectedIds)->delete();
+
+            // Nếu giỏ không còn item nào sau khi xoá → xóa luôn cart (tuỳ ý)
+            if ($cart->items()->count() === 0) {
+                $cart->delete(); // hoặc giữ lại nếu muốn
+            }
 
             session()->forget(['applied_voucher', 'checkout_data', 'selected_ids']);
 
