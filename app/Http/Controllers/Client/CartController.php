@@ -104,7 +104,48 @@ class CartController extends Controller
     return redirect()->route('cart.index')->with('success', 'Đã thêm vào giỏ hàng!');
 }
 
+public function addAjax(Request $request)
+{
+    $request->validate([
+        'product_id' => 'required|exists:products,id',
+        'pot'        => 'required|string',
+        'height'     => 'required|string',
+        'quantity'   => 'required|integer|min:1'
+    ]);
 
+    $variant = ProductVariant::where('product_id', $request->product_id)
+        ->where('pot', $request->pot)
+        ->where('height', $request->height)
+        ->first();
+
+    if (!$variant) {
+        return response()->json(['success' => false, 'message' => 'Không tìm thấy biến thể phù hợp.'], 404);
+    }
+
+    if ($variant->stock_quantity < $request->quantity) {
+        return response()->json(['success' => false, 'message' => 'Số lượng vượt quá tồn kho.'], 400);
+    }
+
+    $user = Auth::user();
+    $cart = Cart::firstOrCreate(['user_id' => $user->id]);
+
+    $item = CartItem::where('cart_id', $cart->id)
+        ->where('product_variant_id', $variant->id)
+        ->first();
+
+    if ($item) {
+        $item->quantity += $request->quantity;
+        $item->save();
+    } else {
+        CartItem::create([
+            'cart_id' => $cart->id,
+            'product_variant_id' => $variant->id,
+            'quantity' => $request->quantity
+        ]);
+    }
+
+    return response()->json(['success' => true, 'message' => 'Đã thêm vào giỏ hàng!']);
+}
     public function update(Request $request, $id)
 {
     $request->validate([
