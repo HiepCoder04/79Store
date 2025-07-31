@@ -123,7 +123,6 @@
                 <tr>
                     <th>Tên SP</th>
                     <th>Biến thể</th>
-                    <th>Đơn giá</th>
                     <th>Số lượng</th>
                     <th>Tổng</th>
                 </tr>
@@ -131,9 +130,8 @@
             <tbody>
                 @foreach ($order->orderDetails as $item)
                 <tr>
-                    <td>{{ $item->productVariant->product->name ?? '---' }}</td>
-                    <td>{{ $item->productVariant->pot  ?? '---' }}</td>
-                    <td>{{ number_format($item->unit_price, 0, ',', '.') }} đ</td>
+                    <td>{{ $item->product_name ?? '---' }}</td>
+                    <td>{{ $item->variant_name ?? '---' }}</td>
                     <td>{{ $item->quantity }}</td>
                     <td>{{ number_format($item->price * $item->quantity, 0, ',', '.') }} đ</td>
                 </tr>
