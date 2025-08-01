@@ -20,8 +20,8 @@
                 </div>
                 @php
                     $statusMap = [
-                        'pending' => ['label' => 'Chờ thanh toán', 'class' => 'warning'],
-                        'confirmed' => ['label' => 'Chờ xác nhận', 'class' => 'info'],
+                        'pending' => ['label' => 'Chờ xác nhận', 'class' => 'warning'],
+                        'confirmed' => ['label' => 'Đã xác nhận', 'class' => 'info'],
                         'shipping' => ['label' => 'Đang giao hàng', 'class' => 'primary'],
                         'delivered' => ['label' => 'Đã nhận hàng', 'class' => 'success'],
                         'cancelled' => ['label' => 'Đã hủy', 'class' => 'danger'],
