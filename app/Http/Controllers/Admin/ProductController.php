@@ -10,7 +10,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-
+use App\Models\Pot;
+use App\Models\ProductVariant;
 class ProductController extends Controller
 {
     public function index(Request $request)
@@ -60,7 +61,7 @@ class ProductController extends Controller
             'description' => 'required|string|max:1500',
             'category_id' => 'required|exists:categories,id',
             'variants' => 'required|array|min:1',
-            'variants.*.pot' => 'nullable|max:50',
+            'variants.*.pot' => 'nullable|exists:pots,id',
             'variants.*.height' => 'nullable|string|max:100',
             'variants.*.price' => 'nullable|numeric|min:0',
             'variants.*.stock_quantity' => 'nullable|integer|min:0',
@@ -92,12 +93,15 @@ class ProductController extends Controller
                 Log::debug($isValid ? '✅ Biến thể OK' : '❌ Bị loại', $variant);
 
                 if ($isValid) {
-                    $product->variants()->create([
+                    $newVariant = $product->variants()->create([
                         'variant_name' => $product->name . ' - ' . ($variant['pot'] ?? 'Không rõ'),
-                        'pot' => $variant['pot'] ?? null,
+                        
+                        'height' => $variant['height'] ?? null,
                         'price' => $variant['price'],
                         'stock_quantity' => $variant['stock_quantity']
                     ]);
+                    $allPotIds =Pot::pluck('id')->toArray();
+                    $newVariant->pots()->attach($allPotIds);
                 }
             }
 
@@ -142,7 +146,8 @@ class ProductController extends Controller
             'description' => 'required|string|max:1500',
             'category_id' => 'required|exists:categories,id',
             'variants' => 'nullable|array',
-            'variants.*.pot' => 'nullable|max:50',
+            'variants.*.pot' => 'nullable|exists:pots,id',
+
             'variants.*.height' => 'nullable|string|max:100',
             'variants.*.price' => 'nullable|numeric|min:0',
             'variants.*.stock_quantity' => 'nullable|integer|min:0',
@@ -171,20 +176,24 @@ class ProductController extends Controller
                             // Update variant
                             $product->variants()->where('id', $variant['id'])->update([
 
-                                'pot' => $variant['pot'] ?? null,
+                                
                                 'height' => $variant['height'] ?? null,
                                 'price' => $variant['price'],
                                 'stock_quantity' => $variant['stock_quantity'],
                             ]);
                         } else {
                             // Create new variant
-                            $product->variants()->create([
-                                'variant_name' => $product->name . ' - ' . ($variant['pot'] ?? 'Không rõ'),
-                                'pot' => $variant['pot'] ?? null,
+                            $newVariant = $product->variants()->create([
+                                'variant_name' => $product->name,
+                                
                                 'height' => $variant['height'] ?? null,
                                 'price' => $variant['price'],
                                 'stock_quantity' => $variant['stock_quantity'],
                             ]);
+                            
+                            $allPotIds = Pot::pluck('id')->toArray();
+                            $newVariant->pots()->attach($allPotIds);
+
                         }
                     }
                 }

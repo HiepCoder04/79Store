@@ -24,7 +24,7 @@ use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\ForgotPasswordOtpController;
 use App\Http\Controllers\Client\AccountController;
-
+use App\Http\Controllers\Admin\PotController;
 // -------------------- BLOG (CLIENT) --------------------
 Route::prefix('blogs')->middleware('ban')->name('client.blogs.')->group(function () {
     Route::get('/', [App\Http\Controllers\Client\BlogController::class, 'index'])->name('index');
@@ -46,6 +46,10 @@ Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard
     Route::resource('products', ProductController::class);
     Route::post('products/{product}/restore', [ProductController::class, 'restore'])->name('products.restore')->withTrashed();
     Route::delete('products/{product}/force-delete', [ProductController::class, 'forceDelete'])->name('products.forceDelete')->withTrashed();
+
+    // Quản lý chậu
+    Route::resource('pot', PotController::class);
+
 
     // Quản lý danh mục
     Route::resource('categories', CategoryController::class)->except(['show']);

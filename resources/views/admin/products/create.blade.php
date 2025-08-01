@@ -34,8 +34,7 @@
         <div id="variants">
             <div class="variant mb-3 border rounded p-3 position-relative">
                 <button type="button" class="btn btn-danger btn-sm remove-variant position-absolute" style="right: 10px; top: 10px;">X</button>
-                <label>Chậu</label>
-                <input type="text" name="variants[0][pot]" class="bg-gray-100 border border-gray-300 rounded px-4 py-2 w-full text-gray-700 focus:outline-none focus:border-blue-500">
+               
                 
                 <label for="height">Chiều cao</label>
                 <input type="text" name="variants[0][height]" class="bg-gray-100 border border-gray-300 rounded px-4 py-2 w-full text-gray-700 focus:outline-none focus:border-blue-500">
@@ -66,10 +65,6 @@
         const variantHTML = `
             <div class="variant mb-3 border rounded p-3 position-relative">
                 <button type="button" class="btn btn-danger btn-sm remove-variant position-absolute" style="right: 10px; top: 10px;">X</button>
-
-               
-                <label>Chậu</label>
-                <input type="text" name="variants[${variantIndex}][pot]" class="bg-gray-100 border border-gray-300 rounded px-4 py-2 w-full text-gray-700 focus:outline-none focus:border-blue-500">
 
                  <label>Chiều cao (height)</label>
                 <input type="text" name="variants[${variantIndex}][height]" class="bg-gray-100 border border-gray-300 rounded px-4 py-2 w-full text-gray-700 focus:outline-none focus:border-blue-500">

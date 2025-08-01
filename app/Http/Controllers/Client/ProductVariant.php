@@ -8,7 +8,7 @@ use App\Models\Comment;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use Illuminate\Support\Facades\DB;
-
+use App\Models\Pot;
 class ProductVariant extends Controller
 {
     public function product(Request $request)
@@ -53,7 +53,12 @@ class ProductVariant extends Controller
     }
     public function productDetail($id)
 {
-    $product = Product::with('category', 'galleries', 'variants')->findOrFail($id);
+    $product = Product::with([
+        'category',
+        'galleries',
+        'variants.pots'          // lấy danh sách chậu riêng theo product
+    ])->findOrFail($id);
+
 
     $comments = Comment::with('user', 'product')
         ->where('product_id', $id)
@@ -62,13 +67,19 @@ class ProductVariant extends Controller
         ->get();
 
     // Thêm đoạn này để truyền biến variants cho JavaScript xử lý
-    $variants = $product->variants->map(fn ($v) => [
-        'pot' => $v->pot,
+    $variants = $product->variants->map(function ($v) {
+    return [
+        'id' => $v->id,
         'height' => $v->height,
-        'price' => $v->price
-    ]);
+        'price' => $v->price,
+        'stock_quantity' => $v->stock_quantity,
+        'pots' => $v->pots->pluck('id')->toArray(),  
+    ];
+});
 
-    return view('client.shopDetail', compact('product', 'comments', 'variants'));
+$allPots = Pot::pluck('name', 'id'); 
+
+    return view('client.shopDetail', compact('product', 'comments', 'variants','allPots'));
 }
 
 }

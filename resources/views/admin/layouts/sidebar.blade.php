@@ -64,6 +64,12 @@
                     <span class="nav-link-text">Quản Lí Voucher</span>
                 </a>
             </li>
+            {{-- quan li chậu --}}
+            <li class="nav-item">
+                <a class="nav-link text-dark" href="{{ route('admin.pot.index') }}">
+                    <span class="nav-link-text">Quản Lí chậu</span>
+                </a>
+            </li>
 
             @if(Auth::user()->role === 'admin')
             <li class="nav-item">

@@ -27,7 +27,6 @@
             <table class="table table-striped table-bordered mb-0">
                 <thead class="table-light">
                     <tr>
-                        <th>Chậu</th>
                         <th>Chiều cao</th>
                         <th>Giá</th>
                         <th>Số lượng tồn kho</th>
@@ -36,7 +35,6 @@
                 <tbody>
                     @foreach($product->variants as $variant)
                     <tr>
-                        <td>{{ $variant->pot ?? 'Không có' }}</td>
                         <td>{{ $variant->height ? $variant->height . ' cm' : 'Không có' }}</td>
                         <td>{{ is_numeric($variant->price) ? number_format($variant->price, 0, ',', '.') . 'Đ' : 'N/A' }}</td>
                         <td>{{ $variant->stock_quantity ?? 0 }}</td>

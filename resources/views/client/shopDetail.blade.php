@@ -3,14 +3,7 @@
 @section('title', $product->name)
 
 @section('content')
-@php
-    $variants = $product->variants->map(fn ($v) => [
-        'pot' => (string)$v->pot,
-        'height' => (string)$v->height,
-        'price' => $v->price,
-         'stock_quantity' => $v->stock_quantity,
-    ]);
-@endphp
+
 
 <div class="breadcrumb-area">
     <div class="top-breadcrumb-area bg-img bg-overlay d-flex align-items-center justify-content-center"
@@ -40,7 +33,7 @@
                     $image = optional($product->galleries->first())->image;
                     $imagePath = $image ? asset(ltrim($image, '/')) : asset('assets/img/bg-img/default.jpg');
                 @endphp
-                <img  class="d-block w-100" src="{{ $imagePath }}" alt="{{ $product->name }}">
+                <img id="product-image" class="d-block w-100" src="{{ $imagePath }}" alt="{{ $product->name }}">
             </div>
 
             <div class="col-12 col-md-6">
@@ -54,25 +47,20 @@
                     <input type="hidden" name="pot" id="selected-pot">
                     <input type="hidden" name="height" id="selected-height">
 
-                    <div class="form-group">
-                        <label>Chọn chậu:</label><br>
-                        <div id="pot-buttons">
-                            @foreach ($product->variants->pluck('pot')->unique() as $pot)
-                                <button type="button" class="btn btn-outline-dark m-1 pot-option" data-pot="{{ $pot }}">{{ $pot }}</button>
-                            @endforeach
-                        </div>
-                    </div>
-
-                    <div class="form-group" id="height-group" style="display:none;">
+                    <div class="form-group" id="height-group">
                         <label>Chọn chiều cao:</label><br>
                         <div id="height-buttons"></div>
-                         <p id="stock-display" class="text-muted mt-2"></p>
+                        <p id="stock-display" class="text-muted mt-2"></p>
+                    </div>
+
+                    <!-- Chọn chậu -->
+                    <div class="form-group">
+                        <label>Chọn chậu:</label><br>
+                        <div id="pot-buttons"></div> <!-- GIỮ LẠI DÒNG NÀY để JS render vào -->
                     </div>
 
                     <div id="add-to-cart-form" data-url="{{ route('cart.add.ajax') }}">
                         <input type="hidden" id="product-id" value="{{ $product->id }}">
-                        <input type="hidden" id="selected-pot">
-                        <input type="hidden" id="selected-height">
 
                         <div class="d-flex align-items-center mt-3 mb-3">
                             <div class="quantity">
@@ -84,7 +72,6 @@
                                     <i class="fa fa-plus"></i>
                                 </span>
                             </div>
-
                             <!-- ✅ Nút AJAX -->
                             <button type="button" id="add-to-cart-btn" class="btn alazea-btn ml-3">THÊM VÀO GIỎ</button>
                         </div>
@@ -97,8 +84,8 @@
             </div>
         </div>
     </div>
-    
-    <!-- ==== Bình luận sản phẩm ==== -->
+
+     <!-- ==== Bình luận sản phẩm ==== -->
 <div class="container d-flex justify-content-center">
     <div class="col-md-8 col-lg-6 mt-4">
         <h5 class="mb-3 fw-semibold text-center">Bình luận sản phẩm</h5>
@@ -114,7 +101,7 @@
                 </div>
             </form>
         @else
-            <p class="text-muted text-center">Vui lòng <a href="{{ route('login') }}">đăng nhập</a> để bình luận.</p>
+             <p class="text-muted text-center">Vui lòng <a href="{{ route('auth.login') }}">đăng nhập</a> để bình luận.</p>
         @endauth
 
         {{-- Danh sách bình luận --}}
@@ -152,6 +139,7 @@
     </div>
 </div>
 
+   
 </section>
 @endsection
 
@@ -159,6 +147,7 @@
 @section('page_scripts')
 <script>
     const allVariants = @json($variants);
+    const allPots = @json($allPots);
 
     document.addEventListener('DOMContentLoaded', function () {
         const potContainer = document.getElementById('pot-buttons');
@@ -166,48 +155,44 @@
         const priceDisplay = document.getElementById('price-display');
         const potInput = document.getElementById('selected-pot');
         const heightInput = document.getElementById('selected-height');
-        const heightGroup = document.getElementById('height-group');
-
         const addBtn = document.getElementById('add-to-cart-btn');
         const form = document.getElementById('add-to-cart-form');
 
-        // --- Biến thể: chọn chậu + chiều cao ---
-        function renderHeightButtons(pot) {
-            heightGroup.style.display = 'block';
-            const heights = allVariants
-                .filter(v => v.pot.toLowerCase().trim() === pot.toLowerCase().trim())
-                .map(v => String(v.height).trim())
-                .filter((v, i, arr) => arr.indexOf(v) === i);
+        function renderPotButtons(height) {
+            const variant = allVariants.find(v => v.height === height);
+            const pots = variant?.pots || [];
 
-            heightContainer.innerHTML = '';
-            heights.forEach((height) => {
-                const btn = document.createElement('button');
-                btn.type = 'button';
-                btn.className = 'btn btn-outline-dark m-1 height-option';
-                btn.dataset.height = height;
-                btn.textContent = height;
-                btn.onclick = function () {
-                    document.querySelectorAll('.height-option').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    heightInput.value = height;
-                    updatePrice(pot, height);
+            potContainer.innerHTML = '';
+
+            pots.forEach(potId => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'btn btn-outline-dark m-1 pot-option';
+                button.textContent = allPots[potId] || potId;
+                button.dataset.potId = potId;
+
+                button.onclick = function () {
+                    document.querySelectorAll('.pot-option').forEach(b => b.classList.remove('active'));
+                    button.classList.add('active');
+                    potInput.value = potId;
+
+                    const selectedHeight = heightInput.value;
+                    if (selectedHeight) updatePrice(potId, selectedHeight);
                 };
-                heightContainer.appendChild(btn);
+
+                potContainer.appendChild(button);
             });
 
-            if (heights.length > 0) {
-                const firstBtn = heightContainer.querySelector('.height-option');
-                firstBtn?.click();
-            } else {
-                heightInput.value = '';
-                updatePrice('', '');
+            // Auto chọn chậu đầu tiên nếu có
+            const firstPotButton = potContainer.querySelector('.pot-option');
+            if (firstPotButton) {
+                firstPotButton.click();
             }
         }
 
         function updatePrice(pot, height) {
             const variant = allVariants.find(v =>
-                v.pot.toLowerCase().trim() === pot.toLowerCase().trim() &&
-                v.height.toLowerCase().trim() === height.toLowerCase().trim()
+                v.height === height && v.pots.includes(pot)
             );
 
             const price = variant ? Number(variant.price).toLocaleString('vi-VN') + 'đ' : '0đ';
@@ -222,16 +207,36 @@
             }, 150);
         }
 
-        document.querySelectorAll('.pot-option').forEach(btn => {
-            btn.addEventListener('click', function () {
-                document.querySelectorAll('.pot-option').forEach(b => b.classList.remove('active'));
+        // --- Tạo nút chọn chiều cao ---
+        const heights = allVariants.map(v => v.height).filter((v, i, a) => a.indexOf(v) === i);
+
+        heights.forEach(height => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'btn btn-outline-dark m-1 height-option';
+            btn.dataset.height = height;
+            btn.textContent = height;
+
+            btn.onclick = function () {
+                document.querySelectorAll('.height-option').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-                potInput.value = btn.dataset.pot;
-                renderHeightButtons(btn.dataset.pot);
-            });
+                heightInput.value = height;
+                renderPotButtons(height); // sau khi chọn chiều cao mới thì lọc chậu phù hợp
+            };
+
+            heightContainer.appendChild(btn);
         });
 
-        heightGroup.style.display = 'none';
+        // --- Auto chọn chiều cao đầu tiên ---
+        if (heights.length > 0) {
+            const defaultHeight = heights[0];
+            heightInput.value = defaultHeight;
+
+            const defaultHeightBtn = [...document.querySelectorAll('.height-option')].find(b => b.dataset.height == defaultHeight);
+            defaultHeightBtn?.classList.add('active');
+
+            renderPotButtons(defaultHeight);
+        }
 
         // --- AJAX thêm vào giỏ ---
         addBtn?.addEventListener('click', function () {
@@ -241,7 +246,7 @@
             const quantity = parseInt(document.getElementById('quantity').value);
 
             if (!pot || !height) {
-                alert('Vui lòng chọn chậu và chiều cao!');
+                alert('Vui lòng chọn chiều cao và chậu!');
                 return;
             }
 
@@ -255,58 +260,15 @@
             })
             .then(res => res.json())
             .then(data => {
-                if (data.success) {
-                    flyToCart();
-                    updateCartCount();
-                    alert(data.message);
-                } else {
-                    alert(data.message);
-                }
+                alert(data.message);
             })
             .catch(err => {
                 console.error(err);
                 alert('Đã có lỗi xảy ra khi thêm vào giỏ hàng!');
             });
         });
-
-        function updateCartCount() {
-            fetch('/cart/count')
-                .then(res => res.json())
-                .then(data => {
-                    document.getElementById('cart-count').textContent = `(${data.count})`;
-                });
-        }
-
-        function flyToCart() {
-            const img = document.getElementById('product-image');
-            const cartIcon = document.getElementById('cart-icon');
-            if (!img || !cartIcon) return;
-
-            const imgRect = img.getBoundingClientRect();
-            const cartRect = cartIcon.getBoundingClientRect();
-
-            const flyingImg = img.cloneNode(true);
-            flyingImg.style.position = 'fixed';
-            flyingImg.style.top = imgRect.top + 'px';
-            flyingImg.style.left = imgRect.left + 'px';
-            flyingImg.style.width = img.offsetWidth + 'px';
-            flyingImg.style.height = img.offsetHeight + 'px';
-            flyingImg.style.transition = 'all 1s ease-in-out';
-            flyingImg.style.zIndex = 9999;
-            document.body.appendChild(flyingImg);
-
-            setTimeout(() => {
-                flyingImg.style.top = cartRect.top + 'px';
-                flyingImg.style.left = cartRect.left + 'px';
-                flyingImg.style.width = '20px';
-                flyingImg.style.height = '20px';
-                flyingImg.style.opacity = 0.3;
-            }, 10);
-
-            setTimeout(() => {
-                document.body.removeChild(flyingImg);
-            }, 1000);
-        }
     });
 </script>
+
+
 @endsection
