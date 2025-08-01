@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\OrderStatusMail;
 
 class OrderController extends Controller
 {
@@ -36,7 +38,7 @@ class OrderController extends Controller
     // Cập nhật trạng thái đơn hàng với kiểm tra logic
     public function updateStatus(Request $request, $id)
     {
-        $order = Order::findOrFail($id);
+        $order = Order::with(['user', 'address'])->findOrFail($id);
         $newStatus = $request->input('status');
         $currentStatus = $order->status;
 
@@ -48,7 +50,24 @@ class OrderController extends Controller
         $order->status = $newStatus;
         $order->save();
 
-        return back()->with('success', 'Cập nhật trạng thái đơn hàng thành công.');
+        // Gửi email thông báo trạng thái
+        $statusText = match ($newStatus) {
+            'pending' => 'Chờ xử lí',
+            'confirmed' => 'Đã xác nhận',
+            'shipping' => 'Đơn hàng đang được giao',
+            'delivered' => 'Đã nhận hàng',
+            'cancelled' => 'Đơn hàng đã bị huỷ',
+            'returned' => 'Đơn hàng đã được trả lại',
+            default => 'Đơn hàng đã được cập nhật',
+        };
+
+        // Load user kèm địa chỉ (nếu cần trong email)
+        // Gửi email
+        if ($order->user && $order->user->email) {
+            Mail::to($order->user->email)->send(new OrderStatusMail($order, $statusText));
+        }
+
+        return back()->with('success', 'Cập nhật trạng thái và gửi email thành công.');
     }
 
     // Kiểm tra tính hợp lệ của việc chuyển trạng thái
@@ -67,8 +86,8 @@ class OrderController extends Controller
     public function getAvailableStatuses($currentStatus)
     {
         $allStatuses = [
-            'pending' => 'Chờ xử lý',
-            'confirmed' => 'Đang xử lý', 
+            'pending' => 'Chờ xử lí',
+            'confirmed' => 'Đã xác nhận',
             'shipping' => 'Đang giao',
             'delivered' => 'Hoàn tất',
             'cancelled' => 'Đã huỷ',
@@ -76,10 +95,10 @@ class OrderController extends Controller
         ];
 
         $availableStatuses = [];
-        
+
         // Luôn hiển thị trạng thái hiện tại
         $availableStatuses[$currentStatus] = $allStatuses[$currentStatus];
-        
+
         // Thêm các trạng thái có thể chuyển đến
         $nextStatuses = $this->statusFlow[$currentStatus] ?? [];
         foreach ($nextStatuses as $status) {
@@ -93,9 +112,9 @@ class OrderController extends Controller
     private function getStatusLabel($status)
     {
         $labels = [
-            'pending' => 'Chờ xử lý',
-            'confirmed' => 'Đang xử lý',
-            'shipping' => 'Đang giao', 
+            'pending' => 'Chờ xử lí',
+            'confirmed' => 'Đã xác nhận',
+            'shipping' => 'Đang giao',
             'delivered' => 'Hoàn tất',
             'cancelled' => 'Đã huỷ',
             'returned' => 'Trả hàng'
@@ -137,11 +156,11 @@ class OrderController extends Controller
     // Cập nhật đơn hàng
     public function update(Request $request, $id)
     {
-         $request->validate([
-        'status' => 'required|in:pending,confirmed,shipping,delivered,cancelled',
-        'payment_method' => 'nullable|string|max:255',
-        'shipping_method' => 'nullable|string|max:255',
-    ]);
+        $request->validate([
+            'status' => 'required|in:pending,confirmed,shipping,delivered,cancelled',
+            'payment_method' => 'nullable|string|max:255',
+            'shipping_method' => 'nullable|string|max:255',
+        ]);
         $order = Order::findOrFail($id);
         dd($request->all());
         $order->update($request->only(['status', 'shipping_method', 'payment_method']));

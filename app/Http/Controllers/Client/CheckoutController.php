@@ -13,6 +13,8 @@ use App\Models\OrderDetail;
 use App\Models\UserAddress;
 use App\Models\Voucher;
 use App\Models\UserVoucher;
+use App\Mail\OrderStatusMail;
+use Illuminate\Support\Facades\Mail;
 
 class CheckoutController extends Controller
 {
@@ -93,9 +95,8 @@ class CheckoutController extends Controller
             return redirect()->back()->with('error', 'Giỏ hàng của bạn đang trống.');
         }
 
-        // Lấy chỉ những items được chọn
         $selectedItems = $cart->items->whereIn('id', $selectedIds);
-        
+
         if ($selectedItems->isEmpty()) {
             return redirect()->back()->with('error', 'Vui lòng chọn ít nhất một sản phẩm để thanh toán.');
         }
@@ -103,6 +104,7 @@ class CheckoutController extends Controller
         DB::beginTransaction();
 
         try {
+            // Xử lý địa chỉ giao hàng
             if ($request->filled('new_address')) {
                 $existingAddress = UserAddress::where('user_id', $user->id)->where('address', $request->new_address)->first();
                 if ($existingAddress) {
@@ -129,9 +131,10 @@ class CheckoutController extends Controller
                 return back()->with('error', 'Vui lòng chọn hoặc nhập địa chỉ giao hàng.');
             }
 
+            // Tính tổng tiền và xử lý voucher
             $totalBefore = $selectedItems->sum(fn($item) => $item->productVariant->price * $item->quantity);
-
             $discount = 0;
+
             $voucherId = session('applied_voucher');
             if ($voucherId) {
                 $voucher = Voucher::find($voucherId);
@@ -142,7 +145,6 @@ class CheckoutController extends Controller
                             $discount = $voucher->max_discount;
                         }
 
-                        // Ghi nhận là đã dùng mã
                         UserVoucher::updateOrCreate([
                             'user_id' => $user->id,
                             'voucher_id' => $voucher->id
@@ -156,26 +158,24 @@ class CheckoutController extends Controller
 
             $finalTotal = $totalBefore - $discount;
 
-            // Xử lý logic trạng thái đơn hàng và thanh toán dựa trên phương thức
+            // Xử lý trạng thái đơn và thanh toán
             $orderStatus = 'pending';
             $paymentStatus = 'unpaid';
-            
+
             if ($request->payment_method == 'cod') {
-                // Thanh toán khi nhận hàng
-                $paymentStatus = 'pending'; // Chưa thanh toán, sẽ thanh toán khi nhận hàng
-                $orderStatus = 'pending'; // Đơn hàng chờ xử lý
+                $paymentStatus = 'pending';
+                $orderStatus = 'pending';
             } elseif ($request->payment_method == 'vnpay') {
                 if (isset($request->payment_status) && $request->payment_status == 'paid') {
-                    // Đã thanh toán thành công qua VNPAY
                     $paymentStatus = 'paid';
-                    $orderStatus = 'confirmed'; // Đơn hàng đã được xác nhận do đã thanh toán
+                    $orderStatus = 'confirmed';
                 } else {
-                    // Chuyển hướng đến cổng thanh toán VNPAY
                     $paymentStatus = 'pending';
                     $orderStatus = 'pending';
                 }
             }
 
+            // Tạo đơn hàng
             $order = Order::create([
                 'user_id' => $user->id,
                 'address_id' => $addressId,
@@ -192,19 +192,19 @@ class CheckoutController extends Controller
                 'sale_channel' => 'website',
             ]);
 
-            // Chỉ tạo order details cho những items được chọn
+            // Tạo chi tiết đơn hàng
             foreach ($selectedItems as $item) {
                 $variant = $item->productVariant;
                 $product = $variant->product;
 
                 OrderDetail::create([
-                   'order_id' => $order->id,
+                    'order_id' => $order->id,
                     'product_id' => $product->id,
                     'product_variant_id' => $variant->id,
                     'product_name' => $product->name,
                     'variant_name' => $variant->height . ' / ' . $variant->pot,
-                    'product_height' => $variant->height,         
-                    'product_pot' => $variant->pot,               
+                    'product_height' => $variant->height,
+                    'product_pot' => $variant->pot,
                     'product_price' => $variant->price,
                     'price' => $variant->price,
                     'quantity' => $item->quantity,
@@ -217,12 +217,11 @@ class CheckoutController extends Controller
                 return $gallery ? $gallery->image : 'assets/img/bg-img/default.jpg';
             })->filter()->toArray();
 
-            // CHỈ XÓA NHỮNG ITEMS ĐÃ ĐƯỢC CHỌN THANH TOÁN
+            // Xóa các sản phẩm đã thanh toán
             foreach ($selectedItems as $item) {
                 $item->delete();
             }
 
-            // Chỉ xóa cart nếu không còn items nào
             if ($cart->items()->count() == 0) {
                 $cart->delete();
             }
@@ -231,12 +230,8 @@ class CheckoutController extends Controller
 
             // Nếu chọn VNPAY và chưa thanh toán, chuyển hướng đến cổng thanh toán
             if ($request->payment_method == 'vnpay' && (!isset($request->payment_status) || $request->payment_status != 'paid')) {
-                // Lưu order_id vào session để xử lý sau khi thanh toán
                 session(['pending_order_id' => $order->id]);
-                
                 DB::commit();
-                
-                // Chuyển hướng đến VNPAY
                 return redirect()->route('vnpay.payment', [
                     'amount' => $finalTotal,
                     'order_id' => $order->id
@@ -248,19 +243,38 @@ class CheckoutController extends Controller
             session()->flash('order_total', $finalTotal);
             session()->flash('order_id', $order->id);
             session()->flash('order_items', $images);
-            
+
+            // ✅ Gửi email xác nhận đơn hàng
+            try {
+                if ($user->email) {
+                    $statusText = match ($order->status) {
+                        'pending' => 'Đơn hàng của bạn đang chờ xác nhận',
+                        'confirmed' => 'Đơn hàng của bạn đã được xác nhận',
+                        'shipping' => 'Đơn hàng của bạn đang được vận chuyển',
+                        'delivered' => 'Đơn hàng của bạn đã được giao thành công',
+                        'cancelled' => 'Đơn hàng của bạn đã bị huỷ',
+                        'returned' => 'Đơn hàng của bạn đã được trả lại',
+                        default => 'Đơn hàng của bạn đã được cập nhật trạng thái',
+                    };
+
+                    Mail::to($user->email)->send(new OrderStatusMail($order, $statusText));
+                }
+            } catch (\Exception $ex) {
+                Log::error('Lỗi gửi mail đơn hàng: ' . $ex->getMessage());
+            }
+
             if ($request->payment_method == 'vnpay') {
                 return redirect()->route('checkout.thankyouvnpay');
             }
-            
+
             return redirect()->route('checkout.thankyou');
-            
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Checkout error: ' . $e->getMessage());
             return back()->with('error', 'Đã xảy ra lỗi khi đặt hàng. Vui lòng thử lại!');
         }
     }
+
 
     private function redirectToVNPay($request)
     {
@@ -300,7 +314,7 @@ class CheckoutController extends Controller
     private function createOrder($request)
     {
         $user = Auth::user();
-        
+
         $selectedIds = collect(explode(',', $request->input('selected_ids', '')))
             ->filter(fn($id) => is_numeric($id))
             ->map(fn($id) => (int) $id)
@@ -332,7 +346,7 @@ class CheckoutController extends Controller
             // Xác định trạng thái đơn hàng và thanh toán
             $orderStatus = 'pending';
             $paymentStatus = 'unpaid';
-            
+
             if ($request->payment_method == 'cod') {
                 $paymentStatus = 'pending';
                 $orderStatus = 'pending';
@@ -399,9 +413,8 @@ class CheckoutController extends Controller
             if ($request->payment_method == 'vnpay') {
                 return redirect()->route('checkout.thankyouvnpay');
             }
-            
+
             return redirect()->route('checkout.thankyou');
-            
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Checkout error: ' . $e->getMessage());
@@ -487,7 +500,7 @@ class CheckoutController extends Controller
         return view('client.users.thank_you');
     }
 
-        public function thankYouvnpay()
+    public function thankYouvnpay()
     {
         return view('client.users.thank_youvnpay');
     }
