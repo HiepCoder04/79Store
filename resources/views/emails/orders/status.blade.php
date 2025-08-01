@@ -17,14 +17,14 @@ Chúng tôi xin thông báo **trạng thái mới nhất** của đơn hàng c�
 
 ---
 
-Thông tin đơn hàng:
+## 📦 Thông tin đơn hàng:
 
-Người nhận:** {{ $order->name }}  
-Số điện thoại:** {{ $order->phone }}  
-Địa chỉ giao hàng:** {{ optional($order->address)->address ?? 'Không có địa chỉ' }}  
-Ghi chú:** {{$order->note}}
-Tổng tiền:** <span style="color: #16a34a;"><strong>{{ number_format($order->total_after_discount, 0, ',', '.') }}₫</strong></span>  
-Phương Thức Thanh toán:** {{ strtoupper($order->payment_method) }}
+**👤 Người nhận:** {{ $order->name }}  
+**📞 Số điện thoại:** {{ $order->phone }}  
+**📍 Địa chỉ giao hàng:** {{ optional($order->address)->address ?? 'Không có địa chỉ' }}  
+**📝 GHI CHÚ:** {{ $order->note ?? 'Không có' }}  
+**💵 Tổng tiền:** <span style="color: #16a34a;"><strong>{{ number_format($order->total_after_discount, 0, ',', '.') }}₫</strong></span>  
+**🧾 Thanh toán:** Thanh toán {{ strtoupper($order->payment_method) }}
 
 ---
 
