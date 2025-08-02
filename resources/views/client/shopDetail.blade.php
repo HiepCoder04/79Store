@@ -33,7 +33,16 @@
                     $image = optional($product->galleries->first())->image;
                     $imagePath = $image ? asset(ltrim($image, '/')) : asset('assets/img/bg-img/default.jpg');
                 @endphp
-                <img id="product-image" class="d-block w-100" src="{{ $imagePath }}" alt="{{ $product->name }}">
+                <div id="productCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="2000">
+    <div class="carousel-inner">
+        @foreach ($product->galleries as $index => $gallery)
+            <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
+                <img src="{{ asset(ltrim($gallery->image, '/')) }}" class="d-block w-100" alt="Ảnh {{ $index + 1 }}">
+            </div>
+        @endforeach
+    </div>
+</div>
+
             </div>
 
             <div class="col-12 col-md-6">
