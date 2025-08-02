@@ -36,6 +36,7 @@
                             <tr class="text-center">
                                 <th>#</th>
                                 <th>Tên chậu</th>
+                                <th>Giá chậu</th>
                                 <th>Ngày tạo</th>
                                 <th>Hành động</th>
                             </tr>
@@ -45,12 +46,13 @@
                                 <tr>
                                     <td class="text-center">{{ $index + 1 }}</td>
                                     <td>{{ $pot->name }}</td>
+                                    <td>{{ number_format($pot->price, 0, ',', '.') }} VND</td>
                                     <td class="text-center">{{ $pot->created_at->format('d/m/Y H:i') }}</td>
                                     <td class="text-center">
                                         <a href="{{ route('admin.pot.edit', $pot->id) }}" class="btn btn-sm btn-outline-primary me-1">
                                             <i class="fas fa-edit"></i> Sửa
                                         </a>
-                                        <form action="{{ route('admin.pot.destroy', $pot->id) }}" method="POST" class="d-inline delete-pot-form">
+                                        <form id="delete-{{$pot->id}}" action="{{ route('admin.pot.destroy', $pot->id) }}" onsubmit="return comfirm('Bạn muốn xóa chậu ???')" method="POST" class="d-inline delete-pot-form">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-sm btn-outline-danger">
@@ -69,15 +71,4 @@
 </div>
 @endsection
 
-@section('scripts')
-<script>
-    // Xác nhận khi xóa
-    document.querySelectorAll('.delete-pot-form').forEach(form => {
-        form.addEventListener('submit', function (e) {
-            if (!confirm('Bạn có chắc chắn muốn xóa chậu này không?')) {
-                e.preventDefault();
-            }
-        });
-    });
-</script>
-@endsection
+@

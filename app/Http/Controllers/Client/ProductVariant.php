@@ -77,7 +77,7 @@ class ProductVariant extends Controller
     ];
 });
 
-$allPots = Pot::pluck('name', 'id'); 
+$allPots = Pot::all()->keyBy('id');
 
     return view('client.shopDetail', compact('product', 'comments', 'variants','allPots'));
 }

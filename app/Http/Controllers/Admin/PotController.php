@@ -21,25 +21,34 @@ class PotController extends Controller
 
   public function store(Request $request)
 {
-    $request->validate([
-        'name' => 'required|unique:pots,name',
-    ]);
 
     $name = trim($request->input('name'));
-    if ($name === '') {
+    $price = $request->input('price');
+    // Kiểm tra xem tên chậu có để trống không
+     if ($name === '') {
         return redirect()->back()
             ->withInput()
             ->with('error', 'Tên chậu không được để trống.');
     }
-
+    // Kiểm tra xem tên chậu đã tồn tại chưa
     if (Pot::where('name', $name)->exists()) {
         return redirect()->back()
             ->withInput()
             ->with('error', 'Tên chậu đã tồn tại.');
     }
+    // Kiểm tra xem giá có hợp lệ không
+    if (!is_numeric($price) || $price < 0) {
+        return redirect()->back()
+            ->withInput()
+            ->with('error', 'Giá phải là một số hợp lệ lớn hơn hoặc bằng 0.');
+    }
+
 
     // Tạo chậu mới
-    $pot = Pot::create(['name' => $name]);
+    $pot = Pot::create([
+        'name' => $name,
+        'price' => $price,
+    ]);
 
     // Gắn chậu này cho tất cả các biến thể sản phẩm hiện có
     $variantIds = \App\Models\ProductVariant::pluck('id'); // Lấy ID tất cả biến thể
@@ -62,20 +71,29 @@ class PotController extends Controller
 
     public function update(Request $request, Pot $pot)
     {
-        $request->validate([
-            'name' => 'required|unique:pots,name,' . $pot->id,
-        ]);
-        if (!$request->has('name') || trim($request->input('name')) === '') {
-            return redirect()->back()->with('error', 'Tên chậu không được để trống.');
-        }
-        $pot->update($request->only('name'));
+        $name = trim($request->input('name'));
+        $price = $request->input('price');
+         if ($name === '') {
+        return redirect()->back()->withInput()->with('error', 'Tên chậu không được để trống.');
+    }
+
+    if (!is_numeric($price) || $price < 0) {
+        return redirect()->back()->withInput()->with('error', 'Giá phải là một số hợp lệ lớn hơn hoặc bằng 0.');
+    }
+          $pot->update([
+        'name' => $name,
+        'price' => $price,
+    ]);
 
         return redirect()->route('admin.pot.index')->with('success', 'Cập nhật chậu thành công.');
     }
 
-    public function destroy(Pot $pot)
-    {
-        $pot->delete();
-        return redirect()->route('admin.pot.index')->with('success', 'Xóa chậu thành công.');
-    }
+   public function destroy($id)
+{
+    $pot = Pot::findOrFail($id);
+
+    $pot->delete();
+
+    return redirect()->route('admin.pot.index')->with('success', 'Xóa chậu thành công.');
+}
 }

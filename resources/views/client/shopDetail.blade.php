@@ -177,7 +177,9 @@
                 const button = document.createElement('button');
                 button.type = 'button';
                 button.className = 'btn btn-outline-dark m-1 pot-option';
-                button.textContent = allPots[potId] || potId;
+                //gia chau
+                const pot = allPots[potId];
+                button.textContent = pot?.name || 'Chậu';
                 button.dataset.potId = potId;
 
                 button.onclick = function () {
@@ -198,23 +200,28 @@
                 firstPotButton.click();
             }
         }
+        //tu dong update gia sp
+       function updatePrice(potId, height) {
+    const variant = allVariants.find(v =>
+        v.height === height && v.pots.includes(potId)
+    );
 
-        function updatePrice(pot, height) {
-            const variant = allVariants.find(v =>
-                v.height === height && v.pots.includes(pot)
-            );
+    const pot = allPots[potId];
+    const potPrice = pot ? Number(pot.price) : 0;
+    const variantPrice = variant ? Number(variant.price) : 0;
+    const total = potPrice + variantPrice;
 
-            const price = variant ? Number(variant.price).toLocaleString('vi-VN') + 'đ' : '0đ';
-            const stock = variant ? variant.stock_quantity : 0;
+    const formatted = total.toLocaleString('vi-VN') + 'đ';
+    const stock = variant ? variant.stock_quantity : 0;
 
-            priceDisplay.style.opacity = 0;
-            setTimeout(() => {
-                priceDisplay.textContent = price;
-                priceDisplay.style.opacity = 1;
-                document.getElementById('stock-display').textContent =
-                    stock > 0 ? `Còn ${stock} sản phẩm` : 'Hết hàng';
-            }, 150);
-        }
+    priceDisplay.style.opacity = 0;
+    setTimeout(() => {
+        priceDisplay.textContent = formatted;
+        priceDisplay.style.opacity = 1;
+        document.getElementById('stock-display').textContent =
+            stock > 0 ? `Còn ${stock} sản phẩm` : 'Hết hàng';
+    }, 150);
+}
 
         // --- Tạo nút chọn chiều cao ---
         const heights = allVariants.map(v => v.height).filter((v, i, a) => a.indexOf(v) === i);

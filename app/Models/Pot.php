@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Pot extends Model
 {
-     protected $fillable = ['name'];
+     protected $fillable = ['name','price'];
 
     public function productVariants()
     {
