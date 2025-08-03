@@ -49,6 +49,18 @@
         </div>
         <button type="button" id="addVariant" class="btn btn-secondary mb-4">+ Thêm biến thể</button>
 
+        <h4>Chọn chậu</h4>
+<div class="mb-3">
+    @foreach($pots as $pot)
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="selected_pots[]" value="{{ $pot->id }}" id="pot_{{ $pot->id }}">
+            <label class="form-check-label" for="pot_{{ $pot->id }}">
+                {{ $pot->name }} - Giá: {{ $pot->price ?? 'N/A' }}
+            </label>
+        </div>
+    @endforeach
+</div>
+
         <h4>Hình ảnh sản phẩm</h4>
         <input type="file" name="images[]" id="imageInput" class="btn btn-secondary mb-4" multiple>
         <div id="imagePreview" class="row"></div>

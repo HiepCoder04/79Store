@@ -29,23 +29,43 @@
         <h4>Biến thể sản phẩm</h4>
         <div id="variants">
             @foreach ($product->variants as $index => $variant)
-            <div class="variant mb-3 border p-3 rounded">
-                <input type="hidden" name="variants[{{ $index }}][id]" value="{{ $variant->id }}">
+    <div class="variant mb-3 border p-3 rounded">
+        <input type="hidden" name="variants[{{ $index }}][id]" value="{{ $variant->id }}">
 
-                <label>Chiều cao (height)</label>
-                <input type="text" name="variants[{{ $index }}][height]" value="{{ $variant->height }}" class="bg-gray-100 border border-gray-300 rounded px-4 py-2 w-full text-gray-700 focus:outline-none focus:border-blue-500">
+        <label>Chiều cao (height)</label>
+        <input type="text" name="variants[{{ $index }}][height]" value="{{ $variant->height }}" class="bg-gray-100 border border-gray-300 rounded px-4 py-2 w-full text-gray-700 focus:outline-none focus:border-blue-500">
 
-                <label>Giá</label>
-                <input type="number" name="variants[{{ $index }}][price]" class="bg-gray-100 border border-gray-300 rounded px-4 py-2 w-full text-gray-700 focus:outline-none focus:border-blue-500" value="{{ $variant->price }}">
+        <label>Giá</label>
+        <input type="number" name="variants[{{ $index }}][price]" class="bg-gray-100 border border-gray-300 rounded px-4 py-2 w-full text-gray-700 focus:outline-none focus:border-blue-500" value="{{ $variant->price }}">
 
-                <br>
-                <label>Số lượng tồn</label>
-                <input type="number" name="variants[{{ $index }}][stock_quantity]" class="bg-gray-100 border border-gray-300 rounded px-4 py-2 w-full text-gray-700 focus:outline-none focus:border-blue-500" value="{{ $variant->stock_quantity }}">
-            </div>
-            @endforeach
+        <label>Số lượng tồn</label>
+        <input type="number" name="variants[{{ $index }}][stock_quantity]" class="bg-gray-100 border border-gray-300 rounded px-4 py-2 w-full text-gray-700 focus:outline-none focus:border-blue-500" value="{{ $variant->stock_quantity }}">
+
+        {{-- Nút xoá biến thể --}}
+        <a href="{{ route('admin.products.variants.deleteVariant', $variant->id) }}"
+   onclick="return confirm('Bạn có chắc muốn xoá biến thể này?');"
+   class="btn btn-sm btn-danger mt-2">Xoá</a>
+
+    </div>
+@endforeach
+
         </div>
 
         <button type="button" id="addVariant" class="btn btn-sm btn-secondary">+ Thêm biến thể</button>
+        
+        <h4>Chọn chậu</h4>
+<div class="mb-3">
+    @foreach($pots as $pot)
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="selected_pots[]" value="{{ $pot->id }}" 
+                   id="pot_{{ $pot->id }}" {{ $selectedPotIds->contains($pot->id) ? 'checked' : '' }}>
+            <label class="form-check-label" for="pot_{{ $pot->id }}">
+                {{ $pot->name }} - Giá: {{ $pot->price ?? 'N/A' }}
+            </label>
+        </div>
+    @endforeach
+</div>
+
 
         <h4 class="mt-4">Hình ảnh sản phẩm</h4>
         <div class="row mb-3">

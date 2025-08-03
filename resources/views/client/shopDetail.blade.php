@@ -63,10 +63,12 @@
                     </div>
 
                     <!-- Chọn chậu -->
+                    @if($potsToShow->isNotEmpty())
                     <div class="form-group">
-                        <label>Chọn chậu:</label><br>
-                        <div id="pot-buttons"></div> <!-- GIỮ LẠI DÒNG NÀY để JS render vào -->
+                    <label>Chọn chậu:</label><br>
+                    <div id="pot-buttons"></div> <!-- GIỮ LẠI DÒNG NÀY để JS render vào -->
                     </div>
+                    @endif
 
                     <div id="add-to-cart-form" data-url="{{ route('cart.add.ajax') }}">
                         <input type="hidden" id="product-id" value="{{ $product->id }}">
@@ -171,6 +173,7 @@
             const variant = allVariants.find(v => v.height === height);
             const pots = variant?.pots || [];
 
+            if (!potContainer) return; // Nếu không có div chọn chậu thì thoát
             potContainer.innerHTML = '';
 
             pots.forEach(potId => {
@@ -202,6 +205,7 @@
         }
         //tu dong update gia sp
        function updatePrice(potId, height) {
+        if (!potId) potId = null;
     const variant = allVariants.find(v =>
         v.height === height && v.pots.includes(potId)
     );
@@ -261,10 +265,10 @@
             const height = heightInput.value;
             const quantity = parseInt(document.getElementById('quantity').value);
 
-            if (!pot || !height) {
-                alert('Vui lòng chọn chiều cao và chậu!');
-                return;
-            }
+            if (!height) {
+    alert('Vui lòng chọn chiều cao!');
+    return;
+}
 
             fetch(form.dataset.url, {
                 method: 'POST',
