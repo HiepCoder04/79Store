@@ -76,12 +76,27 @@ class ProductVariant extends Controller
         'pots' => $v->pots->pluck('id')->toArray(),  
     ];
 });
+$availablePotIds = Pot::where('quantity', '>', 0)->pluck('id')->toArray();
 
-$allPots = Pot::where('quantity', '>', 0)->get()->keyBy('id');
-$potIds = $variants->pluck('pots')->flatten()->unique();
-$potsToShow = $potIds->map(fn($id) => $allPots[$id] ?? null)->filter();
+// Lọc các biến thể có liên kết với chậu còn hàng
+$variants = $product->variants->map(function ($v) use ($availablePotIds) {
+    return [
+        'id' => $v->id,
+        'height' => $v->height,
+        'price' => $v->price,
+        'stock_quantity' => $v->stock_quantity,
+        'pots' => $v->pots->whereIn('id', $availablePotIds)->pluck('id')->toArray(),
+    ];
+});
 
+// Lấy danh sách pots để truyền sang view
+$allPots = Pot::whereIn('id', $availablePotIds)->get()->keyBy('id');
 
+// Lấy tất cả pot thực sự được dùng trong variant
+$linkedPotIds = $variants->pluck('pots')->flatten()->unique();
+
+// Lấy pot thực sự hiển thị: có liên kết & còn hàng
+$potsToShow = $linkedPotIds->map(fn($id) => $allPots[$id] ?? null)->filter();
 
     return view('client.shopDetail', compact('product', 'comments', 'variants','allPots','potsToShow'));
 }
