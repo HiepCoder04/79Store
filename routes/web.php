@@ -1,4 +1,5 @@
 <?php
+use App\Http\Controllers\Admin\AdminStatisticsController;
 use App\Http\Controllers\CommentController;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Facades\Route;
@@ -39,8 +40,7 @@ Route::middleware(['auth', 'role:admin','ban'])->prefix('admin')->name('admin.')
 
 
     // Trang thống kê
-
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+Route::get('/dashboard', [AdminStatisticsController::class, 'dashboard'])->name('statistics.dashboard');
 
     // Quản lý sản phẩm (cập nhật với soft delete)
     Route::resource('products', ProductController::class);
