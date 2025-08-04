@@ -10,11 +10,15 @@ class ProductVariant extends Model
     use HasFactory;
 
     protected $fillable = [
-        'product_id', 'price', 'stock_quantity', 'pot','height'
+        'product_id', 'price', 'stock_quantity','height'
     ];
 
     public function product()
     {
         return $this->belongsTo(Product::class);
     }
+public function pots()
+{
+    return $this->belongsToMany(Pot::class, 'pot_product_variant', 'product_variant_id', 'pot_id');
+}
 }

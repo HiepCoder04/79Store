@@ -79,4 +79,9 @@ public function comments()
 {
     return $this->hasMany(Comment::class);
 }
+public function pots()
+{
+     return $this->belongsToMany(Pot::class, 'pot_product_variant', 'product_variant_id', 'pot_id');
+}
+
 }
