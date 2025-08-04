@@ -109,7 +109,7 @@ class OrderController extends Controller
     {
         $order = Order::with([
             'user.addresses',
-            'orderDetails.productVariant.product'
+            'orderDetails.productVariant'
         ])->findOrFail($id);
 
         // Tổng tiền trước giảm
