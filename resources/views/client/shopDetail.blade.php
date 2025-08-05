@@ -114,7 +114,7 @@
                 </div>
             </form>
         @else
-            <p class="text-muted text-center">Vui lòng <a href="{{ route('login') }}">đăng nhập</a> để bình luận.</p>
+            <p class="text-muted text-center">Vui lòng <a href="{{ route(name: 'auth.login') }}">đăng nhập</a> để bình luận.</p>
         @endauth
 
         {{-- Danh sách bình luận --}}

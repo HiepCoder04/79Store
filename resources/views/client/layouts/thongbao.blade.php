@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+<!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
 @php
     if (session()->has('success')) {
@@ -55,14 +55,14 @@
             top: 20px;
             right: 20px;
             width: 30%;
-            background-color: white;
+            background-color: white !important;
             padding: 16px 20px;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             z-index: 9999;
             transition: transform 0.4s ease, opacity 0.4s ease;
             font-weight: 500;
-            color: #333;
+        
         }
 
         .custom-alert-content {
@@ -172,4 +172,4 @@
         // Tự động đóng sau 4 giây
         setTimeout(() => closeAlert(), 4000);
     </script>
-@endif
+@endif -->

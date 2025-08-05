@@ -1,21 +1,57 @@
-{{-- resources/views/admin/page/order/index.blade.php --}}
 @extends('admin.layouts.dashboard')
 @section('title', 'Danh sách đơn hàng')
 
 @section('content')
+@php use Carbon\Carbon; @endphp
 
 <style>
-.table tr th {
-    padding-left: 0;
-    padding-right: 0;
-    color: #333;
-}
+  body {
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', sans-serif;
+  }
 
-.table thead tr th:last-child,
-.table tbody tr td:last-child {
-    min-width: 130px;
-    width: 130px;
-}
+  .table-container {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.08);
+    margin: 40px auto;
+    max-width: 1200px;
+  }
+
+  .table thead {
+    background-color: #e2e3e5;
+    color: white;
+  }
+
+  .table tbody tr:hover {
+    background-color: #f1f1f1;
+    cursor: pointer;
+  }
+
+  .table th,
+  .table td {
+    vertical-align: middle !important;
+    text-align: center;
+    padding: 12px;
+  }
+
+  .table td:first-child,
+  .table th:first-child {
+    text-align: center;
+  }
+
+  .btn-action {
+    border-radius: 8px;
+    font-size: 0.85rem;
+    padding: 6px 12px;
+  }
+
+  .dropdown-menu a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
 </style>
 
 <div class="card">
@@ -52,9 +88,7 @@
                         @endif
                     </td>
                     <td>
-                        @if($order->payment_status == 'paid' || 
-                            ($order->payment_method == 'vnpay' && $order->status != 'cancelled') ||
-                            ($order->payment_method == 'cod' && $order->status == 'delivered'))
+                        @if($order->payment_status == 'paid' || ($order->payment_method == 'vnpay' && $order->status != 'cancelled'))
                             <span class="badge bg-success">Đã thanh toán</span>
                         @elseif($order->payment_status == 'pending')
                             <span class="badge bg-warning">Chờ thanh toán</span>
@@ -91,6 +125,13 @@
                     <td>{{ number_format($order->total_after_discount, 0, ',', '.') }} đ</td>
                     <td>
                         <a href="{{ route('admin.orders.show', $order->id) }}" class="btn btn-sm btn-info">Chi tiết</a>
+                        <form method="POST" action="{{ route('admin.orders.destroy', $order->id) }}"
+                            style="display:inline;">
+                            @csrf
+                            @method('DELETE')
+                            <button class="btn btn-sm btn-danger"
+                                onclick="return confirm('Xóa đơn hàng này?')">Xóa</button>
+                        </form>
                     </td>
                 </tr>
                 @endforeach
