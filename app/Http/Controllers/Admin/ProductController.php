@@ -10,7 +10,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-
+use App\Models\Pot;
+use App\Models\ProductVariant;
 class ProductController extends Controller
 {
     public function index(Request $request)
@@ -50,7 +51,8 @@ class ProductController extends Controller
     public function create()
     {
         $categories = Category::all();
-        return view('admin.products.create', compact('categories'));
+        $pots = Pot::all();
+        return view('admin.products.create', compact('categories','pots'));
     }
 
     public function store(Request $request)
@@ -60,7 +62,7 @@ class ProductController extends Controller
             'description' => 'required|string|max:1500',
             'category_id' => 'required|exists:categories,id',
             'variants' => 'required|array|min:1',
-            'variants.*.pot' => 'nullable|max:50',
+            'variants.*.pot' => 'nullable|exists:pots,id',
             'variants.*.height' => 'nullable|string|max:100',
             'variants.*.price' => 'nullable|numeric|min:0',
             'variants.*.stock_quantity' => 'nullable|integer|min:0',
@@ -92,12 +94,15 @@ class ProductController extends Controller
                 Log::debug($isValid ? '✅ Biến thể OK' : '❌ Bị loại', $variant);
 
                 if ($isValid) {
-                    $product->variants()->create([
+                    $newVariant = $product->variants()->create([
                         'variant_name' => $product->name . ' - ' . ($variant['pot'] ?? 'Không rõ'),
-                        'pot' => $variant['pot'] ?? null,
+                        
+                        'height' => $variant['height'] ?? null,
                         'price' => $variant['price'],
                         'stock_quantity' => $variant['stock_quantity']
                     ]);
+                    $allPotIds =Pot::pluck('id')->toArray();
+                    $newVariant->pots()->attach($allPotIds);
                 }
             }
 
@@ -118,7 +123,13 @@ class ProductController extends Controller
                     }
                 }
             }
-
+            // Xử lý chậu nếu có
+            if ($request->filled('selected_pots')) {
+    $selectedPotIds = $request->input('selected_pots');
+    foreach ($product->variants as $variant) {
+        $variant->pots()->sync($selectedPotIds);
+    }
+}
             DB::commit();
 
             return redirect()->route('admin.products.index')->with('success', 'Sản phẩm đã được thêm thành công.');
@@ -132,7 +143,9 @@ class ProductController extends Controller
     public function edit(Product $product)
     {
         $categories = Category::all();
-        return view('admin.products.edit', compact('product', 'categories'));
+        $pots = Pot::all();
+        $selectedPotIds = $product->variants->flatMap->pots->pluck('id')->unique();
+        return view('admin.products.edit', compact('product', 'categories', 'pots', 'selectedPotIds'));
     }
 
     public function update(Request $request, Product $product)
@@ -142,7 +155,8 @@ class ProductController extends Controller
             'description' => 'required|string|max:1500',
             'category_id' => 'required|exists:categories,id',
             'variants' => 'nullable|array',
-            'variants.*.pot' => 'nullable|max:50',
+            'variants.*.pot' => 'nullable|exists:pots,id',
+
             'variants.*.height' => 'nullable|string|max:100',
             'variants.*.price' => 'nullable|numeric|min:0',
             'variants.*.stock_quantity' => 'nullable|integer|min:0',
@@ -171,20 +185,24 @@ class ProductController extends Controller
                             // Update variant
                             $product->variants()->where('id', $variant['id'])->update([
 
-                                'pot' => $variant['pot'] ?? null,
+                                
                                 'height' => $variant['height'] ?? null,
                                 'price' => $variant['price'],
                                 'stock_quantity' => $variant['stock_quantity'],
                             ]);
                         } else {
                             // Create new variant
-                            $product->variants()->create([
-                                'variant_name' => $product->name . ' - ' . ($variant['pot'] ?? 'Không rõ'),
-                                'pot' => $variant['pot'] ?? null,
+                            $newVariant = $product->variants()->create([
+                                'variant_name' => $product->name,
+                                
                                 'height' => $variant['height'] ?? null,
                                 'price' => $variant['price'],
                                 'stock_quantity' => $variant['stock_quantity'],
                             ]);
+                            
+                            $allPotIds = Pot::pluck('id')->toArray();
+                            $newVariant->pots()->attach($allPotIds);
+
                         }
                     }
                 }
@@ -212,6 +230,20 @@ class ProductController extends Controller
                     $product->galleries()->create(['image' => '/storage/' . $path]);
                 }
             }
+            // Xử lý chậu nếu có
+            // Gán lại các chậu cho tất cả biến thể nếu người dùng chọn lại
+if ($request->filled('selected_pots')) {
+    $selectedPotIds = $request->input('selected_pots');
+    foreach ($product->variants as $variant) {
+        $variant->pots()->sync($selectedPotIds);
+    }
+} else {
+    // Nếu không chọn gì thì xoá hết liên kết
+    foreach ($product->variants as $variant) {
+        $variant->pots()->detach();
+    }
+}
+
 
             DB::commit();
             return redirect()->route('admin.products.index')->with('success', 'Cập nhật sản phẩm thành công!');
@@ -407,6 +439,21 @@ class ProductController extends Controller
     {
         return view('admin.thongke.thongke');
     }
+    //xoa bien the cua product
+   public function deleteVariant($id)
+{
+    // Tìm biến thể theo ID
+    $variant = ProductVariant::findOrFail($id);
+    $productId = $variant->product_id;
+
+    // Xoá liên kết với chậu nếu có
+    $variant->pots()->detach();
+
+    // Xoá chính biến thể
+    $variant->delete();
+
+    return redirect()->route('admin.products.edit', $productId)->with('success', 'Xoá biến thể thành công.');
+}
 
 
 

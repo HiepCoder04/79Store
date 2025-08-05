@@ -1,5 +1,6 @@
 <?php
 use App\Http\Controllers\Admin\AdminStatisticsController;
+
 use App\Http\Controllers\CommentController;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Facades\Route;
@@ -25,7 +26,7 @@ use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\ForgotPasswordOtpController;
 use App\Http\Controllers\Client\AccountController;
-
+use App\Http\Controllers\Admin\PotController;
 // -------------------- BLOG (CLIENT) --------------------
 Route::prefix('blogs')->middleware('ban')->name('client.blogs.')->group(function () {
     Route::get('/', [App\Http\Controllers\Client\BlogController::class, 'index'])->name('index');
@@ -36,16 +37,25 @@ Route::prefix('blogs')->middleware('ban')->name('client.blogs.')->group(function
 });
 
 // -------------------- ADMIN ROUTES (CÓ AUTH & ROLE) --------------------
-Route::middleware(['auth', 'role:admin','ban'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'role:admin', 'ban'])->prefix('admin')->name('admin.')->group(function () {
 
 
     // Trang thống kê
+
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 Route::get('/dashboard', [AdminStatisticsController::class, 'dashboard'])->name('statistics.dashboard');
 
     // Quản lý sản phẩm (cập nhật với soft delete)
     Route::resource('products', ProductController::class);
     Route::post('products/{product}/restore', [ProductController::class, 'restore'])->name('products.restore')->withTrashed();
     Route::delete('products/{product}/force-delete', [ProductController::class, 'forceDelete'])->name('products.forceDelete')->withTrashed();
+    //xoa bien the cua product
+    Route::get('/products/variants/{variant}/delete', [ProductController::class, 'deleteVariant'])->name('products.variants.deleteVariant');
+
+
+    // Quản lý chậu
+    Route::resource('pot', PotController::class);
+
 
     // Quản lý danh mục
     Route::resource('categories', CategoryController::class)->except(['show']);
@@ -74,8 +84,8 @@ Route::get('/dashboard', [AdminStatisticsController::class, 'dashboard'])->name(
 
     // Route::get('/thongke', [AdminStatisticsController::class, 'index'])->name('admin.thongke');
 
-       // Quản lý liên hệ
-Route::resource('contacts', AdminContactController::class)->except(['create', 'edit', 'store']);
+    // Quản lý liên hệ
+    Route::resource('contacts', AdminContactController::class)->except(['create', 'edit', 'store']);
 
     Route::get('contacts/trashed', [AdminContactController::class, 'trashed'])->name('contacts.trashed');
     Route::post('contacts/{id}/restore', [AdminContactController::class, 'restore'])->name('contacts.restore');
@@ -83,10 +93,10 @@ Route::resource('contacts', AdminContactController::class)->except(['create', 'e
     Route::put('contacts/{id}/note', [AdminContactController::class, 'updateNote'])->name('contacts.updateNote');
 });
 
-    // Quản lý người dùng
-    Route::middleware(['admin','ban'])->prefix('admin/users')->group(function () {
-        Route::get('/', [UserController::class, 'listUser'])->name('admin.users.list');
-    });
+// Quản lý người dùng
+Route::middleware(['admin', 'ban'])->prefix('admin/users')->group(function () {
+    Route::get('/', [UserController::class, 'listUser'])->name('admin.users.list');
+});
 
 
 
@@ -97,16 +107,15 @@ Route::prefix('auth')->name('auth.')->controller(AuthController::class)->group(f
     Route::get('/register', 'register')->name('register');
     Route::post('/register', 'registerPost')->name('registerPost');
     Route::post('/logout', 'logout')->name('logout');
-
 });
 //gg login
-    Route::get('/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
+Route::get('/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
 Route::get('/google/callback', [AuthController::class, 'handleGoogleCallback']);
 
 Route::get('/auth/google', [GoogleController::class, 'redirectToGoogle']);
 Route::get('/auth/google/callback', [GoogleController::class, 'handleGoogleCallback']);
 // -------------------- CLIENT (AUTHENTICATED) --------------------
-Route::middleware(['auth','ban'])->group(function () {
+Route::middleware(['auth', 'ban'])->group(function () {
     // Giỏ hàng
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
     Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
@@ -128,17 +137,16 @@ Route::middleware(['auth','ban'])->group(function () {
     Route::get('/thank-youvnpay', [CheckoutController::class, 'thankYouvnpay'])->name('checkout.thankyouvnpay');
 
 
-     //  Quản lý đơn hàng người dùng (Client)
-   Route::prefix('orders')->name('client.orders.')->group(function () {
+    //  Quản lý đơn hàng người dùng (Client)
+    Route::prefix('orders')->name('client.orders.')->group(function () {
         Route::get('/', [OrderController::class, 'index'])->name('index');
         Route::get('/{id}', [OrderController::class, 'show'])->name('show');
         Route::put('/{order}/cancel', [OrderController::class, 'cancel'])->name('cancel');
-Route::post('/{order}/reorder', [OrderController::class, 'reorder'])->name('reorder');
-Route::put('/{order}/return', [OrderController::class, 'returnOrder'])->name('return');
-
+        Route::post('/{order}/reorder', [OrderController::class, 'reorder'])->name('reorder');
+        Route::put('/{order}/return', [OrderController::class, 'returnOrder'])->name('return');
     });
-    });
-    // THÔNG TIN TÀI KHOẢN (CLIENT)
+});
+// THÔNG TIN TÀI KHOẢN (CLIENT)
 Route::prefix('tai-khoan')->name('client.account.')->group(function () {
     Route::get('/', [AccountController::class, 'index'])->name('index');
     Route::get('/chinh-sua', [AccountController::class, 'edit'])->name('edit');
@@ -164,16 +172,16 @@ Route::get('/shopDetail/{id}', [ProductVariant::class, 'productDetail'])->middle
 
 //route su dung voucher cua user
 
- Route::post('/comment/store', [App\Http\Controllers\CommentController::class, 'store'])->middleware('ban')->name('comment.store');
+Route::post('/comment/store', [App\Http\Controllers\CommentController::class, 'store'])->middleware('ban')->name('comment.store');
 // -------------------- SỬ DỤNG VOUCHER (USER) --------------------
 Route::post('/apply-voucher', [VoucherController::class, 'apply'])->middleware('ban')->name('apply.voucher');
 Route::middleware('auth')->post('/save-voucher/{id}', [VoucherController::class, 'save'])->name('voucher.save');
 
 
 //phân quyền
-Route::put('/ban-user', [UserController::class, 'banUser'])->name('ban-user')->middleware(['admin','ban']);
-Route::put('/unban-user', [UserController::class, 'unBanUser'])->name('unban-user')->middleware(['admin','ban']);
-Route::put('/update-role', [UserController::class, 'UpdateRole'])->name('update-role')->middleware(['admin','ban']);
+Route::put('/ban-user', [UserController::class, 'banUser'])->name('ban-user')->middleware(['admin', 'ban']);
+Route::put('/unban-user', [UserController::class, 'unBanUser'])->name('unban-user')->middleware(['admin', 'ban']);
+Route::put('/update-role', [UserController::class, 'UpdateRole'])->name('update-role')->middleware(['admin', 'ban']);
 
 Route::get('/forgot-password-otp', [ForgotPasswordOtpController::class, 'showEmailForm'])->name('otp.request.form')->middleware('ban');
 Route::post('/forgot-password-otp', [ForgotPasswordOtpController::class, 'sendOtp'])->name('otp.request')->middleware('ban');

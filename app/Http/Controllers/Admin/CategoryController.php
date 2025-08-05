@@ -16,11 +16,11 @@ class CategoryController extends Controller
     }
 
     // Form thêm danh mục
-    public function create()
-    {
-        $parents = Category::all();
-        return view('admin.categories.create', compact('parents'));
-    }
+   public function create()
+{
+    $parents = Category::whereNull('parent_id')->get(); // chỉ lấy cấp 1
+    return view('admin.categories.create', compact('parents'));
+}
 
     // Lưu danh mục mới với validation unique cho name
     public function store(Request $request)
@@ -43,13 +43,16 @@ class CategoryController extends Controller
 
     // Form sửa danh mục (loại trừ chính nó khỏi danh sách parent)
     public function edit(string $id)
-    {
-        $category = Category::findOrFail($id);
-        $parents = Category::where('id', '!=', $category->id)->get();
+{
+    $category = Category::findOrFail($id);
 
-        return view('admin.categories.edit', compact('category', 'parents'));
-    }
+    // chỉ lấy các danh mục cha cấp 1 khác chính nó
+    $parents = Category::whereNull('parent_id')
+        ->where('id', '!=', $category->id)
+        ->get();
 
+    return view('admin.categories.edit', compact('category', 'parents'));
+}
     // Cập nhật danh mục với validation unique bỏ qua chính nó
     public function update(Request $request, string $id)
     {
