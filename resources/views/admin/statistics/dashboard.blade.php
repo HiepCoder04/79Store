@@ -54,7 +54,7 @@
                 @forelse ($orders as $order)
                     <tr>
                         <td>#{{ $order->id }}</td>
-                        <td>{{ $order->customer_name ?? 'N/A' }}</td>
+                        <td>{{ $order->name ?? 'N/A' }}</td>
                         <td>{{ number_format($order->total_after_discount, 0, ',', '.') }} VND</td>
                         <td>{{ ucfirst($order->status) }}</td>
                         <td>{{ $order->created_at->format('d/m/Y') }}</td>
