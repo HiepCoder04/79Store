@@ -43,7 +43,11 @@
                         <h5 class="fw-bold mb-4">Tóm Tắt Đơn Hàng</h5>
 
                         @php
-                            $cartTotal = $cart->items->sum(fn($item) => $item->productVariant->price * $item->quantity);
+                            $cartTotal = $cart->items->sum(function ($item) {
+                                $productPrice = $item->productVariant->price;
+                                $potPrice = $item->pot?->price ?? 0;
+                                return ($productPrice + $potPrice) * $item->quantity;
+                            });
                             $voucherId = session('applied_voucher');
                             $voucher = $voucherId ? \App\Models\Voucher::find($voucherId) : null;
                             $discount = 0;
@@ -83,7 +87,18 @@
                                     <h6 class="mb-1 text-truncate" style="max-width: 200px;">
                                         {{ $product->name }}
                                     </h6>
-                                    <small>Chậu: {{ $item->productVariant->pot }} | SL: {{ $item->quantity }}</small>
+                                    @php
+                                        $potName = $item->pot->name ?? 'Không có chậu';
+                                        $potPrice = $item->pot->price ?? 0;
+                                        $productPrice = $item->productVariant->price;
+                                        $unitPrice = $productPrice + $potPrice;
+                                    @endphp
+
+                                    <small>
+                                        Chậu: {{ $potName }} ({{ number_format($potPrice, 0, ',', '.') }}đ) <br>
+                                        Giá: {{ number_format($productPrice, 0, ',', '.') }}đ <br>
+                                        SL: {{ $item->quantity }}
+                                    </small>
                                 </div>
                             </div>
                         @endforeach

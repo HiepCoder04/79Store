@@ -42,12 +42,20 @@ class CheckoutController extends Controller
             return redirect()->route('cart.index')->with('error', 'Vui lòng chọn ít nhất một sản phẩm để thanh toán.');
         }
 
-        $addresses = UserAddress::where('user_id', $user->id)->get();
+        $addresses = Order::with('address')
+            ->where('user_id', auth()->id())
+            ->whereNotNull('address_id')
+            ->latest()
+            ->get();
 
         // Voucher (áp dụng nếu có trong session)
         $voucher = null;
         $discount = 0;
-        $cartTotal = $cart->items->sum(fn($item) => $item->productVariant->price * $item->quantity);
+        $cartTotal = $cart->items->sum(function ($item) {
+            $productPrice = $item->productVariant->price;
+            $potPrice = $item->pot?->price ?? 0;
+            return ($productPrice + $potPrice) * $item->quantity;
+        });
         $finalTotal = $cartTotal;
 
         $voucherId = session('applied_voucher');
@@ -132,7 +140,11 @@ class CheckoutController extends Controller
             }
 
             // Tính tổng tiền và xử lý voucher
-            $totalBefore = $selectedItems->sum(fn($item) => $item->productVariant->price * $item->quantity);
+            $totalBefore = $selectedItems->sum(function ($item) {
+                $productPrice = $item->productVariant->price;
+                $potPrice = $item->pot?->price ?? 0;
+                return ($productPrice + $potPrice) * $item->quantity;
+            });
             $discount = 0;
 
             $voucherId = session('applied_voucher');
@@ -196,15 +208,21 @@ class CheckoutController extends Controller
             foreach ($selectedItems as $item) {
                 $variant = $item->productVariant;
                 $product = $variant->product;
+                $potId = $item->pot_id; // Lấy từ cart_items
+                $potName = null;
 
+                if ($potId) {
+                    $pot = \App\Models\Pot::find($potId);
+                    $potName = $pot ? $pot->name : null;
+                }
                 OrderDetail::create([
                     'order_id' => $order->id,
                     'product_id' => $product->id,
                     'product_variant_id' => $variant->id,
                     'product_name' => $product->name,
-                    'variant_name' => $variant->height . ' / ' . $variant->pot,
+                    'variant_name' => $variant->height . ' / ' . ($potName ?? 'Không rõ'),
                     'product_height' => $variant->height,
-                    'product_pot' => $variant->pot,
+                    'product_pot' => $potName,
                     'product_price' => $variant->price,
                     'price' => $variant->price,
                     'quantity' => $item->quantity,

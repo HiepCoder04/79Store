@@ -83,13 +83,27 @@
             <div class="col">
                 <h6 class="mb-1">{{ $product->name }}</h6>
                 <div class="text-muted small">Chậu: {{ $detail->product_pot }}</div>
-                <div class="text-muted small">Chiều cao: {{ $detail->product_height }}</div>
-                <div class="text-muted small">Giá: {{ $detail->price }}</div>
+                <div class="text-muted small">Chiều cao: {{ $detail->product_height }} cm</div>
+                 @php
+                    $potPrice = 0;
+                    if ($detail->product_pot) {
+                        $potModel = \App\Models\Pot::where('name', $detail->product_pot)->first();
+                        $potPrice = $potModel?->price ?? 0;
+                    }
+                    $priceCay = $detail->price;
+                    $priceTong = $priceCay + $potPrice;
+                    $thanhTien = $priceTong * $detail->quantity;
+                @endphp
+
+                <div class="text-muted small">Giá cây: {{ number_format($priceCay, 0, ',', '.') }}đ</div>
+                @if ($potPrice > 0)
+                    <div class="text-muted small">Giá chậu: {{ number_format($potPrice, 0, ',', '.') }}đ</div>
+                @endif
                 <div class="text-muted small">Số lượng: {{ $detail->quantity }}</div>
+                        </div>
+                    </div>
+                @endforeach
             </div>
-        </div>
-    @endforeach
-</div>
 
                 <div class="d-flex justify-content-end">
                     <div>

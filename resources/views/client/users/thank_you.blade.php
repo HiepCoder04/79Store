@@ -52,7 +52,7 @@
 <div class="container py-5">
     <div class="order-success bg-white">
         <h1 class="text-success mb-2" style="font-weight: 800;">🎉 Hoàn thành!</h1>
-        <h4 class="text-muted">Cảm ơn bạn! <span class="text-dark">Đơn hàng của bạn sẽ được chuẩn bị.</span></h4>
+        <span class="text-dark">Đơn hàng của bạn sẽ được chuẩn bị.</span></h4>
 
         {{-- Hiển thị sản phẩm (giả lập 2 ảnh nếu không có) --}}
         <div class="d-flex justify-content-center my-4">
