@@ -353,6 +353,73 @@
             document.getElementById('checkout-form-selected').submit();
         });
     });
+    // Lấy danh sách mã giảm giá
+    function renderVoucherSuggestions(vouchers) {
+    const input = document.getElementById('voucher_code_input');
+    let suggestionBox = document.getElementById('voucher-suggestion-box');
+
+    if (suggestionBox) suggestionBox.remove();
+
+    suggestionBox = document.createElement('div');
+    suggestionBox.id = "voucher-suggestion-box";
+    suggestionBox.style.top = "100%";  // đẩy xuống ngay dưới input
+suggestionBox.style.marginTop = "10px"; // thêm khoảng cách
+    suggestionBox.style.zIndex = 999;
+    suggestionBox.style.width = "100%";
+    suggestionBox.style.background = "#fff";
+    suggestionBox.style.border = "1px solid #ccc";
+    suggestionBox.style.boxShadow = "0 2px 6px rgba(0,0,0,0.1)";
+    suggestionBox.innerHTML = vouchers.map(v => `
+        <div class="voucher-item p-2 border-bottom" style="cursor: pointer" data-code="${v.code}">
+            <strong>${v.code}</strong> - ${parseInt(v.discount_percent)}%<br>
+
+            HSD: ${new Date(v.end_date).toLocaleDateString('vi-VN')}<br>
+            Giá giảm tối đa: ${parseInt(v.max_discount)}đ | Giá hóa đơn tối thiểu: ${parseInt(v.min_order_amount)}đ
+
+        </div>
+    `).join('');
+
+    input.parentElement.style.position = "relative";
+    input.parentElement.appendChild(suggestionBox);
+
+    document.querySelectorAll('.voucher-item').forEach(item => {
+        item.addEventListener('click', function () {
+            input.value = this.dataset.code;
+            suggestionBox.remove();
+        });
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    const input = document.getElementById('voucher_code_input');
+
+    input.addEventListener('focus', function () {
+        fetch('/vouchers/suggestions')
+  .then(response => response.json())
+  .then(data => {
+    // Nếu response là object có dạng { data: [...] }
+    const vouchers = Array.isArray(data) ? data : data.data;
+
+    if (!Array.isArray(vouchers)) {
+      throw new Error("Invalid vouchers format");
+    }
+
+    renderVoucherSuggestions(vouchers);
+
+  })
+  .catch(error => {
+    console.error("LỖI API voucher:", error);
+  });
+
+
+    document.addEventListener('click', function (e) {
+        const box = document.getElementById('voucher-suggestion-box');
+        if (box && !box.contains(e.target) && e.target !== input) {
+            box.remove();
+        }
+    });
+});
+})
 </script>
 @endpush
 
