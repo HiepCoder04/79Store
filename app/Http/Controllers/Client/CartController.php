@@ -23,7 +23,11 @@ class CartController extends Controller
             ->first();
 
         $items = $cart ? $cart->items : collect();
-        $cartTotal = $items->sum(fn($item) => $item->productVariant->price * $item->quantity);
+        $cartTotal = $items->sum(function ($item) {
+        $productPrice = $item->productVariant->price;
+        $potPrice = $item->pot?->price ?? 0;
+        return ($productPrice + $potPrice) * $item->quantity;
+});
         $finalTotal = $cartTotal;
         $discount = 0;
 

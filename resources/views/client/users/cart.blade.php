@@ -79,7 +79,8 @@
                                                     <strong>{{ $product->name }}</strong>
                                                 </div>
                                             </td>
-                                            <td>{{ $variant->pot }}</td>
+                                            <td>{{ $item->pot?->name ?? 'Không có chậu' }}</td>
+
                                             <td>
                                                 {{ $variant->height ? $variant->height . ' cm' : 'Không rõ' }}
                                             </td>
@@ -87,12 +88,20 @@
                                                 <input type="number" name="quantity" value="{{ $item->quantity }}" min="1"
                                                     class="form-control quantity-input text-center" style="width: 80px;">
                                             </td>
-                                            <td class="unit-price" data-price="{{ $variant->price }}">
-                                                {{ number_format($variant->price, 0, ',', '.') }}đ
+                                            {{-- update gia = gia sp bien the + gia chau --}}
+                                           @php
+                                            $pot = $item->pot;
+                                            $potPrice = $pot?->price ?? 0;
+                                            $unitPrice = $variant->price + $potPrice;
+                                            @endphp
+
+                                            <td class="unit-price" data-price="{{ $unitPrice }}">
+                                            {{ number_format($unitPrice, 0, ',', '.') }}đ
                                             </td>
                                             <td class="item-subtotal">
-                                                {{ number_format($variant->price * $item->quantity, 0, ',', '.') }}đ
+                                            {{ number_format($unitPrice * $item->quantity, 0, ',', '.') }}đ
                                             </td>
+
                                             <td>
                                                 <form method="POST" action="{{ route('cart.remove', $item->id) }}">
                                                     @csrf @method('DELETE')
