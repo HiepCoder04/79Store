@@ -1,4 +1,5 @@
 <?php
+
 use App\Http\Controllers\Admin\AdminStatisticsController;
 
 use App\Http\Controllers\CommentController;
@@ -43,8 +44,8 @@ Route::middleware(['auth', 'role:admin', 'ban'])->prefix('admin')->name('admin.'
 
     // Trang thống kê
 
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-Route::get('/dashboard', [AdminStatisticsController::class, 'dashboard'])->name('statistics.dashboard');
+
+    Route::get('/dashboard', [AdminStatisticsController::class, 'dashboard'])->name('statistics.dashboard');
 
     // Quản lý sản phẩm (cập nhật với soft delete)
     Route::resource('products', ProductController::class);
@@ -132,10 +133,10 @@ Route::middleware(['auth', 'ban'])->group(function () {
         $count = \App\Models\Cart::where('user_id', auth()->id())->withCount('items')->first()?->items_count ?? 0;
         return response()->json(['count' => $count]);
     });
-        //voucher cho cart
+    //voucher cho cart
     Route::get('/vouchers/suggestions', [Voucher2Controller::class, 'getSuggestions']);
 
-    
+
     Route::post('/cart/add-ajax', [CartController::class, 'addAjax'])->name('cart.add.ajax');
     // Thanh toán
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');

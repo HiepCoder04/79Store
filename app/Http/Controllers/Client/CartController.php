@@ -24,10 +24,10 @@ class CartController extends Controller
 
         $items = $cart ? $cart->items : collect();
         $cartTotal = $items->sum(function ($item) {
-        $productPrice = $item->productVariant->price;
-        $potPrice = $item->pot?->price ?? 0;
-        return ($productPrice + $potPrice) * $item->quantity;
-});
+            $productPrice = $item->productVariant->price;
+            $potPrice = $item->pot?->price ?? 0;
+            return ($productPrice + $potPrice) * $item->quantity;
+        });
         $finalTotal = $cartTotal;
         $discount = 0;
 
@@ -185,7 +185,7 @@ class CartController extends Controller
             'quantity' => 'required|integer|min:1'
         ]);
 
-        $item = CartItem::findOrFail($id);
+        $item = CartItem::with('productVariant', 'pot')->findOrFail($id);
 
         if ($item->cart->user_id !== auth()->id()) {
             abort(403);
@@ -198,12 +198,20 @@ class CartController extends Controller
         $item->quantity = $request->quantity;
         $item->save();
 
-        $cartItems = $item->cart->items;
-        $cartTotal = $cartItems->sum(fn($i) => $i->productVariant->price * $i->quantity);
+        $productPrice = $item->productVariant->price;
+        $potPrice = $item->pot?->price ?? 0;
+        $itemSubtotal = ($productPrice + $potPrice) * $item->quantity;
+
+        // ✅ Tính lại tổng giỏ
+        $cartItems = $item->cart->items()->with('productVariant', 'pot')->get();
+        $cartTotal = $cartItems->sum(function ($i) {
+            return ($i->productVariant->price + ($i->pot?->price ?? 0)) * $i->quantity;
+        });
+
         $finalTotal = $cartTotal;
 
         return response()->json([
-            'itemSubtotalFormatted' => number_format($item->productVariant->price * $item->quantity, 0, ',', '.') . 'đ',
+            'itemSubtotalFormatted' => number_format($itemSubtotal, 0, ',', '.') . 'đ',
             'cartTotalFormatted' => number_format($cartTotal, 0, ',', '.') . 'đ',
             'finalTotalFormatted' => number_format($finalTotal, 0, ',', '.') . 'đ',
         ]);
