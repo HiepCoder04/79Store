@@ -27,6 +27,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\ForgotPasswordOtpController;
 use App\Http\Controllers\Client\AccountController;
 use App\Http\Controllers\Admin\PotController;
+use App\Http\Controllers\Client\Voucher2Controller;
 // -------------------- BLOG (CLIENT) --------------------
 Route::prefix('blogs')->middleware('ban')->name('client.blogs.')->group(function () {
     Route::get('/', [App\Http\Controllers\Client\BlogController::class, 'index'])->name('index');
@@ -71,6 +72,8 @@ Route::get('/dashboard', [AdminStatisticsController::class, 'dashboard'])->name(
     // Quản lý voucher
     Route::resource('vouchers', AdminVoucherController::class);
     Route::get('vouchers/{voucher}/users', [AdminVoucherController::class, 'users'])->name('vouchers.users');
+
+
 
     // Quản lý đơn hàng
     Route::prefix('orders')->name('orders.')->group(function () {
@@ -129,6 +132,10 @@ Route::middleware(['auth', 'ban'])->group(function () {
         $count = \App\Models\Cart::where('user_id', auth()->id())->withCount('items')->first()?->items_count ?? 0;
         return response()->json(['count' => $count]);
     });
+        //voucher cho cart
+    Route::get('/vouchers/suggestions', [Voucher2Controller::class, 'getSuggestions']);
+
+    
     Route::post('/cart/add-ajax', [CartController::class, 'addAjax'])->name('cart.add.ajax');
     // Thanh toán
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
