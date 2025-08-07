@@ -75,8 +75,8 @@
                 @foreach ($orders as $order)
                 <tr>
                     <td>{{ $order->id }}</td>
-                    <td>{{ $order->user->name ?? 'N/A' }}</td>
-                    <td>{{ $order->user->phone ?? '---' }}</td>
+                    <td>{{ $order->name ?? 'N/A' }}</td>
+                    <td>{{ $order->phone ?? '---' }}</td>
                     <td>{{ $order->created_at->format('d/m/Y') }}</td>
                     <td>
                         @if($order->payment_method == 'cod')
