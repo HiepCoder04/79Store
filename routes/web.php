@@ -45,7 +45,7 @@ Route::middleware(['auth', 'role:admin', 'ban'])->prefix('admin')->name('admin.'
     // Trang thống kê
 
 
-    Route::get('/dashboard', [AdminStatisticsController::class, 'dashboard'])->name('statistics.dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Quản lý sản phẩm (cập nhật với soft delete)
     Route::resource('products', ProductController::class);
