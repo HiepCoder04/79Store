@@ -89,7 +89,7 @@
                     </td>
                     <td>
                         @if(
-                            $order->payment_status == 'paid' || 
+                            $order->payment_status == 'paid' ||
                             ($order->payment_method == 'vnpay' && $order->status != 'cancelled') ||
                             ($order->payment_method == 'cod' && $order->status == 'delivered')
                         )
@@ -130,13 +130,6 @@
                     <td>{{ number_format($order->total_after_discount, 0, ',', '.') }} đ</td>
                     <td>
                         <a href="{{ route('admin.orders.show', $order->id) }}" class="btn btn-sm btn-info">Chi tiết</a>
-                        <form method="POST" action="{{ route('admin.orders.destroy', $order->id) }}"
-                            style="display:inline;">
-                            @csrf
-                            @method('DELETE')
-                            <button class="btn btn-sm btn-danger"
-                                onclick="return confirm('Xóa đơn hàng này?')">Xóa</button>
-                        </form>
                     </td>
                 </tr>
                 @endforeach
