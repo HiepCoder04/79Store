@@ -71,7 +71,7 @@ class CheckoutController extends Controller
                 }
             }
         }
-         $addresses = UserAddress::where('user_id', auth()->id())->get();
+        $addresses = UserAddress::where('user_id', auth()->id())->get();
 
         return view('client.users.Checkout', compact('cart', 'addresses', 'user', 'voucher', 'discount', 'cartTotal', 'finalTotal'));
     }
@@ -204,12 +204,12 @@ class CheckoutController extends Controller
                 'status' => $orderStatus,
                 'sale_channel' => 'website',
             ]);
-
+            $orderCode = '79ST-' . now()->format('Ymd') . '-' . str_pad($order->id, 4, '0', STR_PAD_LEFT);
             // Tạo chi tiết đơn hàng
             foreach ($selectedItems as $item) {
                 $variant = $item->productVariant;
                 $product = $variant->product;
-                
+
                 // Lấy thông tin chậu từ cart_items
                 $potId = $item->pot_id;
                 $potName = null;
@@ -294,7 +294,9 @@ class CheckoutController extends Controller
                 return redirect()->route('checkout.thankyouvnpay');
             }
 
-            return redirect()->route('checkout.thankyou');
+            return redirect()->route('checkout.thankyou')->with([
+                'order_code' => $orderCode,
+            ]);
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Checkout error: ' . $e->getMessage());
@@ -534,20 +536,20 @@ class CheckoutController extends Controller
     }
     //luu dia chi ng dung
     public function saveAddress(Request $request)
-{
-    $user = auth()->user();
+    {
+        $user = auth()->user();
 
-    if ($request->set_default) {
-        // Reset địa chỉ mặc định cũ
-        UserAddress::where('user_id', $user->id)->update(['is_default' => false]);
+        if ($request->set_default) {
+            // Reset địa chỉ mặc định cũ
+            UserAddress::where('user_id', $user->id)->update(['is_default' => false]);
+        }
+
+        UserAddress::create([
+            'user_id' => $user->id,
+            'address' => $request->address,
+            'is_default' => $request->set_default ? true : false,
+        ]);
+
+        return response()->json(['message' => 'Địa chỉ đã được lưu' . ($request->set_default ? ' và đặt làm mặc định.' : '.')]);
     }
-
-    UserAddress::create([
-        'user_id' => $user->id,
-        'address' => $request->address,
-        'is_default' => $request->set_default ? true : false,
-    ]);
-
-    return response()->json(['message' => 'Địa chỉ đã được lưu' . ($request->set_default ? ' và đặt làm mặc định.' : '.')]);
-}
 }

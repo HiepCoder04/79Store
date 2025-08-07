@@ -9,8 +9,8 @@
 
                         <!-- Thông tin liên hệ -->
                         <div class="top-header-meta">
-                            <a href="#"><i class="fa fa-envelope-o"></i> <span>Email: lienhe@79store.com</span></a>
-                            <a href="#"><i class="fa fa-phone"></i> <span>Gọi: 0123 456 789</span></a>
+                            <a href="#"><i class="fa fa-envelope-o"></i> <span>Email: 79store@gmail.com</span></a>
+                            <a href="#"><i class="fa fa-phone"></i> <span>Gọi: 0336994436</span></a>
                         </div>
 
                         <!-- User + Ngôn ngữ + Cart -->
@@ -33,45 +33,52 @@
                             <div class="top-header-right d-flex align-items-center justify-content-end gap-1">
 
                                 <div class="login">
-                                    @if (Auth::check())
-                                        <div class="user-dropdown">
-                                            <a href="#" class="user-toggle">
-                                                <i class="fa fa-user"></i>
-                                                @if (Auth::user()->avatar)
-                                                    <img id="header-avatar"
-                                                        src="{{ asset('img/avatars/' . Auth::user()->avatar) }}"
-                                                        alt="Avatar"
-                                                        style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">
-                                                @endif
-                                                <span>{{ Auth::user()->name }}</span>
-                                            </a>
-                                            <ul class="user-dropdown-menu">
-                                                <li>
-                                                    <a href="{{ route('client.account.index') }}">
-                                                        <i class="fa fa-user-circle"></i> Tài khoản của tôi
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a href="{{ route('auth.logout') }}"
-                                                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                                        <i class="fa fa-sign-out-alt"></i> Đăng xuất
-                                                    </a>
-                                                    <form id="logout-form" action="{{ route('auth.logout') }}"
-                                                        method="POST" style="display: none;">@csrf</form>
-                                                </li>
-                                            </ul>
+                                @if (Auth::check())
+                                    <div class="user-dropdown">
+                                        <a href="#" class="user-toggle">
+                                            <i class="fa fa-user"></i>
+                                            @if (Auth::user()->avatar)
+                                                <img id="header-avatar"
+                                                    src="{{ asset('img/avatars/' . Auth::user()->avatar) }}"
+                                                    alt="Avatar"
+                                                    style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">
+                                            @endif
+                                            <span>{{ Auth::user()->name }}</span>
+                                            <i class="fa fa-caret-down ml-1"></i>
+                                        </a>
 
-                                        </div>
-                                    @else
-                                        <a href="{{ route('auth.login') }}">
-                                            <i class="fa fa-user"></i> <span>Đăng nhập</span>
-                                        </a>
-                                        <span class="mx-1"></span>
-                                        <a href="{{ route('auth.register') }}">
-                                            <span>Đăng ký</span>
-                                        </a>
-                                    @endif
-                                </div>
+                                        <ul class="user-dropdown-menu">
+                                            <li>
+                                                <a href="{{ route('client.account.index') }}">
+                                                     Tài khoản của tôi
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="{{ route('client.orders.index') }}">
+                                                     Đơn hàng
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="{{ route('auth.logout') }}"
+                                                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                                     Đăng xuất
+                                                </a>
+                                                <form id="logout-form" action="{{ route('auth.logout') }}"
+                                                    method="POST" style="display: none;">@csrf</form>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                @else
+                                    <a href="{{ route('auth.login') }}">
+                                        <i class="fa fa-user"></i> <span>Đăng nhập</span>
+                                    </a>
+                                    <span class="mx-1"></span>
+                                    <a href="{{ route('auth.register') }}">
+                                        <span>Đăng ký</span>
+                                    </a>
+                                @endif
+                            </div>
+
 
                                 <!-- Giỏ hàng -->
                                 <div class="cart ml-3">
@@ -153,7 +160,7 @@
     }
 
     .user-dropdown .user-toggle {
-        color: #5c5c5c;
+        color: #333;
         text-decoration: none;
         display: flex;
         align-items: center;
@@ -164,14 +171,15 @@
     .user-dropdown-menu {
         display: none;
         position: absolute;
+        top: 100%;
         right: 0;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         list-style: none;
-        padding: 10px 0;
-        margin: 0;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        border-radius: 5px;
-        min-width: 140px;
-        background-color: rgb(245, 233, 233);
+        padding: 8px 0;
+        min-width: 180px;
         z-index: 999;
     }
 
@@ -180,45 +188,22 @@
     }
 
     .user-dropdown-menu li {
-        padding: 5px 20px;
+        width: 100%;
     }
 
     .user-dropdown-menu li a {
         color: #333;
         text-decoration: none;
         display: block;
-        text-align: center;
-        padding: 8px 10px;
-        transition: background-color 0.2s ease;
-    }
-
-    .user-dropdown-menu li a:hover {
-        background-color: #13e68b;
+        padding: 10px 15px;
+        font-size: 14px;
+        transition: background-color 0.2s ease, color 0.2s ease;
         color: #000 !important;
     }
 
-    .user-dropdown-menu {
-        display: none;
-        position: absolute;
-        top: 100%;
-        right: 0;
-        background: rgb(17, 148, 26);
-        border: 1px solid #ccc;
-        padding: 10px;
-        list-style: none;
-        z-index: 999;
-    }
-
-    .user-dropdown:hover .user-dropdown-menu {
-        display: block;
-    }
-
-    .user-toggle {
-        text-decoration: none;
-        color: #333;
-        display: flex;
-        align-items: center;
-        gap: 5px;
+    .user-dropdown-menu li a:hover {
+        background-color: #f5f5f5;
+        color: #000;
     }
 
     .login a,
