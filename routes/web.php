@@ -45,7 +45,7 @@ Route::middleware(['auth', 'role:admin', 'ban'])->prefix('admin')->name('admin.'
     // Trang thống kê
 
 
-    Route::get('/dashboard', [AdminStatisticsController::class, 'dashboard'])->name('statistics.dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Quản lý sản phẩm (cập nhật với soft delete)
     Route::resource('products', ProductController::class);
@@ -143,7 +143,9 @@ Route::middleware(['auth', 'ban'])->group(function () {
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
     Route::get('/thank-you', [CheckoutController::class, 'thankYou'])->name('checkout.thankyou');
     Route::get('/thank-youvnpay', [CheckoutController::class, 'thankYouvnpay'])->name('checkout.thankyouvnpay');
-
+    //luu dia chi thanh toan
+    Route::post('/user/save-address', [CheckoutController::class, 'saveAddress'])
+    ->name('user.saveAddress');
 
     //  Quản lý đơn hàng người dùng (Client)
     Route::prefix('orders')->name('client.orders.')->group(function () {

@@ -71,6 +71,7 @@ class CheckoutController extends Controller
                 }
             }
         }
+         $addresses = UserAddress::where('user_id', auth()->id())->get();
 
         return view('client.users.Checkout', compact('cart', 'addresses', 'user', 'voucher', 'discount', 'cartTotal', 'finalTotal'));
     }
@@ -531,4 +532,22 @@ class CheckoutController extends Controller
     {
         return view('client.users.thank_youvnpay');
     }
+    //luu dia chi ng dung
+    public function saveAddress(Request $request)
+{
+    $user = auth()->user();
+
+    if ($request->set_default) {
+        // Reset địa chỉ mặc định cũ
+        UserAddress::where('user_id', $user->id)->update(['is_default' => false]);
+    }
+
+    UserAddress::create([
+        'user_id' => $user->id,
+        'address' => $request->address,
+        'is_default' => $request->set_default ? true : false,
+    ]);
+
+    return response()->json(['message' => 'Địa chỉ đã được lưu' . ($request->set_default ? ' và đặt làm mặc định.' : '.')]);
+}
 }
