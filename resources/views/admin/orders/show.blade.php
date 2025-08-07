@@ -30,17 +30,38 @@
     align-items: stretch;
     /* Đảm bảo các item và line đều kéo dài theo chiều cao lớn nhất */
     color: #333;
+    gap: 20px;
 }
 
-.general-info-item {
-    min-width: 25%;
+.info-section {
+    flex: 1;
+    padding: 16px;
+    background-color: #fff;
+    border-radius: 8px;
+    border: 1px solid #ddd;
 }
 
-.vertical-line {
-    width: 1px;
-    background-color: #d3d3d3;
-    align-self: stretch;
-    height: auto;
+.info-section h5 {
+    color: #333;
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #007bff;
+}
+
+.info-item {
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+.info-item strong {
+    color: #555;
+    margin-bottom: 5px;
+}
+
+.info-item .value {
+    color: #333;
+    padding: 5px 0;
 }
 
 .status-form {
@@ -75,19 +96,46 @@
     <div class="card-body">
         <h2>Chi tiết đơn hàng #{{ $order->id }}</h2>
         <div class="general-info-container mb-3">
-            <div class="general-info-item">
-                <strong>Khách hàng: </strong>
-                <div class="value">{{ $order->user->name ?? 'N/A' }}</div>
+            {{-- Thông tin người đặt hàng --}}
+            <div class="info-section">
+                <h5><i class="fas fa-user"></i> Thông tin người đặt hàng</h5>
+                <div class="info-item">
+                    <strong>Tên tài khoản:</strong>
+                    <div class="value">{{ $order->user->name ?? 'N/A' }}</div>
+                </div>
+                <div class="info-item">
+                    <strong>Email:</strong>
+                    <div class="value">{{ $order->user->email ?? 'N/A' }}</div>
+                </div>
+                <div class="info-item">
+                    <strong>Số điện thoại:</strong>
+                    <div class="value">{{ $order->user->phone ?? '---' }}</div>
+                </div>
+                <div class="info-item">
+                    <strong>Địa chỉ mặc định:</strong>
+                    <div class="value">{{ optional($order->user->addresses->first())->full_address ?? '---' }}</div>
+                </div>
             </div>
-            <div class="vertical-line"></div>
-            <div class="general-info-item">
-                <strong>SĐT: </strong>
-                <div class="value">{{ $order->user->phone ?? '---' }}</div>
-            </div>
-            <div class="vertical-line"></div>
-            <div class="general-info-item">
-                <strong>Địa chỉ: </strong>
-                <div class="value">{{ optional($order->user->addresses->first())->full_address ?? '---' }}</div>
+
+            {{-- Thông tin người nhận hàng --}}
+            <div class="info-section">
+                <h5><i class="fas fa-shipping-fast"></i> Thông tin người nhận hàng</h5>
+                <div class="info-item">
+                    <strong>Tên người nhận:</strong>
+                    <div class="value">{{ $order->name ?? 'N/A' }}</div>
+                </div>
+                <div class="info-item">
+                    <strong>Số điện thoại:</strong>
+                    <div class="value">{{ $order->phone ?? '---' }}</div>
+                </div>
+                <div class="info-item">
+                    <strong>Địa chỉ nhận hàng:</strong>
+                    <div class="value">{{ optional($order->address)->full_address ?? '---' }}</div>
+                </div>
+                <div class="info-item">
+                    <strong>Ghi chú:</strong>
+                    <div class="value">{{ $order->note ?? '---' }}</div>
+                </div>
             </div>
         </div>
 
