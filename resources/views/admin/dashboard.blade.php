@@ -5,73 +5,169 @@
 @section('content')
 <div class="container-fluid py-4">
 
-    <h4 class="mb-4">Thống kê đơn hàng</h4>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    {{-- Bộ lọc ngày --}}
-    <form method="GET" action="{{ route('admin.dashboard') }}" class="row g-3 mb-4">
-        <div class="col-md-3">
-            <label class="form-label">Từ ngày</label>
-            <input type="date" name="start_date" class="form-control" value="{{ $start }}">
-        </div>
-        <div class="col-md-3">
-            <label class="form-label">Đến ngày</label>
-            <input type="date" name="end_date" class="form-control" value="{{ $end }}">
-        </div>
-        <div class="col-md-3 align-self-end">
-            <button type="submit" class="btn btn-primary">Lọc</button>
-        </div>
-    </form>
+    <body class="bg-light p-4">
 
-    {{-- Thẻ thống kê --}}
-    <div class="row mb-4">
-        <div class="col-md-6">
-            <div class="card bg-gradient-primary text-white shadow">
-                <div class="card-body">
-                    <h5 class="card-title">Tổng đơn hàng</h5>
-                    <h3>{{ $totalOrders }}</h3>
+        <div class="container">
+
+            <h4 class="mb-4">Thống kê đơn hàng</h4>
+
+            <!-- Tổng quan -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card text-white bg-info mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">Doanh thu</h5>
+                            <p class="card-text">{{ number_format($doanhThu) ?? 0}}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-white bg-info mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">Đơn hàng chờ xử lý</h5>
+                            <p class="card-text">{{ number_format($donHangChoXuLy ?? 0) }}</p>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-white bg-info mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">Đơn hàng đã giao</h5>
+                            <p class="card-text">{{ number_format($donHangDaGiao ?? 0) }}</p>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-white bg-info mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">Đơn hàng đã hủy</h5>
+                            <p class="card-text">{{ number_format($donHangDaHuy ?? 0) }}</p>
+
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card bg-gradient-success text-white shadow">
-                <div class="card-body">
-                    <h5 class="card-title">Tổng doanh thu</h5>
-                    <h3>{{ number_format($totalRevenue, 0, ',', '.') }}₫</h3>
+
+            <!-- Biểu đồ -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+                <div class="col-md-6">
+                    <canvas id="crChart"></canvas>
                 </div>
             </div>
-        </div>
-    </div>
 
-    {{-- Bảng đơn hàng
-    <div class="card">
-        <div class="card-header"><strong>Danh sách đơn hàng</strong></div>
-        <div class="table-responsive">
-            <table class="table table-hover mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th>ID</th>
-                        <th>Khách hàng</th>
-                        <th>Điện thoại</th>
-                        <th>Tổng tiền</th>
-                        <th>Ngày tạo</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($orders as $order)
-                        <tr>
-                            <td>#{{ $order->id }}</td>
-                            <td>{{ $order->user->name ?? 'N/A' }}</td>
-                            <td>{{ $order->phone ?? '-' }}</td>
-                            <td>{{ number_format($order->total, 0, ',', '.') }}₫</td>
-                            <td>{{ $order->created_at->format('d/m/Y') }}</td>
-                        </tr>
-                    @empty
-                        <tr><td colspan="5" class="text-center">Không có đơn hàng nào.</td></tr>
-                    @endforelse
-                </tbody>
-            </table>
+            <!-- Top sản phẩm -->
+
+
         </div>
-    </div> --}}
+        <script>
+        // Truyền dữ liệu doanh thu từ PHP sang JS (dạng array of objects: {date, total})
+        const doanhThu = @json($doanhThus);
+
+        // Tách nhãn ngày và giá trị doanh thu từ dữ liệu
+        const labels = doanhThu.map(item => item.date);
+        const data = doanhThu.map(item => item.total);
+
+        // Tính tổng doanh thu
+        const tongDoanhThu = data.reduce((sum, val) => sum + val, 0);
+
+        // Hiển thị tổng doanh thu ra HTML
+        document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById("doanhThu").innerText = tongDoanhThu.toLocaleString('vi-VN') + " đ";
+        });
+
+        // Vẽ biểu đồ dạng đường (Line Chart) doanh thu theo ngày
+        new Chart(document.getElementById('revenueChart'), {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Doanh thu theo ngày',
+                    data: data,
+                    borderColor: 'blue',
+                    backgroundColor: 'rgba(0, 0, 255, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value.toLocaleString('vi-VN') + ' đ';
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return 'Doanh thu: ' + context.parsed.y.toLocaleString('vi-VN') + ' đ';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        console.log("Doanh thu:", doanhThu);
+        </script>
+        <script>
+        // Truyền dữ liệu từ PHP sang JS
+        const donHangTheoNgay = @json($soDonHangTheoNgay); // [{date: '2025-08-01', total: 5}, ...]
+
+        // Tách ngày và tổng số đơn hàng
+        const labelsDonHang = donHangTheoNgay.map(item => item.date);
+        const dataDonHang = donHangTheoNgay.map(item => item.total);
+
+        // Debug log để kiểm tra dữ liệu truyền sang
+        console.log("Labels:", labelsDonHang);
+        console.log("Data:", dataDonHang);
+
+        // Vẽ biểu đồ cột số lượng đơn hàng theo ngày
+        new Chart(document.getElementById('crChart'), {
+            type: 'bar',
+            data: {
+                labels: labelsDonHang,
+                datasets: [{
+                    label: 'Số lượng đơn hàng theo ngày',
+                    data: dataDonHang,
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)' // màu xanh dương
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0 // Không có số thập phân
+                        }
+                    }
+                }
+            }
+        });
+        </script>
+
+
+
+
+    </body>
+
+    </html>
+
+
 
 </div>
 @endsection
