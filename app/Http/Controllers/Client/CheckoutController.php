@@ -208,25 +208,33 @@ class CheckoutController extends Controller
             foreach ($selectedItems as $item) {
                 $variant = $item->productVariant;
                 $product = $variant->product;
-                $potId = $item->pot_id; // Lấy từ cart_items
+                
+                // Lấy thông tin chậu từ cart_items
+                $potId = $item->pot_id;
                 $potName = null;
+                $potPrice = 0;
 
                 if ($potId) {
                     $pot = \App\Models\Pot::find($potId);
-                    $potName = $pot ? $pot->name : null;
+                    if ($pot) {
+                        $potName = $pot->name;
+                        $potPrice = $pot->price;
+                    }
                 }
+
                 OrderDetail::create([
                     'order_id' => $order->id,
                     'product_id' => $product->id,
                     'product_variant_id' => $variant->id,
                     'product_name' => $product->name,
-                    'variant_name' => $variant->height . ' / ' . ($potName ?? 'Không rõ'),
+                    'variant_name' => $variant->height . ' / ' . ($potName ?? 'Không có chậu'),
                     'product_height' => $variant->height,
                     'product_pot' => $potName,
                     'product_price' => $variant->price,
-                    'price' => $variant->price,
+                    'pot_price' => $potPrice, // ✅ Đảm bảo lưu pot_price
+                    'price' => $variant->price + $potPrice, // Tổng giá sản phẩm + chậu
                     'quantity' => $item->quantity,
-                    'total_price' => $variant->price * $item->quantity,
+                    'total_price' => ($variant->price + $potPrice) * $item->quantity,
                 ]);
             }
 
@@ -402,6 +410,7 @@ class CheckoutController extends Controller
                     'product_height' => $variant->height,
                     'product_pot' => $variant->pot,
                     'product_price' => $variant->price,
+                    'pot_price' => $variant->pot->price ?? 0, // Lưu giá trị pot_price
                     'price' => $variant->price,
                     'quantity' => $item->quantity,
                     'total_price' => $variant->price * $item->quantity,

@@ -88,7 +88,11 @@
                         @endif
                     </td>
                     <td>
-                        @if($order->payment_status == 'paid' || ($order->payment_method == 'vnpay' && $order->status != 'cancelled'))
+                        @if(
+                            $order->payment_status == 'paid' || 
+                            ($order->payment_method == 'vnpay' && $order->status != 'cancelled') ||
+                            ($order->payment_method == 'cod' && $order->status == 'delivered')
+                        )
                             <span class="badge bg-success">Đã thanh toán</span>
                         @elseif($order->payment_status == 'pending')
                             <span class="badge bg-warning">Chờ thanh toán</span>
@@ -98,13 +102,14 @@
                             <span class="badge bg-secondary">Chưa thanh toán</span>
                         @endif
                     </td>
+
                     <td>
                         @switch($order->status)
                             @case('pending')
-                                <span class="badge bg-warning">Chờ xử lý</span>
+                                <span class="badge bg-warning">Chờ xác nhận</span>
                                 @break
                             @case('confirmed')
-                                <span class="badge bg-info">Đang xử lý</span>
+                                <span class="badge bg-info">Đã xác nhận</span>
                                 @break
                             @case('shipping')
                                 <span class="badge bg-primary">Đang giao</span>

@@ -20,6 +20,7 @@ class OrderDetail extends Model
         'product_height',
         'product_pot',
         'product_price',
+        'pot_price', // ✅ Thêm pot_price vào fillable
         'quantity',
         'total_price',
     ];
