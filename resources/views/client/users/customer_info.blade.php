@@ -28,7 +28,10 @@
         <div class="bg-light p-3 rounded mb-3">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
-                    <i class="fa fa-user text-secondary"></i> <strong>{{ $default->name }}</strong><br>
+                    <i class="fa fa-user text-secondary"></i>
+<span id="selected-address-text" class="ms-2 fw-semibold text-dark">
+    {{ optional($addresses->first())->address ?? 'Chưa chọn địa chỉ' }}
+</span><strong>{{ $default->name }}</strong><br>
                     <i class="fa fa-phone-alt text-secondary"></i> <span>{{ $default->phone }}</span><br>
                     <i class="fa fa-location-dot text-secondary"></i>
                     {{ $default->address->address ?? '' }}
@@ -48,13 +51,14 @@
                 @foreach($addresses as $order)
                     @if($order->address) {{-- Chỉ hiển thị nếu có địa chỉ --}}
                     <div class="form-check mb-2">
-                        <input class="form-check-input" type="radio" name="address_id"
-                            id="address_{{ $order->address_id }}"
-                            value="{{ $order->address_id }}"
-                            {{ $loop->first ? 'checked' : '' }}>
+                       <input class="form-check-input" type="radio" name="address_id"
+       id="address_{{ $order->id }}"
+       value="{{ $order->id }}"
+       data-address="{{ $order->address }}"
+       {{ $loop->first ? 'checked' : '' }}>
                         <label class="form-check-label" for="address_{{ $order->address_id }}">
                             <i class="fa fa-location-dot me-1 text-muted"></i>
-                            {{ $order->address->address }} -
+                            {{ $order->address }} -
                             <span class="text-muted">{{ $order->phone }}</span>
                         </label>
                     </div>
