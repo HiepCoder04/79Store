@@ -173,63 +173,68 @@
             const variant = allVariants.find(v => v.height === height);
             const pots = variant?.pots || [];
 
-            if (!potContainer) return; // Nếu không có div chọn chậu thì thoát
+            if (!potContainer) return;
             potContainer.innerHTML = '';
 
             pots.forEach(potId => {
+                const pot = allPots[potId];
                 const button = document.createElement('button');
                 button.type = 'button';
                 button.className = 'btn btn-outline-dark m-1 pot-option';
-                //gia chau
-                const pot = allPots[potId];
+                
+                // Lúc render ban đầu chỉ hiện tên chậu
                 button.textContent = pot?.name || 'Chậu';
                 button.dataset.potId = potId;
 
                 button.onclick = function () {
-                    document.querySelectorAll('.pot-option').forEach(b => b.classList.remove('active'));
-                    button.classList.add('active');
-                    potInput.value = potId;
+                    const isActive = button.classList.contains('active');
 
-                    const selectedHeight = heightInput.value;
-                    if (selectedHeight) updatePrice(potId, selectedHeight);
+                    // Bỏ active tất cả nút khác
+                    document.querySelectorAll('.pot-option').forEach(b => b.classList.remove('active'));
+
+                    if (isActive) {
+                        // Bỏ chọn → ẩn giá
+                        potInput.value = '';
+                        button.textContent = pot?.name || 'Chậu';
+                        updatePrice(null, heightInput.value);
+                    } else {
+                        // Chọn chậu → hiện giá
+                        button.classList.add('active');
+                        potInput.value = potId;
+
+                        // Hiện tên + giá khi click
+                        const potPrice = pot?.price ? ` (+${Number(pot.price).toLocaleString('vi-VN')}đ)` : '';
+                        button.textContent = (pot?.name || 'Chậu') + potPrice;
+
+                        updatePrice(potId, heightInput.value);
+                    }
                 };
 
                 potContainer.appendChild(button);
             });
-
-            // Auto chọn chậu đầu tiên nếu có
-            const firstPotButton = potContainer.querySelector('.pot-option');
-            if (firstPotButton) {
-                firstPotButton.click();
-            }
         }
-        //tu dong update gia sp
-       function updatePrice(potId, height) {
-        if (!potId) potId = null;
-    const variant = allVariants.find(v =>
-        v.height === height && v.pots.includes(potId)
-    );
 
-    const pot = allPots[potId];
-    const potPrice = pot ? Number(pot.price) : 0;
-    const variantPrice = variant ? Number(variant.price) : 0;
-    const total = potPrice + variantPrice;
+        function updatePrice(potId, height) {
+            const variant = allVariants.find(v => v.height === height);
+            const pot = potId ? allPots[potId] : null;
+            const potPrice = pot ? Number(pot.price) : 0;
+            const variantPrice = variant ? Number(variant.price) : 0;
+            const total = potPrice + variantPrice;
 
-    const formatted = total.toLocaleString('vi-VN') + 'đ';
-    const stock = variant ? variant.stock_quantity : 0;
+            const formatted = total.toLocaleString('vi-VN') + 'đ';
+            const stock = variant ? variant.stock_quantity : 0;
 
-    priceDisplay.style.opacity = 0;
-    setTimeout(() => {
-        priceDisplay.textContent = formatted;
-        priceDisplay.style.opacity = 1;
-        document.getElementById('stock-display').textContent =
-            stock > 0 ? `Còn ${stock} sản phẩm` : 'Hết hàng';
-    }, 150);
-}
+            priceDisplay.style.opacity = 0;
+            setTimeout(() => {
+                priceDisplay.textContent = formatted;
+                priceDisplay.style.opacity = 1;
+                document.getElementById('stock-display').textContent =
+                    stock > 0 ? `Còn ${stock} sản phẩm` : 'Hết hàng';
+            }, 150);
+        }
 
-        // --- Tạo nút chọn chiều cao ---
+        // Render chiều cao
         const heights = allVariants.map(v => v.height).filter((v, i, a) => a.indexOf(v) === i);
-
         heights.forEach(height => {
             const btn = document.createElement('button');
             btn.type = 'button';
@@ -241,34 +246,34 @@
                 document.querySelectorAll('.height-option').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 heightInput.value = height;
-                renderPotButtons(height); // sau khi chọn chiều cao mới thì lọc chậu phù hợp
+                renderPotButtons(height);
+                updatePrice(null, height); // Mặc định không chọn chậu khi đổi chiều cao
             };
 
             heightContainer.appendChild(btn);
         });
 
-        // --- Auto chọn chiều cao đầu tiên ---
+        // Auto chọn chiều cao đầu tiên
         if (heights.length > 0) {
             const defaultHeight = heights[0];
             heightInput.value = defaultHeight;
-
             const defaultHeightBtn = [...document.querySelectorAll('.height-option')].find(b => b.dataset.height == defaultHeight);
             defaultHeightBtn?.classList.add('active');
-
             renderPotButtons(defaultHeight);
+            updatePrice(null, defaultHeight);
         }
 
-        // --- AJAX thêm vào giỏ ---
+        // Thêm vào giỏ AJAX
         addBtn?.addEventListener('click', function () {
             const productId = document.getElementById('product-id').value;
-            const pot = potInput.value;
+            const pot = potInput.value || null;
             const height = heightInput.value;
             const quantity = parseInt(document.getElementById('quantity').value);
 
             if (!height) {
-    alert('Vui lòng chọn chiều cao!');
-    return;
-}
+                alert('Vui lòng chọn chiều cao!');
+                return;
+            }
 
             fetch(form.dataset.url, {
                 method: 'POST',
@@ -281,6 +286,14 @@
             .then(res => res.json())
             .then(data => {
                 alert(data.message);
+
+                // ✅ Cập nhật số giỏ hàng (thêm dấu ngoặc như giao diện hiện tại)
+                if (typeof data.cart_count !== 'undefined') {
+                    const cartCountEl = document.getElementById('cart-count');
+                    if (cartCountEl) {
+                        cartCountEl.textContent = `(${data.cart_count})`;
+                    }
+                }
             })
             .catch(err => {
                 console.error(err);

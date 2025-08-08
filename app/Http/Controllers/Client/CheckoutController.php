@@ -219,8 +219,12 @@ class CheckoutController extends Controller
                     if ($pot) {
                         $potName = $pot->name;
                         $potPrice = $pot->price;
+                        $pot->quantity = max(0, $pot->quantity - $item->quantity);
+                        $pot->save();
                     }
                 }
+                $variant->stock_quantity = max(0, $variant->stock_quantity - $item->quantity);
+                $variant->save();
 
                 OrderDetail::create([
                     'order_id' => $order->id,

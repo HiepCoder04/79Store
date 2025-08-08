@@ -82,7 +82,9 @@
             </div>
             <div class="col">
                 <h6 class="mb-1">{{ $product->name }}</h6>
-                <div class="text-muted small">Chậu: {{ $detail->product_pot }}</div>
+                @if (!empty($detail->product_pot) && strtolower($detail->product_pot) !== 'không có chậu')
+                    <div class="text-muted small">Chậu: {{ $detail->product_pot }}</div>
+                @endif
                 <div class="text-muted small">Chiều cao: {{ $detail->product_height }} cm</div>
                  @php
                     $potPrice = 0;

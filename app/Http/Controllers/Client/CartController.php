@@ -70,7 +70,7 @@ class CartController extends Controller
     {
         $request->validate([
             'product_id' => 'required|exists:products,id',
-            'pot'        => 'required|numeric|exists:pots,id',
+            'pot'        => 'nullable|numeric|exists:pots,id',
             'height'     => 'required|string', // ✅ Bắt buộc có chiều cao
             'quantity'   => 'required|integer|min:1'
         ]);
@@ -87,17 +87,16 @@ class CartController extends Controller
             return back()->with('error', 'Số lượng vượt quá tồn kho.');
         }
         $potId = $request->pot;
-        $pot = Pot::find($potId);
-
-        if (!$pot || $pot->quantity <= 0) {
-            return back()->with('error', 'Chậu đã hết hàng hoặc không tồn tại.');
-        }
-
-        // Kiểm tra chậu này có liên kết với biến thể cây không
-        $isValidPot = $variant->pots()->where('pots.id', $potId)->exists();
-
-        if (!$isValidPot) {
-            return back()->with('error', 'Chậu không phù hợp với biến thể cây.');
+        if ($potId) {
+            $pot = Pot::find($potId);
+            if (!$pot || $pot->quantity <= 0) {
+                return back()->with('error', 'Chậu đã hết hàng hoặc không tồn tại.');
+            }
+            // Kiểm tra chậu phù hợp với biến thể cây
+            $isValidPot = $variant->pots()->where('pots.id', $potId)->exists();
+            if (!$isValidPot) {
+                return back()->with('error', 'Chậu không phù hợp với biến thể cây.');
+            }
         }
 
         $user = Auth::user();
@@ -128,7 +127,7 @@ class CartController extends Controller
         $request->validate([
             'product_id' => 'required|exists:products,id',
             'height'     => 'required|string',
-            'pot'        => 'required|numeric|exists:pots,id',
+            'pot'        => 'nullable|numeric|exists:pots,id', // ✅ Cho phép null
             'quantity'   => 'required|integer|min:1',
         ]);
 
@@ -145,16 +144,15 @@ class CartController extends Controller
         }
 
         $potId = $request->pot;
-        $pot = Pot::find($potId);
-
-        if (!$pot || $pot->quantity <= 0) {
-            return response()->json(['success' => false, 'message' => 'Chậu đã hết hàng hoặc không tồn tại.'], 400);
-        }
-
-        $isValidPot = $variant->pots()->where('pots.id', $potId)->exists();
-
-        if (!$isValidPot) {
-            return response()->json(['success' => false, 'message' => 'Chậu không phù hợp với biến thể cây.'], 400);
+        if ($potId) {
+            $pot = Pot::find($potId);
+            if (!$pot || $pot->quantity <= 0) {
+                return response()->json(['success' => false, 'message' => 'Chậu đã hết hàng hoặc không tồn tại.'], 400);
+            }
+            $isValidPot = $variant->pots()->where('pots.id', $potId)->exists();
+            if (!$isValidPot) {
+                return response()->json(['success' => false, 'message' => 'Chậu không phù hợp với biến thể cây.'], 400);
+            }
         }
 
         $user = Auth::user();
@@ -177,8 +175,14 @@ class CartController extends Controller
             ]);
         }
 
-        return response()->json(['success' => true, 'message' => 'Đã thêm vào giỏ hàng!']);
+        $cartCount = CartItem::where('cart_id', $cart->id)->sum('quantity');
+
+        return response()->json([
+            'message' => 'Đã thêm sản phẩm vào giỏ hàng!',
+            'cart_count' => $cartCount
+        ]);
     }
+
     public function update(Request $request, $id)
     {
         $request->validate([
