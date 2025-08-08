@@ -5,38 +5,83 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Order;
-use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use DB;
 class DashboardController extends Controller
 {
     public function index(Request $request)
-    {   
- 
-$soDonHangTheoNgay =DB::table('orders')
-    ->selectRaw('DATE(created_at) as date, COUNT(*) as total')
-    ->where('status', 'delivered') // có thể bỏ nếu muốn tính mọi trạng thái
-    ->groupByRaw('DATE(created_at)')
-    ->orderBy('date', 'asc')
-    ->get();
+    {
+        // Map trạng thái sang tiếng Việt
+        $statusLabels = [
+            'pending'   => 'Chờ xử lý',
+            'confirmed' => 'Đã xác nhận',
+            'shipping'  => 'Đang giao',
+            'delivered' => 'Đã giao',
+            'cancelled' => 'Đã hủy',
+            'returned'  => 'Đã trả hàng'
+        ];
 
-   $doanhThus = DB::table('order_details')
-    ->join('orders', 'order_details.order_id', '=', 'orders.id')
-    ->where('orders.status', 'delivered') // hoặc điều kiện khác
-    ->selectRaw('DATE(orders.created_at) as date, SUM(order_details.price * order_details.quantity) as total')
-    ->groupByRaw('DATE(orders.created_at)')
-    ->orderBy('date', 'asc')
-    ->get();
+        // --- Lọc dữ liệu ---
+        $query = Order::query();
 
+        if ($request->start_date) {
+            $query->whereDate('created_at', '>=', $request->start_date);
+        }
 
-        $doanhThu = DB::table('order_details')
-            ->join('orders', 'order_details.order_id', '=', 'orders.id')
-            ->where('orders.status', 'delivered')
-            ->select(DB::raw('SUM(order_details.price * order_details.quantity) as total'))
-            ->value('total');   
-        $donHangChoXuLy =Order::where('status', 'pending')->count();
+        if ($request->end_date) {
+            $query->whereDate('created_at', '<=', $request->end_date);
+        }
+
+        if ($request->status) {
+            $query->where('status', $request->status);
+        }
+
+        // --- Số liệu tổng quan ---
+        $totalOrders = $query->count();
+        $totalRevenue = $query->sum('total_after_discount');
+
+        $doanhThu = Order::where('status', 'delivered')->sum('total_after_discount');
+        $donHangChoXuLy = Order::where('status', 'pending')->count();
         $donHangDaGiao = Order::where('status', 'delivered')->count();
         $donHangDaHuy = Order::where('status', 'cancelled')->count();
 
-        return view('admin.dashboard', compact('doanhThus','soDonHangTheoNgay','doanhThu', 'donHangChoXuLy', 'donHangDaGiao', 'donHangDaHuy'));
+        // --- Dữ liệu biểu đồ ---
+        $doanhThus = Order::select(
+                DB::raw('DATE(created_at) as date'),
+                DB::raw('SUM(total_after_discount) as total')
+            )
+            ->where('status', 'delivered')
+            ->groupBy('date')
+            ->orderBy('date', 'asc')
+            ->get();
+
+        $soDonHangTheoNgay = Order::select(
+                DB::raw('DATE(created_at) as date'),
+                DB::raw('COUNT(*) as total')
+            )
+            ->groupBy('date')
+            ->orderBy('date', 'asc')
+            ->get();
+
+        // --- Danh sách đơn hàng ---
+        $orders = $query->orderBy('created_at', 'desc')->paginate(10);
+
+        // Thay trạng thái tiếng Việt trong danh sách đơn hàng
+        foreach ($orders as $order) {
+            $order->status_vi = $statusLabels[$order->status] ?? $order->status;
+        }
+
+        return view('admin.dashboard', compact(
+            'totalOrders',
+            'totalRevenue',
+            'doanhThu',
+            'donHangChoXuLy',
+            'donHangDaGiao',
+            'donHangDaHuy',
+            'doanhThus',
+            'soDonHangTheoNgay',
+            'orders',
+            'statusLabels'
+        ));
     }
 }

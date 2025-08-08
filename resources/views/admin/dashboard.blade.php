@@ -3,171 +3,127 @@
 @section('title', 'Dashboard - Thống kê')
 
 @section('content')
-<div class="container-fluid py-4">
+    <div class="container mt-4">
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        {{-- Bộ lọc đơn hàng --}}
+        <h2 class="mb-4">📊 Thống kê đơn hàng</h2>
+        <form method="GET" action="{{ route('admin.dashboard') }}" class="row g-2 mb-4">
+            <div class="col-md-3">
+                <input type="date" name="start_date" class="form-control" value="{{ request('start_date') }}">
+            </div>
+            <div class="col-md-3">
+                <input type="date" name="end_date" class="form-control" value="{{ request('end_date') }}">
+            </div>
+            <div class="col-md-3">
+                <select name="status" class="form-select">
+                    <option value="">-- Tất cả trạng thái --</option>
+                    @foreach ($statusLabels as $key => $label)
+                        <option value="{{ $key }}" {{ request('status') == $key ? 'selected' : '' }}>
+                            {{ $label }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button class="btn btn-primary w-100">Lọc dữ liệu</button>
+            </div>
+        </form>
 
-    <body class="bg-light p-4">
-
-        <div class="container">
-
-            <h4 class="mb-4">Thống kê đơn hàng</h4>
-
-            <!-- Tổng quan -->
-            <div class="row mb-4">
-                <div class="col-md-3">
-                    <div class="card text-white bg-info mb-3">
-                        <div class="card-body">
-                            <h5 class="card-title">Doanh thu</h5>
-                            <p class="card-text">{{ number_format($doanhThu) ?? 0}}</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card text-white bg-info mb-3">
-                        <div class="card-body">
-                            <h5 class="card-title">Đơn hàng chờ xử lý</h5>
-                            <p class="card-text">{{ number_format($donHangChoXuLy ?? 0) }}</p>
-
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card text-white bg-info mb-3">
-                        <div class="card-body">
-                            <h5 class="card-title">Đơn hàng đã giao</h5>
-                            <p class="card-text">{{ number_format($donHangDaGiao ?? 0) }}</p>
-
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card text-white bg-info mb-3">
-                        <div class="card-body">
-                            <h5 class="card-title">Đơn hàng đã hủy</h5>
-                            <p class="card-text">{{ number_format($donHangDaHuy ?? 0) }}</p>
-
-                        </div>
+        {{-- Thẻ thống kê tổng quan --}}
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card text-white bg-info mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Doanh thu</h5>
+                        <p class="card-text">{{ number_format($doanhThu ?? 0) }} đ</p>
                     </div>
                 </div>
             </div>
-
-            <!-- Biểu đồ -->
-            <div class="row mb-4">
-                <div class="col-md-6">
-                    <canvas id="revenueChart"></canvas>
-                </div>
-                <div class="col-md-6">
-                    <canvas id="crChart"></canvas>
+            <div class="col-md-3">
+                <div class="card text-white bg-primary mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Đơn hàng chờ xử lý</h5>
+                        <p class="card-text">{{ number_format($donHangChoXuLy ?? 0) }}</p>
+                    </div>
                 </div>
             </div>
-
-            <!-- Top sản phẩm -->
-
-
+            <div class="col-md-3">
+                <div class="card text-white bg-success mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Đơn hàng đã giao</h5>
+                        <p class="card-text">{{ number_format($donHangDaGiao ?? 0) }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-danger mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Đơn hàng đã hủy</h5>
+                        <p class="card-text">{{ number_format($donHangDaHuy ?? 0) }}</p>
+                    </div>
+                </div>
+            </div>
         </div>
-        <script>
-        // Truyền dữ liệu doanh thu từ PHP sang JS (dạng array of objects: {date, total})
-        const doanhThu = @json($doanhThus);
 
-        // Tách nhãn ngày và giá trị doanh thu từ dữ liệu
-        const labels = doanhThu.map(item => item.date);
-        const data = doanhThu.map(item => item.total);
+        {{-- Biểu đồ --}}
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <canvas id="revenueChart"></canvas>
+            </div>
+            <div class="col-md-6">
+                <canvas id="orderChart"></canvas>
+            </div>
+        </div>
 
-        // Tính tổng doanh thu
-        const tongDoanhThu = data.reduce((sum, val) => sum + val, 0);
+        
+    </div>
 
-        // Hiển thị tổng doanh thu ra HTML
-        document.addEventListener("DOMContentLoaded", () => {
-            document.getElementById("doanhThu").innerText = tongDoanhThu.toLocaleString('vi-VN') + " đ";
-        });
+    {{-- Chart.js --}}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Doanh thu theo ngày
+        const doanhThuData = @json($doanhThus);
+        const revenueLabels = doanhThuData.map(item => item.date);
+        const revenueValues = doanhThuData.map(item => item.total);
 
-        // Vẽ biểu đồ dạng đường (Line Chart) doanh thu theo ngày
         new Chart(document.getElementById('revenueChart'), {
             type: 'line',
             data: {
-                labels: labels,
+                labels: revenueLabels,
                 datasets: [{
                     label: 'Doanh thu theo ngày',
-                    data: data,
+                    data: revenueValues,
                     borderColor: 'blue',
                     backgroundColor: 'rgba(0, 0, 255, 0.1)',
                     fill: true,
-                    tension: 0.4,
-                    pointRadius: 4,
-                    pointHoverRadius: 6
+                    tension: 0.4
                 }]
             },
             options: {
                 responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                return value.toLocaleString('vi-VN') + ' đ';
-                            }
-                        }
-                    }
-                },
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return 'Doanh thu: ' + context.parsed.y.toLocaleString('vi-VN') + ' đ';
-                            }
-                        }
-                    }
-                }
+                scales: { y: { beginAtZero: true } }
             }
         });
-        console.log("Doanh thu:", doanhThu);
-        </script>
-        <script>
-        // Truyền dữ liệu từ PHP sang JS
-        const donHangTheoNgay = @json($soDonHangTheoNgay); // [{date: '2025-08-01', total: 5}, ...]
 
-        // Tách ngày và tổng số đơn hàng
-        const labelsDonHang = donHangTheoNgay.map(item => item.date);
-        const dataDonHang = donHangTheoNgay.map(item => item.total);
+        // Số lượng đơn hàng theo ngày
+        const donHangData = @json($soDonHangTheoNgay);
+        const orderLabels = donHangData.map(item => item.date);
+        const orderValues = donHangData.map(item => item.total);
 
-        // Debug log để kiểm tra dữ liệu truyền sang
-        console.log("Labels:", labelsDonHang);
-        console.log("Data:", dataDonHang);
-
-        // Vẽ biểu đồ cột số lượng đơn hàng theo ngày
-        new Chart(document.getElementById('crChart'), {
+        new Chart(document.getElementById('orderChart'), {
             type: 'bar',
             data: {
-                labels: labelsDonHang,
+                labels: orderLabels,
                 datasets: [{
                     label: 'Số lượng đơn hàng theo ngày',
-                    data: dataDonHang,
-                    backgroundColor: 'rgba(54, 162, 235, 0.6)' // màu xanh dương
+                    data: orderValues,
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)'
                 }]
             },
             options: {
                 responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            precision: 0 // Không có số thập phân
-                        }
-                    }
-                }
+                scales: { y: { beginAtZero: true } }
             }
         });
-        </script>
-
-
-
-
-    </body>
-
-    </html>
-
-
-
-</div>
+    </script>
 @endsection
