@@ -60,7 +60,7 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>#ID</th>
+                    <th>Mã đơn hàng</th>
                     <th>Khách hàng</th>
                     <th>SĐT</th>
                     <th>Ngày đặt</th>
@@ -74,7 +74,7 @@
             <tbody>
                 @foreach ($orders as $order)
                 <tr>
-                    <td>{{ $order->id }}</td>
+                    <td>{{ $order->order_code }}</td>
                     <td>{{ $order->name ?? 'N/A' }}</td>
                     <td>{{ $order->phone ?? '---' }}</td>
                     <td>{{ $order->created_at->format('d/m/Y') }}</td>

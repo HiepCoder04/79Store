@@ -204,7 +204,6 @@ class CheckoutController extends Controller
                 'status' => $orderStatus,
                 'sale_channel' => 'website',
             ]);
-            $orderCode = '79ST-' . now()->format('Ymd') . '-' . str_pad($order->id, 4, '0', STR_PAD_LEFT);
             // Tạo chi tiết đơn hàng
             foreach ($selectedItems as $item) {
                 $variant = $item->productVariant;
@@ -294,9 +293,7 @@ class CheckoutController extends Controller
                 return redirect()->route('checkout.thankyouvnpay');
             }
 
-            return redirect()->route('checkout.thankyou')->with([
-                'order_code' => $orderCode,
-            ]);
+            return redirect()->route('checkout.thankyou')->with('order_code', $order->order_code);
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Checkout error: ' . $e->getMessage());

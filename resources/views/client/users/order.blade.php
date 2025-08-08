@@ -34,7 +34,7 @@
         <div class="card mb-4 shadow-sm border">
             <div class="card-header d-flex justify-content-between align-items-center bg-light">
                 <div>
-                    <h5 class="mb-0">🧾 Mã đơn: <strong>#ORD-{{ $order->id }}</strong></h5>
+                    <h5 class="mb-0">🧾 Mã đơn: <strong>{{ $order->order_code }}</strong></h5>
                     <small class="text-muted">📅 Ngày đặt: {{ $order->created_at->format('d/m/Y H:i') }}</small>
                 </div>
                 <span class="badge bg-{{ $status['class'] }} py-2 px-3">{{ $status['label'] }}</span>
