@@ -65,7 +65,9 @@
                     <!-- Chọn chậu -->
                     @if($potsToShow->isNotEmpty())
                     <div class="form-group">
-                    <label>Chọn chậu:</label><br>
+                    <label>Chọn chậu:
+                         <span style="font-size: 0.9em; color: #888;">(Không bắt buộc)</span>
+                    </label><br>
                     <div id="pot-buttons"></div> <!-- GIỮ LẠI DÒNG NÀY để JS render vào -->
                     </div>
                     @endif
