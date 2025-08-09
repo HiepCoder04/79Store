@@ -51,6 +51,7 @@ Route::middleware(['auth', 'role:admin', 'ban'])->prefix('admin')->name('admin.'
     Route::resource('products', ProductController::class);
     Route::post('products/{product}/restore', [ProductController::class, 'restore'])->name('products.restore')->withTrashed();
     Route::delete('products/{product}/force-delete', [ProductController::class, 'forceDelete'])->name('products.forceDelete')->withTrashed();
+    Route::post('/products/{id}/toggle-status', [ProductController::class, 'toggleStatus'])->name('admin.products.toggleStatus');
     //xoa bien the cua product
     Route::get('/products/variants/{variant}/delete', [ProductController::class, 'deleteVariant'])->name('products.variants.deleteVariant');
 
@@ -145,7 +146,7 @@ Route::middleware(['auth', 'ban'])->group(function () {
     Route::get('/thank-youvnpay', [CheckoutController::class, 'thankYouvnpay'])->name('checkout.thankyouvnpay');
     //luu dia chi thanh toan
     Route::post('/user/save-address', [CheckoutController::class, 'saveAddress'])
-    ->name('user.saveAddress');
+        ->name('user.saveAddress');
 
     //  Quản lý đơn hàng người dùng (Client)
     Route::prefix('orders')->name('client.orders.')->group(function () {

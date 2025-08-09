@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Voucher;
+
 class HomeController extends Controller
 {
     public function indexBlog()
@@ -33,6 +34,7 @@ class HomeController extends Controller
 
         // Lấy 8 sản phẩm mới nhất cho phần "New Arrivals"
         $products = Product::with('galleries', 'variants')
+            ->where('is_active', 1)
             ->latest()
             ->take(8)
             ->get();
