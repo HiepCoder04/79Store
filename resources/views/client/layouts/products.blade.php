@@ -92,7 +92,13 @@
                 <div class="col-12 col-sm-6 col-lg-3">
                     <div class="single-product-area mb-50">
                         <div class="product-img">
-                            <img src="{{ asset($product->galleries->first()->image_path ?? 'assets/img/default.jpg') }}" alt="{{ $product->name }}">
+                            @php
+                                $firstGallery = $product->galleries->first();
+                                $imagePath = $firstGallery && $firstGallery->image
+                                    ? asset(ltrim($firstGallery->image, '/'))
+                                    : asset('assets/img/bg-img/default.jpg');
+                            @endphp
+                            <img src="{{ $imagePath }}" alt="{{ $product->name }}">
                         </div>
                         <div class="product-info mt-15 text-center">
                             <a href="{{ route('shop-detail', $product->id) }}">
