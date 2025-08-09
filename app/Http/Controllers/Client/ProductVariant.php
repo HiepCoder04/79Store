@@ -20,14 +20,28 @@ class ProductVariant extends Controller
 
         // Base query: join variants để có min/max price cho sort/hiển thị
         $query = Product::query()
-            ->with(['category', 'galleries', 'variants'])
-            ->leftJoin('product_variants', 'products.id', '=', 'product_variants.product_id')
-            ->select(
-                'products.*',
-                DB::raw('MIN(product_variants.price) as min_price'),
-                DB::raw('MAX(product_variants.price) as max_price')
-            )
-            ->groupBy('products.id');
+        ->with(['category', 'galleries', 'variants'])
+        ->leftJoin('product_variants', 'products.id', '=', 'product_variants.product_id')
+        ->select(
+            'products.id',
+            'products.name',
+            'products.slug',
+            'products.category_id',
+            'products.description',
+            'products.created_at',
+            'products.updated_at',
+            DB::raw('MIN(product_variants.price) as min_price'),
+            DB::raw('MAX(product_variants.price) as max_price')
+        )
+        ->groupBy(
+            'products.id',
+            'products.name',
+            'products.slug',
+            'products.category_id',
+            'products.description',
+            'products.created_at',
+            'products.updated_at'
+        );
 
         // Lọc theo từ khóa
         if ($keyword !== '') {

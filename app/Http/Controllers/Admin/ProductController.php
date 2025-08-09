@@ -28,9 +28,9 @@ class ProductController extends Controller
         }
 
         // Lọc trạng thái hoạt động (chấp nhận 0)
-        if ($request->has('is_active') && $request->is_active !== '') {
-            $query->where('is_active', $request->is_active);
-        }
+        if ($request->filled('is_active')) {
+    $query->where('is_active', $request->is_active);
+}
 
         // Filter trạng thái xóa mềm
         if ($request->filled('status')) {
