@@ -43,10 +43,20 @@ class HomeController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
+        //lay sp ban chay
+        $bestSellers = Product::select('products.*')
+        ->join('product_variants', 'products.id', '=', 'product_variants.product_id')
+        ->join('order_details', 'product_variants.id', '=', 'order_details.product_variant_id')
+        ->selectRaw('SUM(order_details.quantity) as total_sold')
+        ->groupBy('products.id')
+        ->orderByDesc('total_sold')
+        ->take(8)
+        ->get();
+
         $userVouchers = Auth::check()
             ? Auth::user()->vouchers->pluck('voucher_id')
             : collect();
 
-        return view('client.home', compact('banners', 'products', 'vouchers', 'userVouchers'));
+        return view('client.home', compact('banners', 'products', 'vouchers', 'userVouchers','bestSellers'));
     }
 }

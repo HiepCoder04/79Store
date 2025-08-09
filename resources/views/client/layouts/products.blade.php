@@ -76,3 +76,90 @@
         </div>
     </div>
 </section>
+{{-- sp ban chay --}}
+<section class="best-sellers-area section-padding-80-0">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="section-heading text-center">
+                    <h2>Sản phẩm bán chạy</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            @foreach($bestSellers as $product)
+                <div class="col-12 col-sm-6 col-lg-3">
+                    <div class="single-product-area mb-50">
+                        <div class="product-img">
+                            <img src="{{ asset($product->galleries->first()->image_path ?? 'assets/img/default.jpg') }}" alt="{{ $product->name }}">
+                        </div>
+                        <div class="product-info mt-15 text-center">
+                            <a href="{{ route('shop-detail', $product->id) }}">
+                                <p>{{ $product->name }}</p>
+                            </a>
+                            @php
+                                $min = $product->variants->min('price');
+                                $max = $product->variants->max('price');
+                            @endphp
+                            <h6 class="text-success fw-bold">
+                                {{ number_format($min, 0, ',', '.') }}đ
+                                @if ($min != $max)
+                                    – {{ number_format($max, 0, ',', '.') }}đ
+                                @endif
+                            </h6>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    </div>
+</section>
+<style>
+.best-sellers-area {
+    padding-top: 20px; /* khoảng cách trên */
+    padding-bottom: 20px; /* khoảng cách dưới */
+    margin-top: 10px; /* cách phần trên ít nhất 10px */
+    margin-bottom: 10px; /* cách phần dưới ít nhất 10px */
+    background-color: #f9f9f9; /* nền nhẹ để tách biệt */
+    border-radius: 8px;
+}
+
+.best-sellers-area .section-heading h2 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 25px;
+    color: #333;
+}
+
+.best-sellers-area .single-product-area {
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+}
+
+.best-sellers-area .single-product-area:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.best-sellers-area .product-img img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.best-sellers-area .product-info p {
+    margin: 10px 0 5px;
+    font-weight: 500;
+    font-size: 16px;
+    color: #555;
+}
+
+.best-sellers-area .product-info h6 {
+    margin-bottom: 10px;
+}
+
+</style>
