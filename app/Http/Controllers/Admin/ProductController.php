@@ -54,7 +54,7 @@ class ProductController extends Controller
         // Thống kê số lượng
         $stats = [
             'total' => Product::withTrashed()->count(),
-            'active' => Product::count(),
+            'active' => Product::where('is_active', 1)->whereNull('deleted_at')->count(),
             'deleted' => Product::onlyTrashed()->count()
         ];
 
