@@ -10,7 +10,7 @@ class VoucherController extends Controller
 {
     public function index()
     {
-        $vouchers = Voucher::latest()->get();
+        $vouchers = Voucher::latest()->paginate(10);
         return view('admin.vouchers.index', compact('vouchers'));
     }
 

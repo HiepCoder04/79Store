@@ -62,7 +62,7 @@ Route::middleware(['auth', 'role:admin', 'ban'])->prefix('admin')->name('admin.'
 
     // Quản lý danh mục
     Route::resource('categories', CategoryController::class)->except(['show']);
-
+    
     // Quản lý blog & danh mục blog
     Route::resource('blogs', BlogController::class)->except(['show']);
     Route::resource('category_blogs', BlogCategoryController::class)->except(['show']);

@@ -9,10 +9,21 @@ use App\Models\Category;
 class CategoryController extends Controller
 {
     // Hiển thị danh sách danh mục kèm thông tin parent
-    public function index()
+    public function index(Request $request)
     {
-        $categories = Category::with('parent')->get();
-        return view('admin.categories.index', compact('categories'));
+        $categories = Category::with('parent')
+            ->search($request, ['name'])
+            ->when($request->filled('parent_id'), function ($q) use ($request) {
+                $parentId = $request->parent_id;
+                $q->where('parent_id', $parentId)
+                    ->orWhere('id', $parentId); // để hiển thị cả cha lẫn con
+            })
+            ->paginate(10)
+            ->appends($request->query());
+
+        $allParents = Category::whereNull('parent_id')->get();
+
+        return view('admin.categories.index', compact('categories', 'allParents'));
     }
 
     // Form thêm danh mục
@@ -61,7 +72,7 @@ class CategoryController extends Controller
     // Cập nhật danh mục với validation unique bỏ qua chính nó
     public function update(Request $request, string $id)
     {
-         $category = Category::findOrFail($id);
+        $category = Category::findOrFail($id);
 
         $request->validate([
             'name' => 'required|string|max:255|unique:categories,name,' . $id,

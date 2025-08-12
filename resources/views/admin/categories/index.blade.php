@@ -11,29 +11,24 @@
         box-shadow: 0 2px 12px rgba(0,0,0,0.06);
         margin-top: 25px;
     }
-
     .table thead {
         background-color: #f8f9fa;
         font-weight: 600;
         text-transform: uppercase;
         font-size: 0.85rem;
     }
-
     .table th, .table td {
         vertical-align: middle;
         padding: 12px 15px;
     }
-
     .table-hover tbody tr:hover {
         background-color: #f5f7fa;
         transition: all 0.2s ease;
     }
-
     .btn-add {
         border-radius: 8px;
         font-weight: 500;
     }
-
     .badge-parent {
         background-color: #0d6efd;
         color: #fff;
@@ -41,7 +36,6 @@
         padding: 6px 12px;
         border-radius: 999px;
     }
-
     .badge-none {
         background: #adb5bd;
         color: #fff;
@@ -49,19 +43,11 @@
         border-radius: 999px;
         font-size: 0.75rem;
     }
-
     .action-btn {
         display: flex;
         gap: 6px;
         justify-content: center;
     }
-
-    .action-btn a, .action-btn button {
-        border-radius: 6px;
-        padding: 5px 10px;
-        font-size: 0.85rem;
-    }
-
     .alert {
         border-radius: 8px;
         margin-bottom: 15px;
@@ -71,7 +57,6 @@
 @if (session('success'))
     <div class="alert alert-success shadow-sm">{{ session('success') }}</div>
 @endif
-
 @if (session('error'))
     <div class="alert alert-danger shadow-sm">{{ session('error') }}</div>
 @endif
@@ -85,6 +70,36 @@
             <i class="bi bi-plus-circle me-1"></i> Thêm danh mục
         </a>
     </div>
+
+    {{-- Form tìm kiếm & lọc --}}
+ <form method="GET" action="{{ route('admin.categories.index') }}" class="row g-2 mb-3 ">
+    {{-- Ô tìm kiếm --}}
+    <div class="col-md-6">
+        <label for="search" class="form-label fw-semibold">Tìm kiếm danh mục</label>
+        <input type="text" name="search" id="search" value="{{ request('search') }}"
+               class="form-control" placeholder="Nhập tên danh mục...">
+    </div>
+
+    {{-- Dropdown danh mục cha --}}
+    <div class="col-md-4 mt-3">
+        <label for="parent_id" class="form-label fw-semibold">Danh mục cha</label>
+        <select name="parent_id" id="parent_id" class="form-select">
+            <option value="">-- Tất cả danh mục cha --</option>
+            @foreach ($allParents as $parent)
+                <option value="{{ $parent->id }}" {{ request('parent_id') == $parent->id ? 'selected' : '' }}>
+                    {{ $parent->name }}
+                </option>
+            @endforeach
+        </select>
+    </div>
+
+    {{-- Nút lọc --}}
+    <div class="col-md-2 mt-5">
+        <button type="submit" class="btn btn-success w-100 ">
+            <i class="bi bi-funnel-fill "></i> Lọc
+        </button>
+    </div>
+</form>
 
     <div class="table-responsive">
         <table class="table table-bordered table-hover align-middle mb-0">
@@ -110,18 +125,13 @@
                         </td>
                         <td>
                             <div class="action-btn">
-                                <a href="{{ route('admin.categories.edit', $cat) }}" class="btn btn-sm">
-                                    <button type="submit" class="btn btn-sm btn-danger ">
-                                        Sửa
-                                    </button>
+                                <a href="{{ route('admin.categories.edit', $cat) }}" class="btn btn-sm btn-warning">
+                                    Sửa
                                 </a>
-                                <form action="{{ route('admin.categories.destroy', $cat) }}" 
-                                    method="POST" 
-                                    style="display:inline" 
-                                    onsubmit="return confirm('Xoá danh mục này?')">
+                                <form action="{{ route('admin.categories.destroy', $cat) }}" method="POST" onsubmit="return confirm('Xoá danh mục này?')">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger mt-1">
+                                    <button type="submit" class="btn btn-sm btn-danger">
                                         Xoá
                                     </button>
                                 </form>
@@ -135,9 +145,12 @@
                         </td>
                     </tr>
                 @endforelse
-                
             </tbody>
         </table>
+
+        <div class="d-flex justify-content-center mt-3">
+            {{ $categories->appends(request()->query())->links('pagination::bootstrap-5') }}
+        </div>
     </div>
 </div>
 @endsection
