@@ -24,13 +24,24 @@ class ProductController extends Controller
 
         // Lọc danh mục
         if ($request->filled('category_id')) {
-            $query->where('category_id', $request->category_id);
+            $category = Category::find($request->category_id);
+            if ($category) {
+                if ($category->parent_id === null) {
+                    // Nếu là danh mục cha → lấy tất cả id của nó + id con cháu
+                    $ids = $this->getAllChildCategoryIds($category->id);
+                    $ids[] = $category->id; // thêm chính nó
+                    $query->whereIn('category_id', $ids);
+                } else {
+                    // Nếu là danh mục con → chỉ lấy sản phẩm của nó
+                    $query->where('category_id', $category->id);
+                }
+            }
         }
 
         // Lọc trạng thái hoạt động (chấp nhận 0)
         if ($request->filled('is_active')) {
-    $query->where('is_active', $request->is_active);
-}
+            $query->where('is_active', $request->is_active);
+        }
 
         // Filter trạng thái xóa mềm
         if ($request->filled('status')) {
@@ -59,6 +70,14 @@ class ProductController extends Controller
         ];
 
         return view('admin.products.index', compact('products', 'stats', 'categories'));
+    }
+    private function getAllChildCategoryIds($parentId)
+    {
+        $childIds = Category::where('parent_id', $parentId)->pluck('id')->toArray();
+        foreach ($childIds as $childId) {
+            $childIds = array_merge($childIds, $this->getAllChildCategoryIds($childId));
+        }
+        return $childIds;
     }
 
     public function create()
