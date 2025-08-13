@@ -29,6 +29,8 @@ use App\Http\Controllers\ForgotPasswordOtpController;
 use App\Http\Controllers\Client\AccountController;
 use App\Http\Controllers\Admin\PotController;
 use App\Http\Controllers\Client\Voucher2Controller;
+use App\Http\Controllers\Client\searchController;
+
 // -------------------- BLOG (CLIENT) --------------------
 Route::prefix('blogs')->middleware('ban')->name('client.blogs.')->group(function () {
     Route::get('/', [App\Http\Controllers\Client\BlogController::class, 'index'])->name('index');
@@ -180,6 +182,10 @@ Route::get('/about', fn() => view('client.users.about-detail'))->middleware('ban
 Route::get('/shop', [ProductVariant::class, 'product'])->middleware('ban')->name('shop');
 
 Route::get('/shopDetail/{id}', [ProductVariant::class, 'productDetail'])->middleware('ban')->name('shop-detail');
+
+//router tim kiem sp
+Route::get('/search/suggest', [searchController::class, 'suggest'])
+     ->name('search.suggest');
 
 //route su dung voucher cua user
 

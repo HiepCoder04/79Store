@@ -44,36 +44,47 @@
                     </div>
                 </div>
 
-                <!-- Cột: Sản phẩm bán chạy -->
-                <div class="col-12 col-sm-6 col-lg-3">
-                    <div class="single-footer-widget">
-                        <div class="widget-title">
-                            <h5>BÁN CHẠY</h5>
-                        </div>
+<!-- Cột: Sản phẩm bán chạy -->
+<div class="col-12 col-sm-6 col-lg-3">
+    <div class="single-footer-widget">
+        <div class="widget-title">
+            <h5>BÁN CHẠY</h5>
+        </div>
 
-                        <!-- Sản phẩm 1 -->
-                        <div class="single-best-seller-product d-flex align-items-center">
-                            <div class="product-thumbnail">
-                                <a href="#"><img src="{{ asset('assets/img/bg-img/4.jpg') }}" alt="Cây xương rồng"></a>
-                            </div>
-                            <div class="product-info">
-                                <a href="#">Cây xương rồng</a>
-                                <p>10.000đ</p>
-                            </div>
-                        </div>
+        @if(isset($bestSellers) && $bestSellers->count())
+           @foreach ($bestSellers->take(2) as $product) {{-- Lấy tối đa 2 sản phẩm --}}
+                @php
+                    $firstGallery = $product->galleries->first();
+                    $imagePath = $firstGallery && $firstGallery->image
+                        ? asset(ltrim($firstGallery->image, '/'))
+                        : asset('assets/img/bg-img/default.jpg');
 
-                        <!-- Sản phẩm 2 -->
-                        <div class="single-best-seller-product d-flex align-items-center">
-                            <div class="product-thumbnail">
-                                <a href="#"><img src="{{ asset('assets/img/bg-img/5.jpg') }}" alt="Cây tulip"></a>
-                            </div>
-                            <div class="product-info">
-                                <a href="#">Hoa tulip</a>
-                                <p>11.000đ</p>
-                            </div>
-                        </div>
+                    $min = $product->variants->min('price');
+                    $max = $product->variants->max('price');
+                @endphp
+
+                <div class="single-best-seller-product d-flex align-items-center">
+                    <div class="product-thumbnail">
+                        <a href="{{ route('shop-detail', $product->id) }}">
+                            <img src="{{ $imagePath }}" alt="{{ $product->name }}" class="footer-best-thumb">
+                        </a>
+                    </div>
+                    <div class="product-info">
+                        <a href="{{ route('shop-detail', $product->id) }}">{{ $product->name }}</a>
+                        <p class="mb-0 text-success fw-bold">
+                            {{ number_format($min, 0, ',', '.') }}đ
+                            @if ($min != $max)
+                                – {{ number_format($max, 0, ',', '.') }}đ
+                            @endif
+                        </p>
                     </div>
                 </div>
+            @endforeach
+        @else
+            <p>Chưa có dữ liệu.</p>
+        @endif
+    </div>
+</div>
 
                 <!-- Cột: Thông tin liên hệ -->
                 <div class="col-12 col-sm-6 col-lg-3">
@@ -83,8 +94,8 @@
                         </div>
                         <div class="contact-information">
                             <p><span>Địa chỉ:</span> Số 1 Trịnh Văn Bô</p>
-                            <p><span>Điện thoại:</span> +1 234 122 122</p>
-                            <p><span>Email:</span> info.deercreative@gmail.com</p>
+                            <p><span>Điện thoại:</span> 0336994436</p>
+                            <p><span>Email:</span> 79store@gmail.com</p>
                             <p><span>Giờ mở cửa:</span> Thứ 2 - CN: 8h - 21h</p>
                             <p><span>Giờ ưu đãi:</span> Thứ 7: 14h - 16h</p>
                         </div>

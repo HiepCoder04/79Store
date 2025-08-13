@@ -140,17 +140,107 @@
                     </div>
                 </nav>
 
-                <!-- Form tìm kiếm -->
-                <div class="search-form">
-                    <form action="{{ route('shop') }}" method="GET">
-                        <input type="search" name="keyword" placeholder="Tìm sản phẩm..."
-                            value="{{ request('keyword') }}">
-                    </form>
-                </div>
+              <!-- Form tìm kiếm + dropdown  -->
+<div class="search-form">
+  <div id="searchWrap" class="search-wrap">
+    <form action="{{ route('shop') }}" method="GET" onsubmit="return gotoFirstResult(event)">
+      <input
+        id="searchInput"
+        type="search"
+        name="keyword"
+        placeholder="Tìm sản phẩm..."
+        value="{{ request('keyword') }}"
+        autocomplete="off"
+        data-url="{{ route('search.suggest') }}"
+      >
+    </form>
+    <div id="searchDropdown" class="search-dropdown"></div>
+  </div>
+</div>
             </div>
         </div>
     </div>
 </header>
+<script>
+(function(){
+  const input = document.getElementById('searchInput');
+  const box   = document.getElementById('searchDropdown');
+  if (!input || !box) return;
+
+  const url   = input.dataset.url;
+  const DETAIL_PREFIX_BY_SLUG = "{{ url('/shopDetail') }}";
+  let timer = null, lastItems = [];
+
+  function debounce(fn, delay=250){
+    return function(...args){ clearTimeout(timer); timer=setTimeout(()=>fn.apply(this,args), delay); }
+  }
+
+  // Đặt dropdown NGAY DƯỚI ô tìm kiếm, NGANG đúng bằng ô
+  function placeDropdown(){
+    const r = input.getBoundingClientRect();
+    box.style.left  = r.left + 'px';
+    box.style.top   = (r.bottom + 6) + 'px';   // cách ô 6px
+    box.style.width = r.width + 'px';
+  }
+    //lay id sp
+  function buildDetailUrl(item){
+    return item.slug ? `${DETAIL_PREFIX_BY_SLUG}/${encodeURIComponent(item.id)}` : '#';
+  }
+
+  function render(items){
+    if (!Array.isArray(items) || items.length === 0){
+      box.innerHTML = `<div class="search-empty">Không tìm thấy sản phẩm</div>`;
+      placeDropdown();
+      box.style.display = 'block';
+      return;
+    }
+    lastItems = items;
+    box.innerHTML = items.map(it => `
+      <a class="search-item" href="${buildDetailUrl(it)}">
+        <img src="${it.thumb}" alt="">
+        <span class="title">${it.name}</span>
+      </a>
+    `).join('');
+    placeDropdown();
+    box.style.display = 'block';
+  }
+
+  async function fetchSuggest(q){
+    if (!q || q.trim()===''){ box.style.display='none'; return; }
+    try{
+      const res = await fetch(`${url}?q=${encodeURIComponent(q)}`, { headers: {'X-Requested-With':'XMLHttpRequest'} });
+      const data = await res.json();
+      render(data);
+    }catch(e){
+      console.error(e);
+      box.innerHTML = `<div class="search-empty">Có lỗi xảy ra</div>`;
+      placeDropdown();
+      box.style.display = 'block';
+    }
+  }
+
+  input.addEventListener('input', debounce(e => fetchSuggest(e.target.value), 250));
+
+  // Luôn căn lại khi resize/scroll (nav cố định, theme animation…)
+  window.addEventListener('resize', placeDropdown);
+  window.addEventListener('scroll', placeDropdown, true);
+
+  // Ẩn khi click ra ngoài hoặc nhấn ESC
+  document.addEventListener('click', (e) => { if (!box.contains(e.target) && e.target !== input) box.style.display = 'none'; });
+  input.addEventListener('keydown', (e) => { if (e.key === 'Escape') box.style.display = 'none'; });
+
+  // Enter -> mở kết quả đầu tiên nếu có
+  window.gotoFirstResult = function(ev){
+    if (lastItems.length > 0) {
+      const href = buildDetailUrl(lastItems[0]);
+      if (href && href !== '#'){ window.location.href = href; ev.preventDefault(); return false; }
+    }
+    return true;
+  };
+})();
+</script>
+
+
 
 <!-- Style cho user dropdown và responsive -->
 <style>
@@ -216,6 +306,47 @@
         font-weight: bold;
         color: #ffc107;
     }
+/* Dropdown: bám theo toạ độ của input (viewport) */
+#searchDropdown{
+  position: fixed;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.12);
+  display: none;
+  z-index: 100000;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+/* Item: ảnh + tên cùng hàng */
+#searchDropdown .search-item{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  text-decoration: none;
+  color: #222;
+}
+#searchDropdown .search-item:hover{ background: #f6f6f6; }
+
+#searchDropdown .search-item img{
+  width: 40px; height: 40px; object-fit: cover; border-radius: 6px;
+  flex: 0 0 40px;
+}
+
+/* TÊN to hơn, đậm hơn, cùng hàng với ảnh */
+#searchDropdown .search-item .title{
+  font-weight: 700;
+  font-size: 16px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+#searchDropdown .search-empty{
+  padding: 8px 10px; color: #777; font-size: 14px;
+}
+
+
 </style>
 
 @include('client.layouts.thongbao')
