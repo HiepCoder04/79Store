@@ -239,6 +239,7 @@ class CheckoutController extends Controller
                     'price' => $variant->price + $potPrice, // Tổng giá sản phẩm + chậu
                     'quantity' => $item->quantity,
                     'total_price' => ($variant->price + $potPrice) * $item->quantity,
+                    'pot_id' => $potId, 
                 ]);
             }
 

@@ -150,15 +150,15 @@
 @endif
 
 @if ($order->status === 'delivered')
-    <form action="{{ route('client.orders.return', $order->id) }}" method="POST" class="d-inline-block ms-2">
-        @csrf
-        @method('PUT')
-        <button type="submit" class="btn btn-outline-warning"
-            onclick="return confirm('Bạn có chắc muốn trả lại đơn hàng này?')">
-            <i class="fa fa-undo me-1"></i> Trả hàng
-        </button>
-    </form>
+    {{-- Nút + modal TẠO YÊU CẦU TRẢ HÀNG THEO DÒNG HÀNG (line item) --}}
+    @include('client.orders.partials.return_button')
+
+    {{-- Link xem lịch sử yêu cầu trả hàng của đơn --}}
+    <a class="btn btn-link" href="{{ route('client.orders.returns.index', $order) }}">
+        Lịch sử trả hàng
+    </a>
 @endif
+
 
 
                 </div>

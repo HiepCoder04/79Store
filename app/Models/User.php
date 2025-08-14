@@ -67,4 +67,9 @@ class User extends Authenticatable
             ->withPivot(['is_used', 'used_at'])
             ->withTimestamps();
     }
+
+    public function returnRequests()
+    {
+        return $this->hasMany(ReturnRequest::class);
+    }
 }

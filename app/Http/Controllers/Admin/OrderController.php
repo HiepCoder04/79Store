@@ -46,6 +46,9 @@ class OrderController extends Controller
         if (!$this->isValidStatusTransition($currentStatus, $newStatus)) {
             return back()->with('error', 'Không thể chuyển từ trạng thái "' . $this->getStatusLabel($currentStatus) . '" sang "' . $this->getStatusLabel($newStatus) . '".');
         }
+        if ($newStatus === 'delivered' && $currentStatus !== 'delivered') {
+            $order->delivered_at = now();
+        }
 
         $order->status = $newStatus;
         $order->save();
