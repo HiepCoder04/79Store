@@ -1,7 +1,6 @@
 @extends('admin.layouts.dashboard')
 
 @section('content')
-{{-- Thêm meta tag CSRF token --}}
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
 <div class="container">
@@ -40,32 +39,79 @@
         </div>
     </div>
 
-    {{-- Bộ lọc trạng thái --}}
-    <div class="mb-3">
-        <div class="btn-group" role="group">
-            <a href="{{ route('admin.products.index') }}"
-               class="btn {{ request('status', 'active') === 'active' ? 'btn-primary' : 'btn-outline-primary' }}">
-                Đang hoạt động
-            </a>
-            <a href="{{ route('admin.products.index', ['status' => 'deleted']) }}"
-               class="btn {{ request('status') === 'deleted' ? 'btn-danger' : 'btn-outline-danger' }}">
-                Đã xóa
-            </a>
-            <a href="{{ route('admin.products.index', ['status' => 'all']) }}"
-               class="btn {{ request('status') === 'all' ? 'btn-info' : 'btn-outline-info' }}">
-                Tất cả
-            </a>
-        </div>
+    {{-- Form search + filter --}}
+    {{-- Form search + filter đẹp và cân đối --}}
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-light">
+        <h6 class="mb-0 fw-bold"><i class="fa fa-filter me-1 text-primary"></i> Bộ lọc tìm kiếm</h6>
     </div>
+    <div class="card-body">
+        <form method="GET" action="{{ route('admin.products.index') }}">
+            <div class="row g-3">
+                {{-- Tìm kiếm --}}
+                <div class="col-md-3">
+                    <label class="form-label fw-bold mb-1">Tìm kiếm</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white"><i class="fa fa-search text-muted"></i></span>
+                        <input type="text" name="search" class="form-control" placeholder="Nhập tên sản phẩm..."
+                               value="{{ request('search') }}">
+                    </div>
+                </div>
 
-    {{-- Hiển thị thông báo --}}
+                {{-- Danh mục --}}
+                <div class="col-md-3">
+                    <label class="form-label fw-bold mb-1">Danh mục</label>
+                    <select name="category_id" class="form-select">
+                        <option value="">-- Tất cả danh mục --</option>
+                        @foreach($categories as $cat)
+                            <option value="{{ $cat->id }}" {{ request('category_id') == $cat->id ? 'selected' : '' }}>
+                                {{ $cat->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                {{-- Trạng thái --}}
+                <div class="col-md-2">
+                    <label class="form-label fw-bold mb-1">Trạng thái</label>
+                    <select name="is_active" class="form-select">
+                        <option value="">-- Tất cả --</option>
+                        <option value="1" {{ request('is_active') === '1' ? 'selected' : '' }}>Kích hoạt</option>
+                        <option value="0" {{ request('is_active') === '0' ? 'selected' : '' }}>Tắt</option>
+                    </select>
+                </div>
+
+                {{-- Tình trạng --}}
+                <div class="col-md-2">
+                    <label class="form-label fw-bold mb-1">Tình trạng</label>
+                    <select name="status" class="form-select">
+                        <option value="">-- Tất cả --</option>
+                        <option value="active" {{ request('status', 'active') === 'active' ? 'selected' : '' }}>Đang hoạt động</option>
+                        <option value="deleted" {{ request('status') === 'deleted' ? 'selected' : '' }}>Đã xóa</option>
+                        <option value="all" {{ request('status') === 'all' ? 'selected' : '' }}>Tất cả</option>
+                    </select>
+                </div>
+
+                {{-- Nút lọc --}}
+                <div class="col-md-2">
+                    <label class="form-label d-block">&nbsp;</label> {{-- giữ chỗ cho label --}}
+                    <button type="submit" class="btn btn-primary w-100 filter-btn">
+                        <i class="fa fa-search me-1"></i> Lọc
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+    {{-- Thông báo --}}
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show">
             {{ session('success') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     @endif
-
     @if(session('error'))
         <div class="alert alert-danger alert-dismissible fade show">
             {{ session('error') }}
@@ -100,44 +146,32 @@
                         <td>{{ $product->category->name ?? 'N/A' }}</td>
                         <td>{{ number_format($product->variants->first()->price ?? 0) }}đ</td>
                         <td>
-                            @if($product->deleted_at)
-                                <span class="badge bg-danger">Đã xóa</span>
-                                <small class="text-muted d-block">{{ $product->deleted_at->format('d/m/Y H:i') }}</small>
-                            @else
-                                <span class="badge bg-success">Hoạt động</span>
-                            @endif
+                            <input 
+                                type="checkbox" 
+                                class="toggle-status" 
+                                data-id="{{ $product->id }}" 
+                                {{ $product->is_active ? 'checked' : '' }}
+                            >
                         </td>
                         <td>
                             @if($product->deleted_at)
-                                {{-- Sản phẩm đã bị xóa mềm --}}
                                 <div class="btn-group" role="group">
-                                    <button class="btn btn-sm btn-success"
-                                            onclick="restoreProduct({{ $product->id }})"
-                                            title="Khôi phục sản phẩm">
+                                    <button class="btn btn-sm btn-success" onclick="restoreProduct({{ $product->id }})">
                                         <i class="fa fa-undo"></i> Khôi phục
                                     </button>
-                                    <button class="btn btn-sm btn-danger"
-                                            onclick="forceDeleteProduct({{ $product->id }})"
-                                            title="Xóa vĩnh viễn - Không thể hoàn tác">
+                                    <button class="btn btn-sm btn-danger" onclick="forceDeleteProduct({{ $product->id }})">
                                         <i class="fa fa-trash-alt"></i> Xóa vĩnh viễn
                                     </button>
                                 </div>
                             @else
-                                {{-- Sản phẩm đang hoạt động --}}
                                 <div class="btn-group" role="group">
-                                    <a href="{{ route('admin.products.show', $product->id) }}"
-                                       class="btn btn-sm btn-info text-white"
-                                       title="Xem chi tiết sản phẩm">
+                                    <a href="{{ route('admin.products.show', $product->id) }}" class="btn btn-sm btn-info text-white">
                                         <i class="fa fa-eye"></i> Chi tiết
                                     </a>
-                                    <a href="{{ route('admin.products.edit', $product->id) }}"
-                                       class="btn btn-sm btn-warning text-white"
-                                       title="Chỉnh sửa thông tin sản phẩm">
+                                    <a href="{{ route('admin.products.edit', $product->id) }}" class="btn btn-sm btn-warning text-white">
                                         <i class="fa fa-edit"></i> Sửa
                                     </a>
-                                    <button class="btn btn-sm btn-danger"
-                                            onclick="deleteProduct({{ $product->id }})"
-                                            title="Xóa sản phẩm (có thể khôi phục)">
+                                    <button class="btn btn-sm btn-danger" onclick="deleteProduct({{ $product->id }})">
                                         <i class="fa fa-trash"></i> Xóa
                                     </button>
                                 </div>
@@ -297,6 +331,38 @@ document.addEventListener('DOMContentLoaded', function() {
 
 {{-- Thêm CSS để cải thiện giao diện --}}
 <style>
+    .toggle-status {
+    width: 40px;
+    height: 20px;
+    -webkit-appearance: none;
+    appearance: none;
+    background-color: #ccc;
+    outline: none;
+    border-radius: 20px;
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+.toggle-status:checked {
+    background-color: #28a745;
+}
+.toggle-status::before {
+    content: "";
+    width: 18px;
+    height: 18px;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    transition: transform 0.3s;
+}
+.toggle-status:checked::before {
+    transform: translateX(20px);
+}
+.filter-btn {
+    margin-top: 2px; /* chỉnh bao nhiêu px tùy thích */
+}
 .btn-group .btn {
     margin-right: 2px;
     border-radius: 4px !important;
@@ -385,4 +451,36 @@ tr.table-secondary:hover {
     margin-right: 4px;
 }
 </style>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.toggle-status').forEach(function (checkbox) {
+        checkbox.addEventListener('change', function () {
+            let id = this.dataset.id;
+            let status = this.checked ? 1 : 0;
+
+            fetch(`/admin/products/${id}/toggle-status`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({ is_active: status })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (!data.success) {
+                    alert('Lỗi: ' + (data.message || 'Không thể thay đổi trạng thái'));
+                    this.checked = !this.checked; // rollback nếu lỗi
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('Có lỗi kết nối server');
+                this.checked = !this.checked;
+            });
+        });
+    });
+});
+</script>
 @endsection
+

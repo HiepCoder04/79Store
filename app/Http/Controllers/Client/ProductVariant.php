@@ -13,43 +13,74 @@ class ProductVariant extends Controller
 {
     public function product(Request $request)
     {
-        $selectedCategories = $request->input('category', []);
-        $keyword = $request->input('keyword');
+        $selectedCategories = (array) $request->input('category', []);
+        $keyword            = trim((string) $request->input('keyword', ''));
+        $sorts              = (array) $request->input('sort', []);
+        $perPage            = (int) $request->input('per_page', 9);
 
-        // Tạo query ban đầu với quan hệ
-        $query = Product::with('category', 'galleries');
+        // Base query: join variants để có min/max price cho sort/hiển thị
+        $query = Product::query()
+        ->with(['category', 'galleries', 'variants'])
+        ->leftJoin('product_variants', 'products.id', '=', 'product_variants.product_id')
+        ->select(
+            'products.id',
+            'products.name',
+            'products.slug',
+            'products.category_id',
+            'products.description',
+            'products.created_at',
+            'products.updated_at',
+            DB::raw('MIN(product_variants.price) as min_price'),
+            DB::raw('MAX(product_variants.price) as max_price')
+        )
+        ->groupBy(
+            'products.id',
+            'products.name',
+            'products.slug',
+            'products.category_id',
+            'products.description',
+            'products.created_at',
+            'products.updated_at'
+        );
 
-        // Lọc theo từ khóa trong tên sản phẩm
-        if ($request->filled('keyword')) {
-            $query->where('name', 'like', '%' . $keyword . '%');
+        // Lọc theo từ khóa
+        if ($keyword !== '') {
+            $query->where('products.name', 'like', "%{$keyword}%");
         }
 
-        // Lọc theo danh mục nếu có
+        // Lọc theo danh mục
         if (!empty($selectedCategories)) {
-            $query->whereIn('category_id', $selectedCategories);
+            $query->whereIn('products.category_id', $selectedCategories);
         }
 
-        // Nếu sắp xếp theo giá cao -> thấp
-        $query = Product::query()->with('galleries');
-
-        if ($request->has('sort')) {
-            $sort = $request->sort;
-
-            if (in_array('high-low', $sort)) {
-                $query->withMax('variants', 'price')->orderBy('variants_max_price', 'desc');
-            } elseif (in_array('low-high', $sort)) {
-                $query->withMin('variants', 'price')->orderBy('variants_min_price', 'asc');
-            }
+        // Sắp xếp
+        if (in_array('new', $sorts, true)) {
+            $query->orderBy('products.created_at', 'desc');
         }
-        $products = $query->paginate(9)->withQueryString();
+        if (in_array('a-z', $sorts, true)) {
+            $query->orderBy('products.name', 'asc');
+        }
+        if (in_array('z-a', $sorts, true)) {
+            $query->orderBy('products.name', 'desc');
+        }
+        if (in_array('low-high', $sorts, true)) {
+            $query->orderBy('min_price', 'asc');
+        }
+        if (in_array('high-low', $sorts, true)) {
+            $query->orderBy('min_price', 'desc');
+        }
 
-        // Phân trang, sắp xếp mới nhất và giữ query trên URL
-        $products = $query->latest()->paginate(9)->appends($request->query());
+        // Phân trang + giữ toàn bộ query trên URL
+        $products = $query->paginate($perPage)->appends($request->query());
 
         $categories = Category::all();
 
-        // Truyền cả biến keyword về view nếu muốn hiển thị lại từ khóa đã nhập
-        return view('client.shop', compact('products', 'categories', 'selectedCategories', 'keyword'));
+        return view('client.shop', [
+            'products'           => $products,
+            'categories'         => $categories,
+            'selectedCategories' => $selectedCategories,
+            'keyword'            => $keyword,
+        ]);
     }
     public function productDetail($id)
 {

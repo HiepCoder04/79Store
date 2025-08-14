@@ -29,6 +29,8 @@ use App\Http\Controllers\ForgotPasswordOtpController;
 use App\Http\Controllers\Client\AccountController;
 use App\Http\Controllers\Admin\PotController;
 use App\Http\Controllers\Client\Voucher2Controller;
+use App\Http\Controllers\Client\searchController;
+
 // -------------------- BLOG (CLIENT) --------------------
 Route::prefix('blogs')->middleware('ban')->name('client.blogs.')->group(function () {
     Route::get('/', [App\Http\Controllers\Client\BlogController::class, 'index'])->name('index');
@@ -51,6 +53,7 @@ Route::middleware(['auth', 'role:admin', 'ban'])->prefix('admin')->name('admin.'
     Route::resource('products', ProductController::class);
     Route::post('products/{product}/restore', [ProductController::class, 'restore'])->name('products.restore')->withTrashed();
     Route::delete('products/{product}/force-delete', [ProductController::class, 'forceDelete'])->name('products.forceDelete')->withTrashed();
+    Route::post('/products/{id}/toggle-status', [ProductController::class, 'toggleStatus'])->name('admin.products.toggleStatus');
     //xoa bien the cua product
     Route::get('/products/variants/{variant}/delete', [ProductController::class, 'deleteVariant'])->name('products.variants.deleteVariant');
 
@@ -61,7 +64,7 @@ Route::middleware(['auth', 'role:admin', 'ban'])->prefix('admin')->name('admin.'
 
     // Quản lý danh mục
     Route::resource('categories', CategoryController::class)->except(['show']);
-
+    
     // Quản lý blog & danh mục blog
     Route::resource('blogs', BlogController::class)->except(['show']);
     Route::resource('category_blogs', BlogCategoryController::class)->except(['show']);
@@ -156,7 +159,7 @@ Route::middleware(['auth', 'ban'])->group(function () {
     Route::get('/thank-youvnpay', [CheckoutController::class, 'thankYouvnpay'])->name('checkout.thankyouvnpay');
     //luu dia chi thanh toan
     Route::post('/user/save-address', [CheckoutController::class, 'saveAddress'])
-    ->name('user.saveAddress');
+        ->name('user.saveAddress');
 
     //  Quản lý đơn hàng người dùng (Client)
     Route::prefix('orders')->name('client.orders.')->group(function () {
@@ -197,6 +200,10 @@ Route::get('/about', fn() => view('client.users.about-detail'))->middleware('ban
 Route::get('/shop', [ProductVariant::class, 'product'])->middleware('ban')->name('shop');
 
 Route::get('/shopDetail/{id}', [ProductVariant::class, 'productDetail'])->middleware('ban')->name('shop-detail');
+
+//router tim kiem sp
+Route::get('/search/suggest', [searchController::class, 'suggest'])
+     ->name('search.suggest');
 
 //route su dung voucher cua user
 

@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\Filterable;
 
 class Voucher extends Model
 {
-    use HasFactory;
+    use HasFactory,Filterable;
 
     protected $fillable = [
         'code',
@@ -26,5 +27,9 @@ class Voucher extends Model
         return $this->belongsToMany(User::class, 'user_vouchers')
             ->withPivot(['is_used', 'used_at'])
             ->withTimestamps();
+    }
+    public function userVouchers()
+    {
+        return $this->hasMany(UserVoucher::class);
     }
 }

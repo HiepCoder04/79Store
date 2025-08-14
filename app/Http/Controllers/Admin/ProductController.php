@@ -12,13 +12,38 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Pot;
 use App\Models\ProductVariant;
+
 class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Product::with(['category', 'variants', 'galleries']);
+        $categories = Category::all();
 
-        // Kiểm tra có filter theo trạng thái không
+        $query = Product::with(['category', 'variants', 'galleries'])
+            ->search($request, ['name', 'slug', 'description']);
+
+        // Lọc danh mục
+        if ($request->filled('category_id')) {
+            $category = Category::find($request->category_id);
+            if ($category) {
+                if ($category->parent_id === null) {
+                    // Nếu là danh mục cha → lấy tất cả id của nó + id con cháu
+                    $ids = $this->getAllChildCategoryIds($category->id);
+                    $ids[] = $category->id; // thêm chính nó
+                    $query->whereIn('category_id', $ids);
+                } else {
+                    // Nếu là danh mục con → chỉ lấy sản phẩm của nó
+                    $query->where('category_id', $category->id);
+                }
+            }
+        }
+
+        // Lọc trạng thái hoạt động (chấp nhận 0)
+        if ($request->filled('is_active')) {
+            $query->where('is_active', $request->is_active);
+        }
+
+        // Filter trạng thái xóa mềm
         if ($request->filled('status')) {
             switch ($request->status) {
                 case 'active':
@@ -32,27 +57,34 @@ class ProductController extends Controller
                     break;
             }
         } else {
-            // Mặc định chỉ hiển thị sản phẩm chưa bị xóa
             $query->whereNull('deleted_at');
         }
 
-        $products = $query->latest()->paginate(10);
+        $products = $query->latest()->paginate(10)->appends($request->query());
 
         // Thống kê số lượng
         $stats = [
             'total' => Product::withTrashed()->count(),
-            'active' => Product::count(),
+            'active' => Product::where('is_active', 1)->whereNull('deleted_at')->count(),
             'deleted' => Product::onlyTrashed()->count()
         ];
 
-        return view('admin.products.index', compact('products', 'stats'));
+        return view('admin.products.index', compact('products', 'stats', 'categories'));
+    }
+    private function getAllChildCategoryIds($parentId)
+    {
+        $childIds = Category::where('parent_id', $parentId)->pluck('id')->toArray();
+        foreach ($childIds as $childId) {
+            $childIds = array_merge($childIds, $this->getAllChildCategoryIds($childId));
+        }
+        return $childIds;
     }
 
     public function create()
     {
         $categories = Category::all();
         $pots = Pot::all();
-        return view('admin.products.create', compact('categories','pots'));
+        return view('admin.products.create', compact('categories', 'pots'));
     }
 
     public function store(Request $request)
@@ -71,37 +103,37 @@ class ProductController extends Controller
 
         DB::beginTransaction();
 
-    try {
-        $baseSlug = Str::slug($validated['name']);
-        $slug = $baseSlug;
-        $counter = 1;
-        while (Product::where('slug', $slug)->exists()) {
-            $slug = $baseSlug . '-' . $counter++;
-        }
+        try {
+            $baseSlug = Str::slug($validated['name']);
+            $slug = $baseSlug;
+            $counter = 1;
+            while (Product::where('slug', $slug)->exists()) {
+                $slug = $baseSlug . '-' . $counter++;
+            }
 
-        $product = Product::create([
-            'name' => $validated['name'],
-            'slug' => $slug,
-            'category_id' => $validated['category_id'],
-            'description' => $validated['description'],
-            'is_active' => true,
-        ]);
+            $product = Product::create([
+                'name' => $validated['name'],
+                'slug' => $slug,
+                'category_id' => $validated['category_id'],
+                'description' => $validated['description'],
+                'is_active' => true,
+            ]);
 
             foreach ($validated['variants'] as $variant) {
                 $isValid = is_numeric($variant['price'] ?? null) &&
-                          is_numeric($variant['stock_quantity'] ?? null);
+                    is_numeric($variant['stock_quantity'] ?? null);
 
                 Log::debug($isValid ? '✅ Biến thể OK' : '❌ Bị loại', $variant);
 
                 if ($isValid) {
                     $newVariant = $product->variants()->create([
                         'variant_name' => $product->name . ' - ' . ($variant['pot'] ?? 'Không rõ'),
-                        
+
                         'height' => $variant['height'] ?? null,
                         'price' => $variant['price'],
                         'stock_quantity' => $variant['stock_quantity']
                     ]);
-                    $allPotIds =Pot::pluck('id')->toArray();
+                    $allPotIds = Pot::pluck('id')->toArray();
                     $newVariant->pots()->attach($allPotIds);
                 }
             }
@@ -125,11 +157,11 @@ class ProductController extends Controller
             }
             // Xử lý chậu nếu có
             if ($request->filled('selected_pots')) {
-    $selectedPotIds = $request->input('selected_pots');
-    foreach ($product->variants as $variant) {
-        $variant->pots()->sync($selectedPotIds);
-    }
-}
+                $selectedPotIds = $request->input('selected_pots');
+                foreach ($product->variants as $variant) {
+                    $variant->pots()->sync($selectedPotIds);
+                }
+            }
             DB::commit();
 
             return redirect()->route('admin.products.index')->with('success', 'Sản phẩm đã được thêm thành công.');
@@ -185,7 +217,7 @@ class ProductController extends Controller
                             // Update variant
                             $product->variants()->where('id', $variant['id'])->update([
 
-                                
+
                                 'height' => $variant['height'] ?? null,
                                 'price' => $variant['price'],
                                 'stock_quantity' => $variant['stock_quantity'],
@@ -194,15 +226,14 @@ class ProductController extends Controller
                             // Create new variant
                             $newVariant = $product->variants()->create([
                                 'variant_name' => $product->name,
-                                
+
                                 'height' => $variant['height'] ?? null,
                                 'price' => $variant['price'],
                                 'stock_quantity' => $variant['stock_quantity'],
                             ]);
-                            
+
                             $allPotIds = Pot::pluck('id')->toArray();
                             $newVariant->pots()->attach($allPotIds);
-
                         }
                     }
                 }
@@ -232,17 +263,17 @@ class ProductController extends Controller
             }
             // Xử lý chậu nếu có
             // Gán lại các chậu cho tất cả biến thể nếu người dùng chọn lại
-if ($request->filled('selected_pots')) {
-    $selectedPotIds = $request->input('selected_pots');
-    foreach ($product->variants as $variant) {
-        $variant->pots()->sync($selectedPotIds);
-    }
-} else {
-    // Nếu không chọn gì thì xoá hết liên kết
-    foreach ($product->variants as $variant) {
-        $variant->pots()->detach();
-    }
-}
+            if ($request->filled('selected_pots')) {
+                $selectedPotIds = $request->input('selected_pots');
+                foreach ($product->variants as $variant) {
+                    $variant->pots()->sync($selectedPotIds);
+                }
+            } else {
+                // Nếu không chọn gì thì xoá hết liên kết
+                foreach ($product->variants as $variant) {
+                    $variant->pots()->detach();
+                }
+            }
 
 
             DB::commit();
@@ -290,7 +321,6 @@ if ($request->filled('selected_pots')) {
             }
 
             return redirect()->route('admin.products.index')->with('success', 'Sản phẩm đã được xóa thành công!');
-
         } catch (\Throwable $e) {
             Log::error('Lỗi khi xóa sản phẩm', [
                 'product_id' => $product->id,
@@ -333,7 +363,6 @@ if ($request->filled('selected_pots')) {
             }
 
             return redirect()->route('admin.products.index')->with('success', 'Sản phẩm đã được khôi phục thành công!');
-
         } catch (\Throwable $e) {
             Log::error('Lỗi khi khôi phục sản phẩm', [
                 'product_id' => $product->id,
@@ -408,7 +437,6 @@ if ($request->filled('selected_pots')) {
             }
 
             return redirect()->route('admin.products.index')->with('success', 'Sản phẩm đã được xóa vĩnh viễn!');
-
         } catch (\Throwable $e) {
             DB::rollBack();
 
@@ -440,21 +468,26 @@ if ($request->filled('selected_pots')) {
         return view('admin.thongke.thongke');
     }
     //xoa bien the cua product
-   public function deleteVariant($id)
-{
-    // Tìm biến thể theo ID
-    $variant = ProductVariant::findOrFail($id);
-    $productId = $variant->product_id;
+    public function deleteVariant($id)
+    {
+        // Tìm biến thể theo ID
+        $variant = ProductVariant::findOrFail($id);
+        $productId = $variant->product_id;
 
-    // Xoá liên kết với chậu nếu có
-    $variant->pots()->detach();
+        // Xoá liên kết với chậu nếu có
+        $variant->pots()->detach();
 
-    // Xoá chính biến thể
-    $variant->delete();
+        // Xoá chính biến thể
+        $variant->delete();
 
-    return redirect()->route('admin.products.edit', $productId)->with('success', 'Xoá biến thể thành công.');
-}
+        return redirect()->route('admin.products.edit', $productId)->with('success', 'Xoá biến thể thành công.');
+    }
+    public function toggleStatus(Request $request, $id)
+    {
+        $product = Product::findOrFail($id);
+        $product->is_active = $request->is_active;
+        $product->save();
 
-
-
+        return response()->json(['success' => true, 'message' => 'Cập nhật trạng thái thành công']);
+    }
 }

@@ -66,13 +66,11 @@
                     <div class="shop-sidebar-area">
 
                         <!-- Shop Widget -->
-                        <div class="shop-widget price mb-50">
-                            <h4 class="widget-title">Sắp xếp tùy chọn</h4>
-                            <!-- Shop Widget -->
-<div class="shop-widget sort-by mb-50">
+                        <div class="shop-widget sort-by mb-50">
     <h4 class="widget-title">Sắp xếp theo</h4>
     <div class="widget-desc">
         <form method="GET" action="{{ route('shop') }}">
+            {{-- Giữ nguyên các query khác khi đổi sort --}}
             @foreach (request()->except('sort') as $key => $value)
                 @if (is_array($value))
                     @foreach ($value as $item)
@@ -83,37 +81,35 @@
                 @endif
             @endforeach
 
-            @php
-                $currentSorts = request('sort', []);
-            @endphp
+            @php $currentSorts = (array) request('sort', []); @endphp
 
             <div class="custom-control custom-checkbox d-flex align-items-center mb-2">
                 <input type="checkbox" class="custom-control-input" id="sort-new" name="sort[]" value="new"
-                    {{ in_array('new', $currentSorts) ? 'checked' : '' }}>
+                       {{ in_array('new', $currentSorts) ? 'checked' : '' }}>
                 <label class="custom-control-label" for="sort-new">Hàng mới</label>
             </div>
 
             <div class="custom-control custom-checkbox d-flex align-items-center mb-2">
                 <input type="checkbox" class="custom-control-input" id="sort-az" name="sort[]" value="a-z"
-                    {{ in_array('a-z', $currentSorts) ? 'checked' : '' }}>
+                       {{ in_array('a-z', $currentSorts) ? 'checked' : '' }}>
                 <label class="custom-control-label" for="sort-az">Tên: A-Z</label>
             </div>
 
             <div class="custom-control custom-checkbox d-flex align-items-center mb-2">
                 <input type="checkbox" class="custom-control-input" id="sort-za" name="sort[]" value="z-a"
-                    {{ in_array('z-a', $currentSorts) ? 'checked' : '' }}>
+                       {{ in_array('z-a', $currentSorts) ? 'checked' : '' }}>
                 <label class="custom-control-label" for="sort-za">Tên: Z-A</label>
             </div>
 
             <div class="custom-control custom-checkbox d-flex align-items-center mb-2">
                 <input type="checkbox" class="custom-control-input" id="sort-low" name="sort[]" value="low-high"
-                    {{ in_array('low-high', $currentSorts) ? 'checked' : '' }}>
+                       {{ in_array('low-high', $currentSorts) ? 'checked' : '' }}>
                 <label class="custom-control-label" for="sort-low">Giá: thấp đến cao</label>
             </div>
 
             <div class="custom-control custom-checkbox d-flex align-items-center mb-3">
                 <input type="checkbox" class="custom-control-input" id="sort-high" name="sort[]" value="high-low"
-                    {{ in_array('high-low', $currentSorts) ? 'checked' : '' }}>
+                       {{ in_array('high-low', $currentSorts) ? 'checked' : '' }}>
                 <label class="custom-control-label" for="sort-high">Giá: cao đến thấp</label>
             </div>
 
@@ -122,7 +118,6 @@
     </div>
 </div>
 
-                        </div>
 
                         <!-- Shop Widget -->
                         <div class="shop-widget catagory mb-50">
@@ -147,41 +142,7 @@
                         </div>
 
                         <!-- Shop Widget -->
-                        <div class="shop-widget sort-by mb-50">
-                            <h4 class="widget-title">Sắp xếp theo</h4>
-                            <div class="widget-desc">
-                                <!-- Single Checkbox -->
-                                <div class="custom-control custom-checkbox d-flex align-items-center mb-2">
-                                    <input type="checkbox" class="custom-control-input" id="customCheck7" name="sort[]"
-                                        value="new">
-                                    <label class="custom-control-label" for="customCheck7">Hàng mới nhất</label>
-                                </div>
-                                <!-- Single Checkbox -->
-                                <div class="custom-control custom-checkbox d-flex align-items-center mb-2">
-                                    <input type="checkbox" class="custom-control-input" id="customCheck8" name="sort[]"
-                                        value="a-z">
-                                    <label class="custom-control-label" for="customCheck8">Từ A đến Z</label>
-                                </div>
-                                <!-- Single Checkbox -->
-                                <div class="custom-control custom-checkbox d-flex align-items-center mb-2">
-                                    <input type="checkbox" class="custom-control-input" id="customCheck9" name="sort[]"
-                                        value="z-a">
-                                    <label class="custom-control-label" for="customCheck9">Từ Z đến A</label>
-                                </div>
-                                <!-- Single Checkbox -->
-                                <div class="custom-control custom-checkbox d-flex align-items-center mb-2">
-                                    <input type="checkbox" class="custom-control-input" id="customCheck10" name="sort[]"
-                                        value="low-high">
-                                    <label class="custom-control-label" for="customCheck10">Giá: Thấp đến Cao</label>
-                                </div>
-                                <!-- Single Checkbox -->
-                                <div class="custom-control custom-checkbox d-flex align-items-center">
-                                    <input type="checkbox" class="custom-control-input" id="customCheck11"
-                                        name="sort[]" value="high-low">
-                                    <label class="custom-control-label" for="customCheck11">Giá: Cao đến Thấp</label>
-                                </div>
-                            </div>
-                        </div>
+                        
 
                         <!-- Shop Widget -->
 
@@ -336,7 +297,3 @@
     overflow: hidden;
 }
 </style>
-@php
-    $minPrice = $product->variants->min('price');
-    $maxPrice = $product->variants->max('price');
-@endphp

@@ -23,6 +23,27 @@ class CartController extends Controller
             ->first();
 
         $items = $cart ? $cart->items : collect();
+        foreach ($items as $item) {
+            $variantStock = $item->productVariant->stock_quantity ?? 0;
+            $potStock = $item->pot->quantity ?? null;
+
+            $item->out_of_stock = false;
+            $item->out_of_stock_message = '';
+
+            // Check cây
+            if ($variantStock < $item->quantity) {
+                $item->out_of_stock = true;
+                $item->out_of_stock_message = 'Cây đã hết hàng';
+            }
+
+            // Check chậu (nếu có)
+            if (!is_null($potStock) && $potStock < $item->quantity) {
+                $item->out_of_stock = true;
+                $item->out_of_stock_message = $item->out_of_stock_message
+                    ? $item->out_of_stock_message . ' và chậu đã hết hàng'
+                    : 'Chậu đã hết hàng';
+            }
+        }
         $cartTotal = $items->sum(function ($item) {
             $productPrice = $item->productVariant->price;
             $potPrice = $item->pot?->price ?? 0;
