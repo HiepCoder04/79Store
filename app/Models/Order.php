@@ -52,4 +52,10 @@ class Order extends Model
     {
         return $this->belongsTo(Voucher::class);
     }
+    public function getOrderCodeAttribute()
+    {
+        $date = $this->created_at ? $this->created_at->format('Ymd') : now()->format('Ymd');
+        $id = $this->id ?? 0;
+        return '79ST' . $date . str_pad($id, 4, '0', STR_PAD_LEFT);
+    }
 }
