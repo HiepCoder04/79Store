@@ -12,10 +12,33 @@ use Exception;
 
 class BlogController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $blogs = Blog::with('category')->latest()->paginate(10);
-        return view('admin.blogs.index', compact('blogs'));
+    $q = Blog::with('categoryBlog'); // quan hệ belongsTo
+
+    // Tiêu đề
+    if ($request->filled('title')) {
+        $q->where('title', 'like', '%'.$request->title.'%');
+    }
+
+    // Danh mục
+    if ($request->filled('category_blog_id')) {
+        $q->where('category_blog_id', $request->category_blog_id);
+    }
+
+    // Trạng thái (0/1)
+    if ($request->filled('is_active') && in_array($request->is_active, ['0','1'], true)) {
+        $q->where('is_active', (int)$request->is_active);
+    }
+
+    $blogs = $q->latest()
+        ->paginate(15)
+        ->appends($request->query());
+
+    $categories = BlogCategory::orderBy('name')->get(['id','name']); // load cho combobox
+
+    return view('admin.blogs.index', compact('blogs','categories'));
+
     }
 
     public function create()

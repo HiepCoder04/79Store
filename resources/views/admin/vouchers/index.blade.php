@@ -47,6 +47,24 @@
     border-radius: 10px;
     font-weight: 500;
     }
+    .filter-box{
+    border-radius:12px;               /* bo góc */
+    padding:12px;
+    background:#fff;
+  }
+  .filter-box label{
+    font-size:.9rem; color:#6b7280; margin-bottom:.35rem;
+  }
+  .filter-field.form-control,
+  .filter-field.form-select{
+    border:1.5px solid #d1d5db;      /* viền input rõ hơn */
+    border-radius:10px;
+  }
+  .filter-field:focus{
+    border-color:#e91e63;             /* màu viền khi focus (cùng tone nút Lọc) */
+    box-shadow:0 0 0 .2rem rgba(233,30,99,.12);
+    outline:0;
+  }
   </style>
 
   <div class="container table-container">
@@ -58,6 +76,62 @@
     </div>
 
     <div class="table-responsive">
+    {{-- loc tim kiem --}}
+    <form method="GET" action="{{ route('admin.vouchers.index') }}" class="card mb-4 p-3">
+  <div class="row g-3 align-items-end">
+
+    <div class="col-md-3">
+      <div class="filter-box">
+        <label class="form-label">Mã voucher</label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="fa fa-ticket-alt"></i></span>
+          <input type="text" name="code" class="form-control filter-field" placeholder="Nhập mã..."
+                 value="{{ request('code') }}">
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="filter-box">
+        <label class="form-label">Ngày bắt đầu</label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="fa fa-calendar"></i></span>
+          <input type="date" name="start_date" class="form-control filter-field"
+                 value="{{ request('start_date') }}">
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="filter-box">
+        <label class="form-label">Ngày kết thúc</label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="fa fa-calendar"></i></span>
+          <input type="date" name="end_date" class="form-control filter-field"
+                 value="{{ request('end_date') }}">
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="filter-box">
+        <label class="form-label">Trạng thái</label>
+        <select name="is_active" class="form-select filter-field">
+          <option value="">-- Tất cả --</option>
+          <option value="1" @selected(request('is_active')==='1')>Bật</option>
+          <option value="0" @selected(request('is_active')==='0')>Tắt</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="col-12 d-flex gap-2">
+      <button type="submit" class="btn btn-primary">Lọc</button>
+      <a href="{{ route('admin.vouchers.index') }}" class="btn btn-outline-secondary">Xoá lọc</a>
+    </div>
+  </div>
+</form>
+
+
     <table class="table custom-table table-bordered align-middle mb-0">
       <thead>
       <tr>

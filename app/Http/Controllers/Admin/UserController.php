@@ -10,9 +10,36 @@ class UserController extends Controller
     // public function listUser(){
     //     return view('admin.users.list-user');
     // }
-    public function listUser()
+    public function listUser(Request $request)
 {
-    $users = User::paginate(10); // hoặc ->latest()->paginate(10);
+    $q = User::query();
+
+    // Tên người dùng
+    if ($request->filled('name')) {
+        $q->where('name', 'like', '%'.$request->name.'%');
+    }
+
+    // Email
+    if ($request->filled('email')) {
+        $q->where('email', 'like', '%'.$request->email.'%');
+    }
+
+    // Số điện thoại (tìm ở cột 'phone' hoặc 'phone_number' nếu bạn dùng tên đó)
+    if ($request->filled('phone')) {
+        $raw = $request->phone;
+        $digits = preg_replace('/\D/', '', $raw); // loại ký tự không phải số
+        $q->where(function ($w) use ($raw, $digits) {
+            $w->where('phone', 'like', '%'.$raw.'%')
+              ->orWhere('phone', 'like', '%'.$digits.'%')
+              ->orWhere('phone_number', 'like', '%'.$raw.'%')
+              ->orWhere('phone_number', 'like', '%'.$digits.'%');
+        });
+    }
+
+    $users = $q->latest()
+        ->paginate(20)
+        ->appends($request->query()); // giữ tham số khi phân trang
+
     return view('admin.users.list-user', compact('users'));
 }
 

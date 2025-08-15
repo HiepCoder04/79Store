@@ -116,11 +116,10 @@ Route::prefix('auth')->name('auth.')->controller(AuthController::class)->group(f
     Route::post('/logout', 'logout')->name('logout');
 });
 //gg login
-Route::get('/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
-Route::get('/google/callback', [AuthController::class, 'handleGoogleCallback']);
 
-Route::get('/auth/google', [GoogleController::class, 'redirectToGoogle']);
-Route::get('/auth/google/callback', [GoogleController::class, 'handleGoogleCallback']);
+Route::get('/auth/google', [GoogleController::class, 'redirectToGoogle'])->name('auth.google');
+Route::get('/auth/google/callback', [GoogleController::class, 'handleGoogleCallback'])->name('auth.google.callback');
+
 // -------------------- CLIENT (AUTHENTICATED) --------------------
 Route::middleware(['auth', 'ban'])->group(function () {
     // Giỏ hàng

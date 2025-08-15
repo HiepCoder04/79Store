@@ -8,11 +8,20 @@ use Illuminate\Http\Request;
 
 class BlogCategoryController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $categories = BlogCategory::withCount('blogs')->get();
-        // folder: resources/views/admin/category_blogs/index.blade.php
-        return view('admin.category_blogs.index', compact('categories'));
+        $q = BlogCategory::query();
+
+    // Lọc theo tên danh mục
+    if ($request->filled('q')) {
+        $q->where('name', 'like', '%'.$request->q.'%'); // nếu cột khác, đổi 'name' cho khớp
+    }
+
+    $categories = $q->latest()
+        ->paginate(15)
+        ->appends($request->query()); // giữ tham số khi phân trang
+
+    return view('admin.category_blogs.index', compact('categories'));
     }
 
     public function create()

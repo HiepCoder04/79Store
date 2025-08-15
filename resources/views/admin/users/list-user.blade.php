@@ -64,6 +64,11 @@ QUẢN LÍ TÀI KHOẢN
         gap: 8px;
         flex-wrap: wrap;
     }
+      .filter-box{border-radius:12px;padding:12px;background:#fff}
+  .filter-box label{font-size:.9rem;color:#6b7280;margin-bottom:.35rem}
+  .filter-field.form-control{border:1.5px solid #d1d5db;border-radius:10px}
+  .filter-field:focus{border-color:#e91e63;box-shadow:0 0 0 .2rem rgba(233,30,99,.12);outline:0}
+
 </style>
 
 <div class="container table-container">
@@ -73,6 +78,40 @@ QUẢN LÍ TÀI KHOẢN
     </div>
 
     <div class="table-responsive">
+    <div class="search">
+    <form method="GET" action="{{ route('admin.users.list') }}" class="card mb-4 p-3">
+  <div class="row g-3 align-items-end">
+    <div class="col-md-4">
+      <div class="filter-box">
+        <label class="form-label">Tên người dùng</label>
+        <input type="text" name="name" class="form-control filter-field"
+               placeholder="Nhập tên…" value="{{ request('name') }}">
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="filter-box">
+        <label class="form-label">Email</label>
+        <input type="text" name="email" class="form-control filter-field"
+               placeholder="Nhập email…" value="{{ request('email') }}">
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="filter-box">
+        <label class="form-label">Số điện thoại</label>
+        <input type="text" name="phone" class="form-control filter-field"
+               placeholder="Nhập SĐT…" value="{{ request('phone') }}">
+      </div>
+    </div>
+
+    <div class="col-12 d-flex gap-2">
+      <button type="submit" class="btn btn-primary">Lọc</button>
+      <a href="{{ route('admin.users.list') }}" class="btn btn-outline-secondary">Xoá lọc</a>
+    </div>
+  </div>
+</form>
+    </div>
         <table class="table custom-table table-bordered align-middle mb-0">
             <thead>
                 <tr>
