@@ -86,7 +86,7 @@
                 <div class="card bg-warning text-white">
                     <div class="card-body text-center">
                         <h5>{{ $stats['pending_orders'] }}</h5>
-                        <small>Chờ xử lý</small>
+                        <small>Chờ xác nhận</small>
                     </div>
                 </div>
             </div>
