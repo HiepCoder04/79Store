@@ -64,13 +64,43 @@ class DashboardController extends Controller
             ->orderBy('date', 'asc')
             ->get();
 
+        // --- Biểu đồ Doanh thu theo tuần (7 ngày gần nhất) ---
+        $weeklyRevenue = Order::select(
+                DB::raw('DATE(created_at) as date'),
+                DB::raw('SUM(total_after_discount) as total')
+            )
+            ->where('status', 'delivered')
+            ->where('created_at', '>=', Carbon::now()->subDays(6))
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+
+        $weeklyRevenueData = [
+            'labels' => $weeklyRevenue->pluck('date'),
+            'totals' => $weeklyRevenue->pluck('total')
+        ];
+
+        // --- Biểu đồ Top 5 sản phẩm bán chạy ---
+        $topProducts = DB::table('order_details')
+            ->join('products', 'order_details.product_id', '=', 'products.id')
+            ->select('products.name', DB::raw('SUM(order_details.quantity) as total_sold'))
+            ->groupBy('products.name')
+            ->orderByDesc('total_sold')
+            ->limit(5)
+            ->get();
+
+        $topProductsData = [
+            'labels' => $topProducts->pluck('name'),
+            'totals' => $topProducts->pluck('total_sold')
+        ];
+
         // --- Danh sách đơn hàng ---
         $orders = $query->orderBy('created_at', 'desc')->paginate(10);
 
         foreach ($orders as $order) {
             $order->status_vi = $statusLabels[$order->status] ?? $order->status;
         }
-
+        
         return view('admin.dashboard', compact(
             'totalOrders',
             'totalRevenue',
@@ -81,6 +111,8 @@ class DashboardController extends Controller
             'donHangDaTra',
             'doanhThus',
             'soDonHangTheoNgay',
+            'weeklyRevenueData',
+            'topProductsData',
             'orders',
             'statusLabels'
         ));
