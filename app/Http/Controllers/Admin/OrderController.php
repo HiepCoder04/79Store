@@ -166,7 +166,7 @@ class OrderController extends Controller
 
         // Gửi email thông báo trạng thái
         $statusText = match ($newStatus) {
-            'pending' => 'Chờ xử lí',
+            'pending' => 'Chờ xác nhận',
             'confirmed' => 'Đã xác nhận',
             'shipping' => 'Đơn hàng đang được giao',
             'delivered' => 'Đã nhận hàng',
@@ -181,7 +181,7 @@ class OrderController extends Controller
             Mail::to($order->user->email)->send(new OrderStatusMail($order, $statusText));
         }
 
-        return back()->with('success', 'Cập nhật trạng thái và gửi email thành công.');
+        return back()->with('success');
     }
 
     // Kiểm tra tính hợp lệ của việc chuyển trạng thái
@@ -200,7 +200,7 @@ class OrderController extends Controller
     public function getAvailableStatuses($currentStatus)
     {
         $allStatuses = [
-            'pending' => 'Chờ xử lí',
+            'pending' => 'Chờ xác nhận',
             'confirmed' => 'Đã xác nhận',
             'shipping' => 'Đang giao',
             'delivered' => 'Hoàn tất',
@@ -226,7 +226,7 @@ class OrderController extends Controller
     private function getStatusLabel($status)
     {
         $labels = [
-            'pending' => 'Chờ xử lí',
+            'pending' => 'Chờ xác nhận',
             'confirmed' => 'Đã xác nhận',
             'shipping' => 'Đang giao',
             'delivered' => 'Hoàn tất',
