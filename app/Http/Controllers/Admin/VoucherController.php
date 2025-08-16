@@ -12,33 +12,7 @@ class VoucherController extends Controller
 {
     public function index(Request $request)
     {
-<<<<<<< HEAD
-        $query = Voucher::query();
 
-    // Lọc theo mã
-    if ($request->filled('code')) {
-        $query->where('code', 'like', '%'.$request->code.'%');
-    }
-
-    // Lọc theo ngày bắt đầu/kết thúc (kiểu DATE)
-    if ($request->filled('start_date')) {
-        $query->whereDate('start_date', '>=', $request->start_date);
-    }
-    if ($request->filled('end_date')) {
-        $query->whereDate('end_date', '<=', $request->end_date);
-    }
-
-    // Lọc theo trạng thái 0/1 của is_active
-    if ($request->filled('is_active') && in_array($request->is_active, ['0','1'], true)) {
-        $query->where('is_active', $request->is_active);
-    }
-
-    $vouchers = $query->latest()
-        ->paginate(15)
-        ->appends($request->query());
-
-    return view('admin.vouchers.index', compact('vouchers'));
-=======
         $query = Voucher::query()
             ->search($request, ['code']) // tìm kiếm theo code và mô tả
             ->filter($request, [
@@ -78,7 +52,7 @@ class VoucherController extends Controller
         $vouchers = $query->latest()->paginate(10)->appends($request->query());
 
         return view('admin.vouchers.index', compact('vouchers'));
->>>>>>> hiep
+
     }
 
 
