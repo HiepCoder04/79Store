@@ -13,12 +13,15 @@ use App\Models\CartItem;
 class OrderController extends Controller
 {
     //
-    public function index()
+    public function index(Request $request)
     {
-        $orders = Order::with('orderDetails.productVariant.product')
-            ->where('user_id', Auth::id())
+        $orders = Order::where('user_id', auth()->id())
+            ->when($request->status, function ($query) use ($request) {
+                $query->where('status', $request->status); // chỉ lọc theo status
+            })
             ->latest()
-            ->get();
+            ->paginate(10)
+            ->appends($request->query());
 
         return view('client.users.order', compact('orders'));
     }

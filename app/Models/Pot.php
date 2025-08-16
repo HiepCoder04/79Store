@@ -13,4 +13,8 @@ class Pot extends Model
     {
         return $this->belongsToMany(ProductVariant::class);
     }
+    public function returnRequests()
+    {
+        return $this->hasMany(ReturnRequest::class, 'pot_id');
+    }
 }

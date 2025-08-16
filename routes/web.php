@@ -98,6 +98,17 @@ Route::middleware(['auth', 'role:admin', 'ban'])->prefix('admin')->name('admin.'
     Route::post('contacts/{id}/restore', [AdminContactController::class, 'restore'])->name('contacts.restore');
     Route::post('contacts/{id}/reply', [AdminContactController::class, 'sendReply'])->name('contacts.reply');
     Route::put('contacts/{id}/note', [AdminContactController::class, 'updateNote'])->name('contacts.updateNote');
+
+    //Trả hàng
+    Route::prefix('returns')->name('returns.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\ReturnController::class, 'index'])->name('index');
+        Route::get('/{id}', [\App\Http\Controllers\Admin\ReturnController::class, 'show'])->name('show');
+        Route::post('/{id}/approve', [\App\Http\Controllers\Admin\ReturnController::class, 'approve'])->name('approve');
+        Route::post('/{id}/reject', [\App\Http\Controllers\Admin\ReturnController::class, 'reject'])->name('reject');
+        Route::post('/{id}/refund', [\App\Http\Controllers\Admin\ReturnController::class, 'refund'])->name('refund');
+        // Nếu dùng luồng đổi hàng
+        Route::post('/{id}/exchange', [\App\Http\Controllers\Admin\ReturnController::class, 'exchange'])->name('exchange');
+    });    
 });
 
 // Quản lý người dùng
@@ -156,6 +167,13 @@ Route::middleware(['auth', 'ban'])->group(function () {
         Route::put('/{order}/cancel', [OrderController::class, 'cancel'])->name('cancel');
         Route::post('/{order}/reorder', [OrderController::class, 'reorder'])->name('reorder');
         Route::put('/{order}/return', [OrderController::class, 'returnOrder'])->name('return');
+        
+
+        //Trả hàng
+        Route::get('/{order}/returns', [\App\Http\Controllers\Client\ReturnController::class, 'index'])
+            ->name('returns.index');
+        Route::post('/{order}/returns', [\App\Http\Controllers\Client\ReturnController::class, 'store'])
+            ->name('returns.store');
     });
 });
 // THÔNG TIN TÀI KHOẢN (CLIENT)

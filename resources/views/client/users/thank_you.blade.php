@@ -73,7 +73,7 @@
         {{-- Thông tin đơn hàng --}}
         <div class="order-info text-start bg-light p-4 rounded shadow-sm">
             @if(session('order_code'))
-                <p><strong>Mã đơn hàng:</strong> {{ session('order_code') }}</p>
+                <p><strong>Mã đơn hàng:</strong> {{ $order->order_code }}</p>
             @endif
             <p><strong>Ngày:</strong> {{ Carbon::now()->translatedFormat('l, d F Y') }}</p>
             <p><strong>Tổng cộng:</strong> {{ number_format(session('order_total') ?? 0, 0, ',', '.') }}đ</p>

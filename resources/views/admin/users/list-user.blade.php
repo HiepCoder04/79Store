@@ -78,40 +78,44 @@ QUẢN LÍ TÀI KHOẢN
     </div>
 
     <div class="table-responsive">
-    <div class="search">
-    <form method="GET" action="{{ route('admin.users.list') }}" class="card mb-4 p-3">
-  <div class="row g-3 align-items-end">
-    <div class="col-md-4">
-      <div class="filter-box">
-        <label class="form-label">Tên người dùng</label>
-        <input type="text" name="name" class="form-control filter-field"
-               placeholder="Nhập tên…" value="{{ request('name') }}">
-      </div>
+
+
+        <form method="GET" class="row g-2 mb-3">
+    <div class="col-md-3">
+        <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="Tìm tên, email, SĐT...">
     </div>
 
-    <div class="col-md-4">
-      <div class="filter-box">
-        <label class="form-label">Email</label>
-        <input type="text" name="email" class="form-control filter-field"
-               placeholder="Nhập email…" value="{{ request('email') }}">
-      </div>
+    <div class="col-md-2">
+        <select name="role" class="form-select">
+            <option value="">-- Quyền --</option>
+            <option value="admin" {{ request('role')=='admin' ? 'selected' : '' }}>Admin</option>
+            <option value="staff" {{ request('role')=='staff' ? 'selected' : '' }}>Staff</option>
+            <option value="customer" {{ request('role')=='customer' ? 'selected' : '' }}>Customer</option>
+        </select>
     </div>
 
-    <div class="col-md-4">
-      <div class="filter-box">
-        <label class="form-label">Số điện thoại</label>
-        <input type="text" name="phone" class="form-control filter-field"
-               placeholder="Nhập SĐT…" value="{{ request('phone') }}">
-      </div>
+    <div class="col-md-2">
+        <select name="is_ban" class="form-select">
+            <option value="">-- Trạng thái --</option>
+            <option value="0" {{ request('is_ban')==='0' ? 'selected' : '' }}>Hoạt động</option>
+            <option value="1" {{ request('is_ban')==='1' ? 'selected' : '' }}>Bị cấm</option>
+        </select>
     </div>
 
-    <div class="col-12 d-flex gap-2">
-      <button type="submit" class="btn btn-primary">Lọc</button>
-      <a href="{{ route('admin.users.list') }}" class="btn btn-outline-secondary">Xoá lọc</a>
+    <div class="col-md-2">
+        <select name="verified" class="form-select">
+            <option value="">-- Xác minh --</option>
+            <option value="1" {{ request('verified')=='1' ? 'selected' : '' }}>Đã xác minh</option>
+            <option value="0" {{ request('verified')=='0' ? 'selected' : '' }}>Chưa xác minh</option>
+        </select>
     </div>
-  </div>
+
+    <div class="col-md-3 d-flex gap-2">
+        <button type="submit" class="btn btn-primary">Lọc</button>
+        <a href="{{ route('admin.users.list') }}" class="btn btn-secondary">Xóa lọc</a>
+    </div>
 </form>
-    </div>
+>>>>>>> hiep
         <table class="table custom-table table-bordered align-middle mb-0">
             <thead>
                 <tr>

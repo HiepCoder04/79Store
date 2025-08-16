@@ -13,22 +13,42 @@
 </section>
 
 <div class="container py-5">
-    <h2 class="mb-4">🛒 Lịch sử đơn hàng</h2>
-
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+    <h2 class="mb-3 mb-md-0">🛒 Lịch sử đơn hàng</h2>
+    <form method="GET" class="d-flex flex-wrap gap-2">
+        <div>
+            <select name="status" class="form-select">
+                <option value="">-- Tất cả trạng thái --</option>
+                <option value="pending"   {{ request('status') === 'pending' ? 'selected' : '' }}>Chờ xác nhận</option>
+                <option value="confirmed" {{ request('status') === 'confirmed' ? 'selected' : '' }}>Đã xác nhận</option>
+                <option value="shipping"  {{ request('status') === 'shipping' ? 'selected' : '' }}>Đang giao hàng</option>
+                <option value="delivered" {{ request('status') === 'delivered' ? 'selected' : '' }}>Đã nhận hàng</option>
+                <option value="cancelled" {{ request('status') === 'cancelled' ? 'selected' : '' }}>Đã hủy</option>
+                <option value="returned" {{ request('status') === 'returned' ? 'selected' : '' }}>Đã hoàn hàng</option>
+            </select>
+        </div>
+        <div>
+            <button type="submit" class="btn btn-primary">Lọc</button>
+            <a href="{{ route('client.orders.index') }}" class="btn btn-secondary">Đặt lại</a>
+        </div>
+    </form>
+</div>
     @forelse ($orders as $order)
         @php
-            $statusMap = [
-                'pending' => ['label' => 'Chờ xác nhận', 'class' => 'warning'],
+              $statusMap = [
+                'pending'   => ['label' => 'Chờ xác nhận', 'class' => 'warning'],
                 'confirmed' => ['label' => 'Đã xác nhận', 'class' => 'info'],
-                'shipping' => ['label' => 'Đang giao hàng', 'class' => 'primary'],
+                'shipping'  => ['label' => 'Đang giao hàng', 'class' => 'primary'],
                 'delivered' => ['label' => 'Đã nhận hàng', 'class' => 'success'],
                 'cancelled' => ['label' => 'Đã hủy', 'class' => 'danger'],
-                'returned' => ['label' => 'Trả hàng', 'class' => 'secondary'],
+                'returned'  => ['label' => 'Đã hoàn hàng', 'class' => 'secondary'], // đổi từ "Trả hàng" → "Đã hoàn hàng"
             ];
+
             $status = $statusMap[$order->status] ?? ['label' => 'Không xác định', 'class' => 'dark'];
 
             $steps = ['pending', 'confirmed', 'shipping', 'delivered'];
             $currentIndex = array_search($order->status, $steps);
+
         @endphp
 
         <div class="card mb-4 shadow-sm border">

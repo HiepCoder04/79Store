@@ -239,6 +239,7 @@ class CheckoutController extends Controller
                     'price' => $variant->price + $potPrice, // Tổng giá sản phẩm + chậu
                     'quantity' => $item->quantity,
                     'total_price' => ($variant->price + $potPrice) * $item->quantity,
+                    'pot_id' => $potId,
                 ]);
             }
 
@@ -445,7 +446,7 @@ class CheckoutController extends Controller
                 return redirect()->route('checkout.thankyouvnpay');
             }
 
-            return redirect()->route('checkout.thankyou');
+            return redirect()->route('checkout.thankyou')->with('order_code', $order->order_code);
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Checkout error: ' . $e->getMessage());
@@ -528,9 +529,14 @@ class CheckoutController extends Controller
 
     public function thankYou()
     {
-        return view('client.users.thank_you');
-    }
+        $orderId = session('order_id'); // bạn đã flash trong store()
+        if (!$orderId) {
+            return redirect()->route('shop')->with('error', 'Không tìm thấy đơn hàng.');
+        }
 
+        $order = Order::with('orderDetails')->findOrFail($orderId);
+        return view('client.users.thank_you', compact('order'));
+    }
     public function thankYouvnpay()
     {
         return view('client.users.thank_youvnpay');

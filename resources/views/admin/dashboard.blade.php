@@ -110,6 +110,40 @@
     </div>
 
 </div>
+{{-- Biểu đồ mới: Doanh thu 7 ngày & Top 5 sản phẩm --}}
+<div class="row g-4 mt-2">
+    <div class="col-md-6">
+        <div class="chart-card">
+            <h5 class="mb-3">💰 Doanh thu 7 ngày gần nhất</h5>
+            <canvas id="chartWeeklyRevenue"></canvas>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="chart-card">
+            <h5 class="mb-3">🏆 Top 5 sản phẩm bán chạy</h5>
+            <table class="table table-striped table-hover mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Sản phẩm</th>
+                        <th>Số lượng bán</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($topProductsData['labels'] as $index => $productName)
+                        <tr>
+                            <td>{{ $index + 1 }}</td>
+                            <td>{{ $productName }}</td>
+                            <td>{{ $topProductsData['totals'][$index] }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
 
 {{-- FontAwesome --}}
 <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
@@ -145,6 +179,24 @@
                 backgroundColor: 'rgba(54, 162, 235, 0.5)',
                 borderColor: 'rgba(54, 162, 235, 1)',
                 borderWidth: 1
+            }]
+        },
+        options: { responsive: true }
+    });
+    const weeklyRevenueData = @json($weeklyRevenueData);
+
+    // Doanh thu 7 ngày gần nhất (biểu đồ đường)
+    new Chart(document.getElementById('chartWeeklyRevenue'), {
+        type: 'line',
+        data: {
+            labels: weeklyRevenueData.labels,
+            datasets: [{
+                label: 'Doanh thu (VND)',
+                data: weeklyRevenueData.totals,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                fill: true,
+                tension: 0.3
             }]
         },
         options: { responsive: true }

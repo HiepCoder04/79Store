@@ -2,25 +2,19 @@
 
 namespace App\Providers;
 
-// use Illuminate\Support\Facades\Gate;
+use App\Models\Order;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Gate;
 
 class AuthServiceProvider extends ServiceProvider
 {
-    /**
-     * The model to policy mappings for the application.
-     *
-     * @var array<class-string, class-string>
-     */
-    protected $policies = [
-        //
-    ];
+    protected $policies = [/* ... */];
 
-    /**
-     * Register any authentication / authorization services.
-     */
     public function boot(): void
     {
-        //
+        // Quyền sở hữu đơn: chỉ chủ đơn mới thao tác
+        Gate::define('own-order', function ($user, Order $order) {
+            return (int) $order->user_id === (int) $user->id;
+        });
     }
 }

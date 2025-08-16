@@ -83,5 +83,8 @@ public function pots()
 {
      return $this->belongsToMany(Pot::class, 'pot_product_variant', 'product_variant_id', 'pot_id');
 }
-
+    public function returnRequests()
+    {
+        return $this->hasMany(ReturnRequest::class);
+    }
 }

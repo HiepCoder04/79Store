@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\Filterable;
 
 class Order extends Model
 {
-    use HasFactory;
+    use HasFactory, Filterable;
     protected $table = 'orders';
 
     protected $fillable = [
@@ -54,9 +55,8 @@ class Order extends Model
     }
     public function getOrderCodeAttribute()
     {
-        // phòng trường hợp created_at = null
         $date = $this->created_at ? $this->created_at->format('Ymd') : now()->format('Ymd');
         $id = $this->id ?? 0;
-        return '79ST-' . $date . '-' . str_pad($id, 2, '0', STR_PAD_LEFT);
+        return '79ST' . $date . str_pad($id, 4, '0', STR_PAD_LEFT);
     }
 }

@@ -61,51 +61,56 @@
                 <div class="mb-4">
     <h5 class="fw-bold mb-3">🛍️ Sản phẩm đã mua</h5>
 
+<div class="list-group">
     @foreach ($order->orderDetails as $detail)
         @php
             $product = $detail->productVariant->product;
             $image = optional($product->galleries->first())->image;
-
             $imageUrl = $image
                 ? (Str::startsWith($image, ['http', '/']) ? $image : asset($image))
                 : asset('assets/img/bg-img/default.jpg');
 
-            $total = $detail->price * $detail->quantity;
+            $potPrice = 0;
+            $potName = null;
+            if ($detail->product_pot && strtolower($detail->product_pot) !== 'không có chậu') {
+                $potName = $detail->product_pot;
+                $potModel = \App\Models\Pot::where('name', $potName)->first();
+                $potPrice = $potModel?->price ?? 0;
+            }
+            $priceCay = $detail->price;
         @endphp
 
-        <div class="row align-items-center border-bottom pb-3 mb-3">
-            <div class="col-auto">
-                <img src="{{ $imageUrl }}"
-                    onerror="this.onerror=null;this.src='{{ asset('assets/img/default.jpg') }}';"
-                    alt="{{ $product->name }}"
-                    class="rounded border" style="width: 60px; height: 60px; object-fit: cover;">
-            </div>
-            <div class="col">
-                <h6 class="mb-1">{{ $product->name }}</h6>
-                @if (!empty($detail->product_pot) && strtolower($detail->product_pot) !== 'không có chậu')
-                    <div class="text-muted small">Chậu: {{ $detail->product_pot }}</div>
-                @endif
-                <div class="text-muted small">Chiều cao: {{ $detail->product_height }} cm</div>
-                 @php
-                    $potPrice = 0;
-                    if ($detail->product_pot) {
-                        $potModel = \App\Models\Pot::where('name', $detail->product_pot)->first();
-                        $potPrice = $potModel?->price ?? 0;
-                    }
-                    $priceCay = $detail->price;
-                    $priceTong = $priceCay + $potPrice;
-                    $thanhTien = $priceTong * $detail->quantity;
-                @endphp
+        <div class="list-group-item border rounded mb-3 shadow-sm">
+            <div class="row g-3 align-items-center">
+                <!-- Ảnh sản phẩm -->
+                <div class="col-md-2 col-4">
+                    <img src="{{ $imageUrl }}"
+                        onerror="this.onerror=null;this.src='{{ asset('assets/img/default.jpg') }}';"
+                        alt="{{ $product->name }}"
+                        class="rounded border w-100" style="aspect-ratio: 1/1; object-fit: cover;">
+                </div>
 
-                <div class="text-muted small">Giá cây: {{ number_format($priceCay, 0, ',', '.') }}đ</div>
-                @if ($potPrice > 0)
-                    <div class="text-muted small">Giá chậu: {{ number_format($potPrice, 0, ',', '.') }}đ</div>
-                @endif
-                <div class="text-muted small">Số lượng: {{ $detail->quantity }}</div>
-                        </div>
-                    </div>
-                @endforeach
+                <!-- Thông tin sản phẩm -->
+                <div class="col-md-6 col-8">
+                    <h6 class="mb-1 fw-bold">{{ $product->name }}</h6>
+                    <div class="small text-muted">Chiều cao: {{ $detail->product_height }} cm</div>
+                    @if ($potName)
+                        <div class="small text-muted">Chậu: {{ $potName }}</div>
+                    @endif
+                    <div class="small text-muted">Số lượng: {{ $detail->quantity }}</div>
+                </div>
+
+                <!-- Giá -->
+                <div class="col-md-4 text-end">
+                    <div class="small">Giá cây: <strong>{{ number_format($priceCay, 0, ',', '.') }}đ</strong></div>
+                    @if ($potPrice > 0)
+                        <div class="small">Giá chậu: <strong>{{ number_format($potPrice, 0, ',', '.') }}đ</strong></div>
+                    @endif
+                </div>
             </div>
+        </div>
+    @endforeach
+</div>
 
                 <div class="d-flex justify-content-end">
                     <div>
@@ -150,15 +155,15 @@
 @endif
 
 @if ($order->status === 'delivered')
-    <form action="{{ route('client.orders.return', $order->id) }}" method="POST" class="d-inline-block ms-2">
-        @csrf
-        @method('PUT')
-        <button type="submit" class="btn btn-outline-warning"
-            onclick="return confirm('Bạn có chắc muốn trả lại đơn hàng này?')">
-            <i class="fa fa-undo me-1"></i> Trả hàng
-        </button>
-    </form>
+    {{-- Nút + modal TẠO YÊU CẦU TRẢ HÀNG THEO DÒNG HÀNG (line item) --}}
+    @include('client.orders.partials.return_button')
+
+    {{-- Link xem lịch sử yêu cầu trả hàng của đơn --}}
+    <a class="btn btn-link" href="{{ route('client.orders.returns.index', $order) }}">
+        Lịch sử trả hàng
+    </a>
 @endif
+
 
 
                 </div>
