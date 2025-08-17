@@ -104,9 +104,13 @@
 
                                     <!-- Giá -->
                                     <div class="col-md-4 text-end">
-                                        <div class="small">Giá cây: <strong>{{ number_format($priceCay, 0, ',', '.') }}đ</strong></div>
-                                        @if ($potPrice > 0)
-                                            <div class="small">Giá chậu: <strong>{{ number_format($potPrice, 0, ',', '.') }}đ</strong></div>
+                                        <div class="small">Giá cây: 
+                                            <strong>{{ number_format($detail->product_price ?? 0, 0, ',', '.') }}đ</strong>
+                                        </div>
+                                        @if ($detail->pot_price > 0)
+                                            <div class="small">Giá chậu: 
+                                                <strong>{{ number_format($detail->pot_price, 0, ',', '.') }}đ</strong>
+                                            </div>
                                         @endif
                                     </div>
                                 </div>
@@ -135,20 +139,20 @@
 
                 {{-- Nút hành động --}}
                 <div class="mt-4 d-flex justify-content-end gap-2">
+                    <!-- Nút quay lại -->
                     <a href="{{ route('client.orders.index') }}" class="btn btn-outline-secondary">
                         <i class="fa fa-arrow-left me-1"></i> Quay lại đơn hàng
                     </a>
 
+                    <!-- Hủy đơn hàng -->
                     @if (in_array($order->status, ['pending','confirmed']))
-                        <!-- Nút mở modal hủy -->
                         <button type="button" class="btn btn-outline-danger" 
                                 data-bs-toggle="modal" data-bs-target="#cancelModal-{{ $order->id }}">
                             <i class="fa fa-times-circle me-1"></i> Hủy đơn hàng
                         </button>
 
-                        <!-- Modal nhập lý do hủy -->
-                        <div class="modal fade" id="cancelModal-{{ $order->id }}" tabindex="-1" 
-                            aria-labelledby="cancelModalLabel-{{ $order->id }}" aria-hidden="true">
+                        <!-- Modal hủy -->
+                        <div class="modal fade" id="cancelModal-{{ $order->id }}" tabindex="-1" aria-hidden="true">
                             <div class="modal-dialog">
                                 <div class="modal-content">
                                     <form action="{{ route('client.orders.cancel', $order->id) }}" method="POST">
@@ -178,6 +182,7 @@
                         </div>
                     @endif
 
+                    <!-- Mua lại -->
                     @if ($order->status === 'cancelled')
                         <form method="POST" action="{{ route('client.orders.reorder', $order->id) }}">
                             @csrf
@@ -186,7 +191,19 @@
                             </button>
                         </form>
                     @endif
+
+                    <!-- Hoàn hàng -->
+                    @if ($order->status === 'delivered')
+                        {{-- Nút + modal TẠO YÊU CẦU TRẢ HÀNG THEO DÒNG HÀNG --}}
+                        @include('client.orders.partials.return_button')
+
+                        {{-- Link xem lịch sử yêu cầu trả hàng --}}
+                        <a class="btn btn-link" href="{{ route('client.orders.returns.index', $order) }}">
+                            Lịch sử trả hàng
+                        </a>
+                    @endif
                 </div>
+
 
             </div>
         </div>
