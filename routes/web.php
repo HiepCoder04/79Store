@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminStatisticsController;
-
+use Illuminate\Support\Facades\Mail;
 use App\Http\Controllers\CommentController;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Facades\Route;
@@ -30,7 +30,8 @@ use App\Http\Controllers\Client\AccountController;
 use App\Http\Controllers\Admin\PotController;
 use App\Http\Controllers\Client\Voucher2Controller;
 use App\Http\Controllers\Client\searchController;
-
+use App\Http\Controllers\Client\CancellationController as ClientCancellationController;
+use App\Http\Controllers\Admin\CancellationController as AdminCancellationController;
 // -------------------- BLOG (CLIENT) --------------------
 Route::prefix('blogs')->middleware('ban')->name('client.blogs.')->group(function () {
     Route::get('/', [App\Http\Controllers\Client\BlogController::class, 'index'])->name('index');
@@ -64,7 +65,7 @@ Route::middleware(['auth', 'role:admin', 'ban'])->prefix('admin')->name('admin.'
 
     // Quản lý danh mục
     Route::resource('categories', CategoryController::class)->except(['show']);
-    
+
     // Quản lý blog & danh mục blog
     Route::resource('blogs', BlogController::class)->except(['show']);
     Route::resource('category_blogs', BlogCategoryController::class)->except(['show']);
@@ -108,7 +109,13 @@ Route::middleware(['auth', 'role:admin', 'ban'])->prefix('admin')->name('admin.'
         Route::post('/{id}/refund', [\App\Http\Controllers\Admin\ReturnController::class, 'refund'])->name('refund');
         // Nếu dùng luồng đổi hàng
         Route::post('/{id}/exchange', [\App\Http\Controllers\Admin\ReturnController::class, 'exchange'])->name('exchange');
-    });    
+    });
+    Route::prefix('cancellations')->name('cancellations.')->group(function () {
+        Route::get('/', [AdminCancellationController::class, 'index'])->name('index');
+        Route::get('/{cancellation}', [AdminCancellationController::class, 'show'])->name('show');
+        Route::put('/{cancellation}/approve', [AdminCancellationController::class, 'approve'])->name('approve');
+        Route::put('/{cancellation}/reject', [AdminCancellationController::class, 'reject'])->name('reject');
+    });
 });
 
 // Quản lý người dùng
@@ -168,7 +175,8 @@ Route::middleware(['auth', 'ban'])->group(function () {
         Route::put('/{order}/cancel', [OrderController::class, 'cancel'])->name('cancel');
         Route::post('/{order}/reorder', [OrderController::class, 'reorder'])->name('reorder');
         Route::put('/{order}/return', [OrderController::class, 'returnOrder'])->name('return');
-        
+        Route::post('/{order}/cancellations', [ClientCancellationController::class, 'store'])
+            ->name('cancellations.store');
 
         //Trả hàng
         Route::get('/{order}/returns', [\App\Http\Controllers\Client\ReturnController::class, 'index'])
@@ -203,7 +211,7 @@ Route::get('/shopDetail/{id}', [ProductVariant::class, 'productDetail'])->middle
 
 //router tim kiem sp
 Route::get('/search/suggest', [searchController::class, 'suggest'])
-     ->name('search.suggest');
+    ->name('search.suggest');
 
 //route su dung voucher cua user
 
@@ -229,4 +237,16 @@ Route::get('/chatbot/suggestions', [App\Http\Controllers\ChatbotController::clas
 
 Route::middleware(['auth'])->group(function () {
     Route::post('/comments', [CommentController::class, 'store'])->name('comments.store');
+});
+Route::get('/test-mail', function () {
+    try {
+        Mail::raw('Test gửi mail từ Laravel OK!', function ($msg) {
+            $msg->to('yourmail@example.com') // 📩 thay bằng email nhận
+                ->subject('Test Mail Laravel');
+        });
+
+        return '✅ Gửi mail thành công!';
+    } catch (\Exception $e) {
+        return '❌ Lỗi: ' . $e->getMessage();
+    }
 });
