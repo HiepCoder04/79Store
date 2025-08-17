@@ -3,8 +3,11 @@
 @section('title', 'Giới Thiệu')
 
 @section('content')
+@include('client.layouts.banner')
+
     <section class="about-us-area section-padding-100-0">
         <div class="container">
+        
             <div class="row align-items-center">
 
                 <!-- Hình ảnh -->

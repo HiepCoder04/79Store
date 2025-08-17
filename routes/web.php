@@ -201,7 +201,7 @@ Route::get('/vnpay-callback', [PaymentController::class, 'vnpayCallback'])->name
 // -------------------- TRANG CHÍNH & GIỚI THIỆU --------------------
 Route::get('/', [HomeController::class, 'index'])->name('home')->middleware('ban');
 Route::get('/home', [HomeController::class, 'index']);
-Route::get('/about', fn() => view('client.users.about-detail'))->middleware('ban')->name('about');
+Route::get('/about', [HomeController::class ,'about'])->middleware('ban')->name('about');
 
 // -------------------- SHOP --------------------
 Route::get('/shop', [ProductVariant::class, 'product'])->middleware('ban')->name('shop');

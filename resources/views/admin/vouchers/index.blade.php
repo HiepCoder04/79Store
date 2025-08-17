@@ -77,7 +77,7 @@
   </form>
 
   <div class="table-responsive">
->>>>>>> hiep
+
     <table class="table custom-table table-bordered align-middle mb-0">
       <thead>
         <tr>

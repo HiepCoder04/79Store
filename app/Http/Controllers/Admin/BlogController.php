@@ -14,7 +14,7 @@ class BlogController extends Controller
 {
     public function index(Request $request)
     {
-    $q = Blog::with('categoryBlog'); // quan hệ belongsTo
+    $q = Blog::with('category'); // quan hệ belongsTo
 
     // Tiêu đề
     if ($request->filled('title')) {

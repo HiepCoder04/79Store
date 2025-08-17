@@ -4,12 +4,13 @@ namespace App\Http\Controllers\Client;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Contact;
-
+use App\Models\Banner;
 class ContactController extends Controller
 {
     public function showForm()
     {
-        return view('client.contact');
+        $banners = Banner::where('is_active', 1)->latest()->get();
+        return view('client.contact',compact('banners'));
     }
 
     public function submitForm(Request $request)
@@ -24,4 +25,5 @@ class ContactController extends Controller
 
         return redirect()->back()->with('success', 'Gửi liên hệ thành công!');
     }
+    
 }
