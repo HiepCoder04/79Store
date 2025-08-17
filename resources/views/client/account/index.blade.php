@@ -3,11 +3,28 @@
 @section('title', 'Thông tin người dùng')
 
 @section('content')
+<div class="breadcrumb-area">
+        <div class="top-breadcrumb-area bg-img bg-overlay d-flex align-items-center justify-content-center"
+            style="background-image: url({{ asset('assets/img/bg-img/24.jpg') }});">
+            <h2>Thông tin tài khoản</h2>
+        </div>
+
+        <div class="container py-4">
+            <div class="row">
+                <div class="col-12">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{{ route('home') }}"><i class="fa fa-home"></i> Trang chủ</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Thông tin tài khoản</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
 <div class="container mt-5 mb-5">
     <div class="card shadow-sm border-0">
         <div class="card-body p-4">
-            <h4 class="mb-4 text-primary">👤 Thông tin người dùng</h4>
-
             {{-- Hiển thị lỗi --}}
             <div id="form-errors" class="alert alert-danger mb-4 d-none">
                 <ul class="mb-0" id="form-errors-list"></ul>
@@ -60,7 +77,7 @@
                 </div>
 
                 <div class="d-flex justify-content-end">
-                    <button type="submit" class="btn btn-primary px-4">💾 Lưu thay đổi</button>
+                    <button type="submit" class="btn btn-primary px-4">Lưu thay đổi</button>
                 </div>
             </form>
         </div>

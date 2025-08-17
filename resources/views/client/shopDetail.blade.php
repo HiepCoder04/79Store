@@ -7,7 +7,7 @@
 
 <div class="breadcrumb-area">
     <div class="top-breadcrumb-area bg-img bg-overlay d-flex align-items-center justify-content-center"
-         style="background-image: url('https://i.imgur.com/T6dAash.jpeg');">
+         style="background-image: url({{ asset('assets/img/bg-img/24.jpg') }});">
         <h2>{{ $product->name }}</h2>
     </div>
     <div class="container">
