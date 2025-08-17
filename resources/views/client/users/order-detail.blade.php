@@ -134,15 +134,42 @@
                     <a href="{{ route('client.orders.index') }}" class="btn btn-outline-secondary">
                         <i class="fa fa-arrow-left me-1"></i> Quay lại đơn hàng
                     </a>
-                    @if ($order->status === 'pending')
-                        <form action="{{ route('client.orders.cancel', $order->id) }}" method="POST" class="d-inline-block ms-2">
-                            @csrf
-                            @method('PUT')
-                            <button type="submit" class="btn btn-outline-danger"
-                                onclick="return confirm('Bạn có chắc muốn hủy đơn hàng này không?')">
-                                <i class="fa fa-times-circle me-1"></i> Hủy đơn hàng
-                            </button>
-                        </form>
+                    @if (in_array($order->status, ['pending','confirmed']))
+    <!-- Nút mở modal -->
+                        <button type="button" class="btn btn-outline-danger ms-2" data-bs-toggle="modal" data-bs-target="#cancelModal-{{ $order->id }}">
+                            <i class="fa fa-times-circle me-1"></i> Hủy đơn hàng
+                        </button>
+
+                        <!-- Modal nhập lý do hủy -->
+                        <div class="modal fade" id="cancelModal-{{ $order->id }}" tabindex="-1" aria-labelledby="cancelModalLabel-{{ $order->id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <form action="{{ route('client.orders.cancel', $order->id) }}" method="POST">
+                                        @csrf
+                                        @method('PUT')
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="cancelModalLabel-{{ $order->id }}">
+                                                Hủy đơn hàng #{{ $order->order_code }}
+                                            </h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="mb-3">
+                                                <label for="reason-{{ $order->id }}" class="form-label">Lý do hủy</label>
+                                                <textarea name="reason" id="reason-{{ $order->id }}" class="form-control" rows="3" required></textarea>
+                                            </div>
+                                            <p class="text-muted">
+                                                <small>💡 Vui lòng nhập lý do để chúng tôi cải thiện dịch vụ.</small>
+                                            </p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                            <button type="submit" class="btn btn-danger">Xác nhận hủy</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
                     @endif
 
                     @if ($order->status === 'cancelled')

@@ -67,6 +67,12 @@
             </li>
 
             <li class="nav-item">
+                <a class="nav-link text-dark" href="{{ route('admin.cancellations.index') }}">
+                    <span class="nav-link-text">Quản Lí Hủy Hàng</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
                 <a class="nav-link text-dark" href="{{ route('admin.vouchers.index') }}">
                     <span class="nav-link-text">Quản Lí Voucher</span>
                 </a>

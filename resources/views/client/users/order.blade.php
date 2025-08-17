@@ -60,15 +60,7 @@
                 <span class="badge bg-{{ $status['class'] }} py-2 px-3">{{ $status['label'] }}</span>
             </div>
 
-            @if (in_array($order->status, ['pending', 'confirmed']))
-    <form action="{{ route('client.orders.cancel', $order->id) }}" method="POST" class="mb-3" onsubmit="return confirm('Bạn có chắc chắn muốn hủy đơn hàng này không?')">
-        @csrf
-        @method('PUT')
-        <button type="submit" class="btn btn-sm btn-danger">
-             Hủy đơn hàng
-        </button>
-    </form>
-@endif
+
 
 
             <div class="card-body">

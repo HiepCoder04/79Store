@@ -12,7 +12,7 @@ use App\Traits\Filterable;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable,Filterable;
+    use HasApiTokens, HasFactory, Notifiable, Filterable;
 
     /**
      * The attributes that are mass assignable.
@@ -72,5 +72,9 @@ class User extends Authenticatable
     public function returnRequests()
     {
         return $this->hasMany(ReturnRequest::class);
+    }
+    public function cancellations()
+    {
+        return $this->hasMany(Cancellation::class);
     }
 }
