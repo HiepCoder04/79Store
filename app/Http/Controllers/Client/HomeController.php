@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Voucher;
+use Illuminate\Support\Facades\DB;
 class HomeController extends Controller
 {
     public function indexBlog()
@@ -33,6 +34,7 @@ class HomeController extends Controller
 
         // Lấy 8 sản phẩm mới nhất cho phần "New Arrivals"
         $products = Product::with('galleries', 'variants')
+            ->where('is_active', 1)
             ->latest()
             ->take(8)
             ->get();
@@ -43,10 +45,26 @@ class HomeController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
+        //lay sp ban chay
+        $bestSellersIds = Product::join('product_variants', 'products.id', '=', 'product_variants.product_id')
+            ->join('order_details', 'product_variants.id', '=', 'order_details.product_variant_id')
+            ->whereNull('products.deleted_at')
+            ->select('products.id')
+            ->groupBy('products.id')
+            ->orderByDesc(DB::raw('SUM(order_details.quantity)'))
+            ->take(8)
+            ->pluck('id');
+
+        // Lấy sản phẩm với quan hệ
+        $bestSellers = Product::with('galleries', 'variants')
+            ->where('is_active', 1)
+            ->whereIn('id', $bestSellersIds)
+            ->get();
+
         $userVouchers = Auth::check()
             ? Auth::user()->vouchers->pluck('voucher_id')
             : collect();
 
-        return view('client.home', compact('banners', 'products', 'vouchers', 'userVouchers'));
+        return view('client.home', compact('banners', 'products', 'vouchers', 'userVouchers', 'bestSellers'));
     }
 }

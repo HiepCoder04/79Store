@@ -52,7 +52,7 @@
 <div class="container py-5">
     <div class="order-success bg-white">
         <h1 class="text-success mb-2" style="font-weight: 800;">🎉 Hoàn thành!</h1>
-        <h4 class="text-muted">Cảm ơn bạn! <span class="text-dark">Đơn hàng của bạn sẽ được chuẩn bị.</span></h4>
+        <span class="text-dark">Đơn hàng của bạn sẽ được chuẩn bị.</span></h4>
 
         {{-- Hiển thị sản phẩm (giả lập 2 ảnh nếu không có) --}}
         <div class="d-flex justify-content-center my-4">
@@ -72,7 +72,9 @@
 
         {{-- Thông tin đơn hàng --}}
         <div class="order-info text-start bg-light p-4 rounded shadow-sm">
-            <p><strong>Mã đơn hàng:</strong> <span class="text-dark">ORD-{{ session('order_id') }}</span></p>
+            @if(session('order_code'))
+                <p><strong>Mã đơn hàng:</strong> {{ $order->order_code }}</p>
+            @endif
             <p><strong>Ngày:</strong> {{ Carbon::now()->translatedFormat('l, d F Y') }}</p>
             <p><strong>Tổng cộng:</strong> {{ number_format(session('order_total') ?? 0, 0, ',', '.') }}đ</p>
         </div>

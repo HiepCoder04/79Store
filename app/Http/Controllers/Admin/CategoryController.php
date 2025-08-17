@@ -9,16 +9,27 @@ use App\Models\Category;
 class CategoryController extends Controller
 {
     // Hiển thị danh sách danh mục kèm thông tin parent
-    public function index()
+    public function index(Request $request)
     {
-        $categories = Category::with('parent')->get();
-        return view('admin.categories.index', compact('categories'));
+        $categories = Category::with('parent')
+            ->search($request, ['name'])
+            ->when($request->filled('parent_id'), function ($q) use ($request) {
+                $parentId = $request->parent_id;
+                $q->where('parent_id', $parentId)
+                    ->orWhere('id', $parentId); // để hiển thị cả cha lẫn con
+            })
+            ->paginate(10)
+            ->appends($request->query());
+
+        $allParents = Category::whereNull('parent_id')->get();
+
+        return view('admin.categories.index', compact('categories', 'allParents'));
     }
 
     // Form thêm danh mục
     public function create()
     {
-        $parents = Category::all();
+        $parents = Category::whereNull('parent_id')->get(); // chỉ lấy cấp 1
         return view('admin.categories.create', compact('parents'));
     }
 
@@ -27,12 +38,22 @@ class CategoryController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255|unique:categories,name',
-            'parent_id' => 'nullable|exists:categories,id',
+            'parent_id' => [
+                'nullable',
+                function ($attribute, $value, $fail) {
+                    if ($value) {
+                        $parent = Category::find($value);
+                        if (!$parent || $parent->parent_id !== null) {
+                            $fail('Danh mục cha phải là cấp 1.');
+                        }
+                    }
+                }
+            ]
         ]);
 
         Category::create($request->only('name', 'parent_id'));
 
-        return redirect()->route('admin.categories.index')->with('success', 'Thêm danh mục thành công');
+        return redirect()->route('admin.categories.index')->with('success', 'Thêm danh mục thành công.');
     }
 
     // Redirect về danh sách (không dùng show chi tiết)
@@ -45,40 +66,50 @@ class CategoryController extends Controller
     public function edit(string $id)
     {
         $category = Category::findOrFail($id);
-        $parents = Category::where('id', '!=', $category->id)->get();
-
+        $parents = Category::whereNull('parent_id')->where('id', '!=', $id)->get();
         return view('admin.categories.edit', compact('category', 'parents'));
     }
-
     // Cập nhật danh mục với validation unique bỏ qua chính nó
     public function update(Request $request, string $id)
     {
         $category = Category::findOrFail($id);
 
         $request->validate([
-            'name' => 'required|string|max:255|unique:categories,name,' . $category->id,
-            'parent_id' => 'nullable|exists:categories,id|not_in:' . $category->id,
+            'name' => 'required|string|max:255|unique:categories,name,' . $id,
+            'parent_id' => [
+                'nullable',
+                function ($attribute, $value, $fail) use ($id) {
+                    if ($value) {
+                        if ($value == $id) {
+                            $fail('Không thể chọn chính nó làm cha.');
+                        }
+                        $parent = Category::find($value);
+                        if (!$parent || $parent->parent_id !== null) {
+                            $fail('Danh mục cha phải là cấp 1.');
+                        }
+                    }
+                }
+            ]
         ]);
 
         $category->update($request->only('name', 'parent_id'));
 
-        return redirect()->route('admin.categories.index')->with('success', 'Cập nhật danh mục thành công');
+        return redirect()->route('admin.categories.index')->with('success', 'Cập nhật danh mục thành công.');
     }
+
 
     // Xóa danh mục, kiểm tra nếu còn danh mục con thì báo lỗi
     public function destroy(string $id)
     {
         $category = Category::findOrFail($id);
 
-        $hasChildren = Category::where('parent_id', $category->id)->exists();
-
-        if ($hasChildren) {
-            return redirect()->route('admin.categories.index')
-                ->with('error', 'Không thể xóa danh mục vì còn danh mục con. Vui lòng xóa danh mục con trước.');
+        // Nếu là cha và có con thì không cho xóa
+        if (Category::where('parent_id', $category->id)->exists()) {
+            return back()->with('error', 'Không thể xóa danh mục cha khi còn danh mục con.');
         }
 
         $category->delete();
 
-        return redirect()->route('admin.categories.index')->with('success', 'Đã xoá danh mục');
+        return back()->with('success', 'Xóa danh mục thành công.');
     }
 }

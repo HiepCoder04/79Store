@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
@@ -6,13 +7,52 @@ use Illuminate\Http\Request;
 use App\Models\Voucher;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+
 class VoucherController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $vouchers = Voucher::latest()->get();
+        $query = Voucher::query()
+            ->search($request, ['code']) // tìm kiếm theo code và mô tả
+            ->filter($request, [
+                'discount_type'    => 'exact',
+                'min_order_amount' => 'exact',
+            ]);
+
+        // Lọc theo trạng thái thời gian
+        if ($request->filled('status')) {
+            $now = now();
+            switch ($request->status) {
+                case 'active':
+                    $query->where('is_active', 1)
+                        ->whereDate('start_date', '<=', $now)
+                        ->whereDate('end_date', '>=', $now);
+                    break;
+                case 'expired':
+                    $query->whereDate('end_date', '<', $now);
+                    break;
+                case 'upcoming':
+                    $query->whereDate('start_date', '>', $now);
+                    break;
+            }
+        }
+
+        // Lọc theo ngày
+        if ($request->filled('start_date')) {
+            $query->whereDate('start_date', '>=', $request->start_date);
+        }
+        if ($request->filled('end_date')) {
+            $query->whereDate('end_date', '<=', $request->end_date);
+        }
+        if ($request->has('is_active') && $request->is_active !== '') {
+            $query->where('is_active', $request->is_active);
+        }
+
+        $vouchers = $query->latest()->paginate(10)->appends($request->query());
+
         return view('admin.vouchers.index', compact('vouchers'));
     }
+
 
     public function create()
     {
@@ -20,150 +60,150 @@ class VoucherController extends Controller
     }
 
     public function store(Request $request)
-{
-    $data = $request->all();
- 
+    {
+        $data = $request->all();
 
-    // Validate 
-    $errors = [];
 
-    if (empty($data['code'])) {
-        $errors['code'] = 'Mã không được để trống.';
-    } elseif (Voucher::where('code', $data['code'])->exists()) {
-        $errors['code'] = 'Mã đã tồn tại.';
+        // Validate 
+        $errors = [];
+
+        if (empty($data['code'])) {
+            $errors['code'] = 'Mã không được để trống.';
+        } elseif (Voucher::where('code', $data['code'])->exists()) {
+            $errors['code'] = 'Mã đã tồn tại.';
+        }
+
+        if (!empty($data['description']) && strlen($data['description']) > 1000) {
+            $errors['description'] = 'Mô tả quá dài.';
+        }
+
+        if (empty($data['event_type'])) {
+            $errors['event_type'] = 'Loại sự kiện ko đc trống.';
+        }
+
+
+        if (empty($data['start_date'])) {
+            $errors['start_date'] = 'Vui lòng nhập ngày bắt đầu.';
+        } elseif ($data['start_date'] < date('Y-m-d')) {
+            $errors['start_date'] = 'Ngày bắt đầu phải lớn hơn hoặc bằng hôm nay.';
+        }
+
+        if (empty($data['end_date'])) {
+            $errors['end_date'] = 'Vui lòng nhập ngày kết thúc.';
+        } elseif (!empty($data['start_date']) && $data['end_date'] < $data['start_date']) {
+            $errors['end_date'] = 'Ngày kết thúc phải sau hoặc bằng ngày bắt đầu.';
+        }
+
+        if (empty($data['discount_percent']) || !is_numeric($data['discount_percent'])) {
+            $errors['discount_percent'] = 'Phần trăm giảm giá không hợp lệ.';
+        }
+
+        if (!empty($data['max_discount']) && (!is_numeric($data['max_discount']) || $data['max_discount'] < 0)) {
+            $errors['max_discount'] = 'Giảm tối đa phải là số dương.';
+        }
+
+        if (!empty($data['min_order_amount']) && (!is_numeric($data['min_order_amount']) || $data['min_order_amount'] < 0)) {
+            $errors['min_order_amount'] = 'Đơn tối thiểu phải là số dương.';
+        }
+
+        if (!isset($data['is_active']) || !in_array($data['is_active'], [0, 1, '0', '1'])) {
+            $errors['is_active'] = 'Trạng thái không hợp lệ.';
+        }
+
+
+        if (!empty($errors)) {
+            return back()->withErrors($errors)->withInput();
+        }
+
+        // Tạo mới
+        Voucher::create([
+            'code' => $data['code'],
+            'description' => $data['description'] ?? null,
+            'event_type' => $data['event_type'] ?? '',
+            'discount_percent' => $data['discount_percent'],
+            'start_date' => $data['start_date'],
+            'end_date' => $data['end_date'],
+            'max_discount' => $data['max_discount'] ?? null,
+            'min_order_amount' => $data['min_order_amount'] ?? null,
+            'is_active' => $data['is_active'] ?? 1,
+        ]);
+
+        return redirect()->route('admin.vouchers.index')->with('success', 'Thêm voucher thành công!');
     }
-
-    if (!empty($data['description']) && strlen($data['description']) > 1000) {
-        $errors['description'] = 'Mô tả quá dài.';
-    }
-
-    if ( empty($data['event_type'] )){
-        $errors['event_type'] = 'Loại sự kiện ko đc trống.';
-    }
-    
-
-    if (empty($data['start_date'])) {
-        $errors['start_date'] = 'Vui lòng nhập ngày bắt đầu.';
-    } elseif ($data['start_date'] < date('Y-m-d')) {
-        $errors['start_date'] = 'Ngày bắt đầu phải lớn hơn hoặc bằng hôm nay.';
-    }
-
-    if (empty($data['end_date'])) {
-        $errors['end_date'] = 'Vui lòng nhập ngày kết thúc.';
-    } elseif (!empty($data['start_date']) && $data['end_date'] < $data['start_date']) {
-        $errors['end_date'] = 'Ngày kết thúc phải sau hoặc bằng ngày bắt đầu.';
-    }
-
-    if (empty($data['discount_percent']) || !is_numeric($data['discount_percent'])) {
-        $errors['discount_percent'] = 'Phần trăm giảm giá không hợp lệ.';
-    }
-
-    if (!empty($data['max_discount']) && (!is_numeric($data['max_discount']) || $data['max_discount'] < 0)) {
-        $errors['max_discount'] = 'Giảm tối đa phải là số dương.';
-    }
-
-    if (!empty($data['min_order_amount']) && (!is_numeric($data['min_order_amount']) || $data['min_order_amount'] < 0)) {
-        $errors['min_order_amount'] = 'Đơn tối thiểu phải là số dương.';
-    }
-
-    if (!isset($data['is_active']) || !in_array($data['is_active'], [0, 1, '0', '1'])) {
-        $errors['is_active'] = 'Trạng thái không hợp lệ.';
-    }
-
-    
-    if (!empty($errors)) {
-        return back()->withErrors($errors)->withInput();
-    }
-
-    // Tạo mới
-    Voucher::create([
-        'code' => $data['code'],
-        'description' => $data['description'] ?? null,
-        'event_type' => $data['event_type'] ?? '',
-        'discount_percent' => $data['discount_percent'],
-        'start_date' => $data['start_date'],
-        'end_date' => $data['end_date'],
-        'max_discount' => $data['max_discount'] ?? null,
-        'min_order_amount' => $data['min_order_amount'] ?? null,
-        'is_active' => $data['is_active'] ?? 1,
-    ]);
-
-    return redirect()->route('admin.vouchers.index')->with('success', 'Thêm voucher thành công!');
-}
 
     public function edit(Voucher $voucher)
     {
         return view('admin.vouchers.edit', compact('voucher'));
     }
 
-public function update(Request $request, $id)
-{
-    $voucher = Voucher::findOrFail($id);
-    $data = $request->all();
-    $errors = [];
+    public function update(Request $request, $id)
+    {
+        $voucher = Voucher::findOrFail($id);
+        $data = $request->all();
+        $errors = [];
 
-    // Validate
-    if (empty($data['code'])) {
-        $errors['code'] = 'Mã không được để trống.';
-    } elseif (Voucher::where('code', $data['code'])->where('id', '!=', $id)->exists()) {
-        $errors['code'] = 'Mã đã tồn tại.';
+        // Validate
+        if (empty($data['code'])) {
+            $errors['code'] = 'Mã không được để trống.';
+        } elseif (Voucher::where('code', $data['code'])->where('id', '!=', $id)->exists()) {
+            $errors['code'] = 'Mã đã tồn tại.';
+        }
+
+        if (empty($data['description']) && strlen($data['description']) > 1000) {
+            $errors['description'] = 'Mô tả quá dài.';
+        }
+
+        if (empty($data['event_type'])) {
+            $errors['event_type'] = 'Loại sự kiện không được để trống.';
+        }
+
+        if (empty($data['start_date'])) {
+            $errors['start_date'] = 'Vui lòng nhập ngày bắt đầu.';
+        } elseif ($data['start_date'] < date('Y-m-d')) {
+            $errors['start_date'] = 'Ngày bắt đầu phải lớn hơn hoặc bằng hôm nay.';
+        }
+
+        if (empty($data['end_date'])) {
+            $errors['end_date'] = 'Vui lòng nhập ngày kết thúc.';
+        } elseif (!empty($data['start_date']) && $data['end_date'] < $data['start_date']) {
+            $errors['end_date'] = 'Ngày kết thúc phải sau hoặc bằng ngày bắt đầu.';
+        }
+
+        if (empty($data['discount_percent']) || !is_numeric($data['discount_percent'])) {
+            $errors['discount_percent'] = 'Phần trăm giảm giá không hợp lệ.';
+        }
+
+        if (!empty($data['max_discount']) && (!is_numeric($data['max_discount']) || $data['max_discount'] < 0)) {
+            $errors['max_discount'] = 'Giảm tối đa phải là số dương.';
+        }
+
+        if (!empty($data['min_order_amount']) && (!is_numeric($data['min_order_amount']) || $data['min_order_amount'] < 0)) {
+            $errors['min_order_amount'] = 'Đơn tối thiểu phải là số dương.';
+        }
+
+        if (!isset($data['is_active']) || !in_array($data['is_active'], [0, 1, '0', '1'])) {
+            $errors['is_active'] = 'Trạng thái không hợp lệ.';
+        }
+
+        if (!empty($errors)) {
+            return back()->withErrors($errors)->withInput();
+        }
+
+        // Cập nhật
+        $voucher->update([
+            'code' => $data['code'],
+            'description' => $data['description'] ?? null,
+            'event_type' => $data['event_type'] ?? null,
+            'discount_percent' => $data['discount_percent'],
+            'start_date' => $data['start_date'],
+            'end_date' => $data['end_date'],
+            'max_discount' => $data['max_discount'] ?? null,
+            'min_order_amount' => $data['min_order_amount'] ?? null,
+            'is_active' => $data['is_active'] ?? 1,
+        ]);
+
+        return redirect()->route('admin.vouchers.index')->with('success', 'Cập nhật voucher thành công!');
     }
-
-    if (empty($data['description']) && strlen($data['description']) > 1000) {
-        $errors['description'] = 'Mô tả quá dài.';
-    }
-
-    if (empty($data['event_type'])) {
-        $errors['event_type'] = 'Loại sự kiện không được để trống.';
-    }
-
-    if (empty($data['start_date'])) {
-        $errors['start_date'] = 'Vui lòng nhập ngày bắt đầu.';
-    } elseif ($data['start_date'] < date('Y-m-d')) {
-        $errors['start_date'] = 'Ngày bắt đầu phải lớn hơn hoặc bằng hôm nay.';
-    }
-
-    if (empty($data['end_date'])) {
-        $errors['end_date'] = 'Vui lòng nhập ngày kết thúc.';
-    } elseif (!empty($data['start_date']) && $data['end_date'] < $data['start_date']) {
-        $errors['end_date'] = 'Ngày kết thúc phải sau hoặc bằng ngày bắt đầu.';
-    }
-
-    if (empty($data['discount_percent']) || !is_numeric($data['discount_percent'])) {
-        $errors['discount_percent'] = 'Phần trăm giảm giá không hợp lệ.';
-    }
-
-    if (!empty($data['max_discount']) && (!is_numeric($data['max_discount']) || $data['max_discount'] < 0)) {
-        $errors['max_discount'] = 'Giảm tối đa phải là số dương.';
-    }
-
-    if (!empty($data['min_order_amount']) && (!is_numeric($data['min_order_amount']) || $data['min_order_amount'] < 0)) {
-        $errors['min_order_amount'] = 'Đơn tối thiểu phải là số dương.';
-    }
-
-    if (!isset($data['is_active']) || !in_array($data['is_active'], [0, 1, '0', '1'])) {
-        $errors['is_active'] = 'Trạng thái không hợp lệ.';
-    }
-
-    if (!empty($errors)) {
-        return back()->withErrors($errors)->withInput();
-    }
-
-    // Cập nhật
-    $voucher->update([
-        'code' => $data['code'],
-        'description' => $data['description'] ?? null,
-        'event_type' => $data['event_type'] ?? null,
-        'discount_percent' => $data['discount_percent'],
-        'start_date' => $data['start_date'],
-        'end_date' => $data['end_date'],
-        'max_discount' => $data['max_discount'] ?? null,
-        'min_order_amount' => $data['min_order_amount'] ?? null,
-        'is_active' => $data['is_active'] ?? 1,
-    ]);
-
-    return redirect()->route('admin.vouchers.index')->with('success', 'Cập nhật voucher thành công!');
-}
 
 
     public function destroy(Voucher $voucher)
@@ -184,4 +224,3 @@ public function update(Request $request, $id)
         return view('admin.vouchers.user', compact('voucher', 'users'));
     }
 }
-

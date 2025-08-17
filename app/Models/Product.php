@@ -6,10 +6,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Comment;
-
+use App\Traits\Filterable;
 class Product extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes,Filterable;
 
     protected $fillable = [
         'name',
@@ -79,4 +79,12 @@ public function comments()
 {
     return $this->hasMany(Comment::class);
 }
+public function pots()
+{
+     return $this->belongsToMany(Pot::class, 'pot_product_variant', 'product_variant_id', 'pot_id');
+}
+    public function returnRequests()
+    {
+        return $this->hasMany(ReturnRequest::class);
+    }
 }

@@ -20,8 +20,10 @@ class OrderDetail extends Model
         'product_height',
         'product_pot',
         'product_price',
+        'pot_price', // ✅ Thêm pot_price vào fillable
         'quantity',
         'total_price',
+        'pot_id',
     ];
 
     public function order()
@@ -38,4 +40,30 @@ class OrderDetail extends Model
     {
         return $this->belongsTo(ProductVariant::class, 'product_variant_id');
     }
+
+    // Alias để match với controller: with(['product','variant'])
+    public function variant()
+    {
+        return $this->productVariant(); // bạn đã có productVariant()
+    }
+
+    // Nếu đã thêm cột pot_id ở order_details (bước 1.2)
+    public function pot()
+    {
+        return $this->belongsTo(Pot::class, 'pot_id');
+    }
+
+    //duongthemqh
+    public function returnRequests()
+    {
+        return $this->hasMany(ReturnRequest::class);
+    }
+
+    public function qtyReturned(): int
+    {
+        return (int) $this->returnRequests()
+            ->whereIn('status', ['approved', 'refunded', 'exchanged'])
+            ->sum('quantity');
+    }
+
 }

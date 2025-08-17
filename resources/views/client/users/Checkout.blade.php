@@ -43,7 +43,11 @@
                         <h5 class="fw-bold mb-4">Tóm Tắt Đơn Hàng</h5>
 
                         @php
-                            $cartTotal = $cart->items->sum(fn($item) => $item->productVariant->price * $item->quantity);
+                            $cartTotal = $cart->items->sum(function ($item) {
+                                $productPrice = $item->productVariant->price;
+                                $potPrice = $item->pot?->price ?? 0;
+                                return ($productPrice + $potPrice) * $item->quantity;
+                            });
                             $voucherId = session('applied_voucher');
                             $voucher = $voucherId ? \App\Models\Voucher::find($voucherId) : null;
                             $discount = 0;
@@ -83,7 +87,18 @@
                                     <h6 class="mb-1 text-truncate" style="max-width: 200px;">
                                         {{ $product->name }}
                                     </h6>
-                                    <small>Chậu: {{ $item->productVariant->pot }} | SL: {{ $item->quantity }}</small>
+                                    @php
+                                        $potName = $item->pot->name ?? 'Không có chậu';
+                                        $potPrice = $item->pot->price ?? 0;
+                                        $productPrice = $item->productVariant->price;
+                                        $unitPrice = $productPrice + $potPrice;
+                                    @endphp
+
+                                    <small>
+                                        Chậu: {{ $potName }} ({{ number_format($potPrice, 0, ',', '.') }}đ) <br>
+                                        Giá: {{ number_format($productPrice, 0, ',', '.') }}đ <br>
+                                        SL: {{ $item->quantity }}
+                                    </small>
                                 </div>
                             </div>
                         @endforeach
@@ -184,5 +199,83 @@
             }
         });
     });
+    // Thêm sự kiện cho nút xác nhận địa chỉ mới
+    document.addEventListener('DOMContentLoaded', function () {
+    const confirmBtn = document.getElementById('confirm-new-address');
+    const cancelBtn = document.getElementById('cancel-new-address');
+    const addressInput = document.getElementById('new_address');
+    const setDefaultCheckbox = document.getElementById('set_default');
+    const successBox = document.getElementById('address-added-success');
+    const addNewBox = document.getElementById('add-new-address');
+
+    confirmBtn.addEventListener('click', function () {
+        const address = addressInput.value.trim();
+        const setDefault = setDefaultCheckbox.checked;
+
+        if (!address) {
+            alert('Vui lòng nhập địa chỉ.');
+            return;
+        }
+
+        fetch("{{ route('user.saveAddress') }}", {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                address: address,
+                set_default: setDefault
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            successBox.classList.remove('d-none');
+            setTimeout(() => {
+                successBox.classList.add('d-none');
+            }, 3000);
+            addressInput.value = '';
+            setDefaultCheckbox.checked = false;
+            addNewBox.classList.add('d-none');
+            // Có thể reload để thấy địa chỉ mới
+            location.reload();
+        })
+        .catch(error => {
+            alert('Có lỗi xảy ra khi lưu địa chỉ.');
+            console.error(error);
+        });
+    });
+
+    cancelBtn.addEventListener('click', function () {
+        addNewBox.classList.add('d-none');
+    });
+
+    const changeBtn = document.getElementById('change-address-btn');
+    if (changeBtn) {
+        changeBtn.addEventListener('click', function () {
+            document.getElementById('change-address').classList.toggle('d-none');
+        });
+    }
+});
+//update lai dia chi moi khi user chon dia chi moi
+document.addEventListener('DOMContentLoaded', function () {
+    const radios = document.querySelectorAll('input[name="address_id"]');
+    const display = document.getElementById('selected-address-text');
+
+    radios.forEach(radio => {
+        radio.addEventListener('change', function () {
+            const address = this.getAttribute('data-address');
+            if (address && display) {
+                display.textContent = address;
+            }
+        });
+    });
+
+    // Auto hiển thị địa chỉ đã chọn lúc load
+    const selected = document.querySelector('input[name="address_id"]:checked');
+    if (selected && display) {
+        display.textContent = selected.getAttribute('data-address');
+    }
+});
 </script>
 @endsection

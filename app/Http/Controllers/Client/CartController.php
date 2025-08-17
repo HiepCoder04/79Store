@@ -8,6 +8,7 @@ use App\Models\Cart;
 use App\Models\CartItem;
 use Illuminate\Support\Facades\Auth;
 use App\Models\ProductVariant;
+use App\Models\Pot;
 
 class CartController extends Controller
 {
@@ -17,12 +18,37 @@ class CartController extends Controller
         $voucher = null;
         $errorMessage = null;
 
-        $cart = Cart::with('items.productVariant.product.galleries')
+        $cart = Cart::with('items.productVariant.product.galleries', 'items.pot')
             ->where('user_id', $user->id)
             ->first();
 
         $items = $cart ? $cart->items : collect();
-        $cartTotal = $items->sum(fn($item) => $item->productVariant->price * $item->quantity);
+        foreach ($items as $item) {
+            $variantStock = $item->productVariant->stock_quantity ?? 0;
+            $potStock = $item->pot->quantity ?? null;
+
+            $item->out_of_stock = false;
+            $item->out_of_stock_message = '';
+
+            // Check cây
+            if ($variantStock < $item->quantity) {
+                $item->out_of_stock = true;
+                $item->out_of_stock_message = 'Cây đã hết hàng';
+            }
+
+            // Check chậu (nếu có)
+            if (!is_null($potStock) && $potStock < $item->quantity) {
+                $item->out_of_stock = true;
+                $item->out_of_stock_message = $item->out_of_stock_message
+                    ? $item->out_of_stock_message . ' và chậu đã hết hàng'
+                    : 'Chậu đã hết hàng';
+            }
+        }
+        $cartTotal = $items->sum(function ($item) {
+            $productPrice = $item->productVariant->price;
+            $potPrice = $item->pot?->price ?? 0;
+            return ($productPrice + $potPrice) * $item->quantity;
+        });
         $finalTotal = $cartTotal;
         $discount = 0;
 
@@ -62,119 +88,159 @@ class CartController extends Controller
     }
 
     public function add(Request $request)
-{
-    $request->validate([
-        'product_id' => 'required|exists:products,id',
-        'pot'        => 'required|string',
-        'height'     => 'required|string', // ✅ Bắt buộc có chiều cao
-        'quantity'   => 'required|integer|min:1'
-    ]);
+    {
+        $request->validate([
+            'product_id' => 'required|exists:products,id',
+            'pot'        => 'nullable|numeric|exists:pots,id',
+            'height'     => 'required|string', // ✅ Bắt buộc có chiều cao
+            'quantity'   => 'required|integer|min:1'
+        ]);
 
-    $variant = ProductVariant::where('product_id', $request->product_id)
-        ->where('pot', $request->pot)
-        ->where('height', $request->height) // ✅ THÊM ĐIỀU KIỆN CHIỀU CAO
-        ->first();
+        $variant = ProductVariant::where('product_id', $request->product_id)
+            ->where('height', $request->height) // ✅ THÊM ĐIỀU KIỆN CHIỀU CAO
+            ->first();
 
-    if (!$variant) {
-        return back()->with('error', 'Không tìm thấy biến thể phù hợp.');
+        if (!$variant) {
+            return back()->with('error', 'Không tìm thấy biến thể phù hợp.');
+        }
+
+        if ($variant->stock_quantity < $request->quantity) {
+            return back()->with('error', 'Số lượng vượt quá tồn kho.');
+        }
+        $potId = $request->pot;
+        if ($potId) {
+            $pot = Pot::find($potId);
+            if (!$pot || $pot->quantity <= 0) {
+                return back()->with('error', 'Chậu đã hết hàng hoặc không tồn tại.');
+            }
+            // Kiểm tra chậu phù hợp với biến thể cây
+            $isValidPot = $variant->pots()->where('pots.id', $potId)->exists();
+            if (!$isValidPot) {
+                return back()->with('error', 'Chậu không phù hợp với biến thể cây.');
+            }
+        }
+
+        $user = Auth::user();
+        $cart = Cart::firstOrCreate(['user_id' => $user->id]);
+
+        $item = CartItem::where('cart_id', $cart->id)
+            ->where('product_variant_id', $variant->id)
+            ->where('pot_id', $potId)
+            ->first();
+
+        if ($item) {
+            $item->quantity += $request->quantity;
+            $item->save();
+        } else {
+            CartItem::create([
+                'cart_id' => $cart->id,
+                'product_variant_id' => $variant->id,
+                'pot_id'             => $potId,
+                'quantity' => $request->quantity
+            ]);
+        }
+
+        return redirect()->route('cart.index')->with('success', 'Đã thêm vào giỏ hàng!');
     }
 
-    if ($variant->stock_quantity < $request->quantity) {
-        return back()->with('error', 'Số lượng vượt quá tồn kho.');
-    }
+    public function addAjax(Request $request)
+    {
+        $request->validate([
+            'product_id' => 'required|exists:products,id',
+            'height'     => 'required|string',
+            'pot'        => 'nullable|numeric|exists:pots,id', // ✅ Cho phép null
+            'quantity'   => 'required|integer|min:1',
+        ]);
 
-    $user = Auth::user();
-    $cart = Cart::firstOrCreate(['user_id' => $user->id]);
+        $variant = ProductVariant::where('product_id', $request->product_id)
+            ->where('height', $request->height)
+            ->first();
 
-    $item = CartItem::where('cart_id', $cart->id)
-        ->where('product_variant_id', $variant->id)
-        ->first();
+        if (!$variant) {
+            return response()->json(['success' => false, 'message' => 'Không tìm thấy biến thể phù hợp.'], 404);
+        }
 
-    if ($item) {
-        $item->quantity += $request->quantity;
-        $item->save();
-    } else {
-        CartItem::create([
-            'cart_id' => $cart->id,
-            'product_variant_id' => $variant->id,
-            'quantity' => $request->quantity
+        if ($variant->stock_quantity < $request->quantity) {
+            return response()->json(['success' => false, 'message' => 'Số lượng vượt quá tồn kho cây.'], 400);
+        }
+
+        $potId = $request->pot;
+        if ($potId) {
+            $pot = Pot::find($potId);
+            if (!$pot || $pot->quantity <= 0) {
+                return response()->json(['success' => false, 'message' => 'Chậu đã hết hàng hoặc không tồn tại.'], 400);
+            }
+            $isValidPot = $variant->pots()->where('pots.id', $potId)->exists();
+            if (!$isValidPot) {
+                return response()->json(['success' => false, 'message' => 'Chậu không phù hợp với biến thể cây.'], 400);
+            }
+        }
+
+        $user = Auth::user();
+        $cart = Cart::firstOrCreate(['user_id' => $user->id]);
+
+        $item = CartItem::where('cart_id', $cart->id)
+            ->where('product_variant_id', $variant->id)
+            ->where('pot_id', $potId)
+            ->first();
+
+        if ($item) {
+            $item->quantity += $request->quantity;
+            $item->save();
+        } else {
+            CartItem::create([
+                'cart_id'            => $cart->id,
+                'product_variant_id' => $variant->id,
+                'pot_id'             => $potId,
+                'quantity'           => $request->quantity
+            ]);
+        }
+
+        $cartCount = CartItem::where('cart_id', $cart->id)->sum('quantity');
+
+        return response()->json([
+            'message' => 'Đã thêm sản phẩm vào giỏ hàng!',
+            'cart_count' => $cartCount
         ]);
     }
 
-    return redirect()->route('cart.index')->with('success', 'Đã thêm vào giỏ hàng!');
-}
-
-public function addAjax(Request $request)
-{
-    $request->validate([
-        'product_id' => 'required|exists:products,id',
-        'pot'        => 'required|string',
-        'height'     => 'required|string',
-        'quantity'   => 'required|integer|min:1'
-    ]);
-
-    $variant = ProductVariant::where('product_id', $request->product_id)
-        ->where('pot', $request->pot)
-        ->where('height', $request->height)
-        ->first();
-
-    if (!$variant) {
-        return response()->json(['success' => false, 'message' => 'Không tìm thấy biến thể phù hợp.'], 404);
-    }
-
-    if ($variant->stock_quantity < $request->quantity) {
-        return response()->json(['success' => false, 'message' => 'Số lượng vượt quá tồn kho.'], 400);
-    }
-
-    $user = Auth::user();
-    $cart = Cart::firstOrCreate(['user_id' => $user->id]);
-
-    $item = CartItem::where('cart_id', $cart->id)
-        ->where('product_variant_id', $variant->id)
-        ->first();
-
-    if ($item) {
-        $item->quantity += $request->quantity;
-        $item->save();
-    } else {
-        CartItem::create([
-            'cart_id' => $cart->id,
-            'product_variant_id' => $variant->id,
-            'quantity' => $request->quantity
-        ]);
-    }
-
-    return response()->json(['success' => true, 'message' => 'Đã thêm vào giỏ hàng!']);
-}
     public function update(Request $request, $id)
-{
-    $request->validate([
-        'quantity' => 'required|integer|min:1'
-    ]);
+    {
+        $request->validate([
+            'quantity' => 'required|integer|min:1'
+        ]);
 
-    $item = CartItem::findOrFail($id);
+        $item = CartItem::with('productVariant', 'pot')->findOrFail($id);
 
-    if ($item->cart->user_id !== auth()->id()) {
-        abort(403);
+        if ($item->cart->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        if ($item->productVariant->stock_quantity < $request->quantity) {
+            return response()->json(['error' => 'Số lượng vượt quá tồn kho'], 400);
+        }
+
+        $item->quantity = $request->quantity;
+        $item->save();
+
+        $productPrice = $item->productVariant->price;
+        $potPrice = $item->pot?->price ?? 0;
+        $itemSubtotal = ($productPrice + $potPrice) * $item->quantity;
+
+        // ✅ Tính lại tổng giỏ
+        $cartItems = $item->cart->items()->with('productVariant', 'pot')->get();
+        $cartTotal = $cartItems->sum(function ($i) {
+            return ($i->productVariant->price + ($i->pot?->price ?? 0)) * $i->quantity;
+        });
+
+        $finalTotal = $cartTotal;
+
+        return response()->json([
+            'itemSubtotalFormatted' => number_format($itemSubtotal, 0, ',', '.') . 'đ',
+            'cartTotalFormatted' => number_format($cartTotal, 0, ',', '.') . 'đ',
+            'finalTotalFormatted' => number_format($finalTotal, 0, ',', '.') . 'đ',
+        ]);
     }
-
-    if ($item->productVariant->stock_quantity < $request->quantity) {
-        return response()->json(['error' => 'Số lượng vượt quá tồn kho'], 400);
-    }
-
-    $item->quantity = $request->quantity;
-    $item->save();
-
-    $cartItems = $item->cart->items;
-    $cartTotal = $cartItems->sum(fn($i) => $i->productVariant->price * $i->quantity);
-    $finalTotal = $cartTotal;
-
-    return response()->json([
-        'itemSubtotalFormatted' => number_format($item->productVariant->price * $item->quantity, 0, ',', '.') . 'đ',
-        'cartTotalFormatted' => number_format($cartTotal, 0, ',', '.') . 'đ',
-        'finalTotalFormatted' => number_format($finalTotal, 0, ',', '.') . 'đ',
-    ]);
-}
 
 
     public function remove($id)

@@ -15,13 +15,13 @@
         <div class="card mb-4 shadow-sm border">
             <div class="card-header d-flex justify-content-between align-items-center bg-light">
                 <div>
-                    <h5 class="mb-0">🧾 Mã đơn: <strong>#ORD-{{ $order->id }}</strong></h5>
+                    <h5 class="mb-0">🧾 Mã đơn: <strong>{{ $order->order_code }}</strong></h5>
                     <small class="text-muted">📅 Ngày đặt: {{ $order->created_at->format('d/m/Y H:i') }}</small>
                 </div>
                 @php
                     $statusMap = [
-                        'pending' => ['label' => 'Chờ thanh toán', 'class' => 'warning'],
-                        'confirmed' => ['label' => 'Chờ xác nhận', 'class' => 'info'],
+                        'pending' => ['label' => 'Chờ xác nhận', 'class' => 'warning'],
+                        'confirmed' => ['label' => 'Đã xác nhận', 'class' => 'info'],
                         'shipping' => ['label' => 'Đang giao hàng', 'class' => 'primary'],
                         'delivered' => ['label' => 'Đã nhận hàng', 'class' => 'success'],
                         'cancelled' => ['label' => 'Đã hủy', 'class' => 'danger'],
@@ -61,31 +61,52 @@
                 <div class="mb-4">
     <h5 class="fw-bold mb-3">🛍️ Sản phẩm đã mua</h5>
 
+<div class="list-group">
     @foreach ($order->orderDetails as $detail)
         @php
             $product = $detail->productVariant->product;
             $image = optional($product->galleries->first())->image;
-
             $imageUrl = $image
                 ? (Str::startsWith($image, ['http', '/']) ? $image : asset($image))
                 : asset('assets/img/bg-img/default.jpg');
 
-            $total = $detail->price * $detail->quantity;
+            $potPrice = 0;
+            $potName = null;
+            if ($detail->product_pot && strtolower($detail->product_pot) !== 'không có chậu') {
+                $potName = $detail->product_pot;
+                $potModel = \App\Models\Pot::where('name', $potName)->first();
+                $potPrice = $potModel?->price ?? 0;
+            }
+            $priceCay = $detail->price;
         @endphp
 
-        <div class="row align-items-center border-bottom pb-3 mb-3">
-            <div class="col-auto">
-                <img src="{{ $imageUrl }}"
-                    onerror="this.onerror=null;this.src='{{ asset('assets/img/default.jpg') }}';"
-                    alt="{{ $product->name }}"
-                    class="rounded border" style="width: 60px; height: 60px; object-fit: cover;">
-            </div>
-            <div class="col">
-                <h6 class="mb-1">{{ $product->name }}</h6>
-                <div class="text-muted small">Chậu: {{ $detail->product_pot }}</div>
-                <div class="text-muted small">Chiều cao: {{ $detail->product_height }}</div>
-                <div class="text-muted small">Giá: {{ $detail->price }}</div>
-                <div class="text-muted small">Số lượng: {{ $detail->quantity }}</div>
+        <div class="list-group-item border rounded mb-3 shadow-sm">
+            <div class="row g-3 align-items-center">
+                <!-- Ảnh sản phẩm -->
+                <div class="col-md-2 col-4">
+                    <img src="{{ $imageUrl }}"
+                        onerror="this.onerror=null;this.src='{{ asset('assets/img/default.jpg') }}';"
+                        alt="{{ $product->name }}"
+                        class="rounded border w-100" style="aspect-ratio: 1/1; object-fit: cover;">
+                </div>
+
+                <!-- Thông tin sản phẩm -->
+                <div class="col-md-6 col-8">
+                    <h6 class="mb-1 fw-bold">{{ $product->name }}</h6>
+                    <div class="small text-muted">Chiều cao: {{ $detail->product_height }} cm</div>
+                    @if ($potName)
+                        <div class="small text-muted">Chậu: {{ $potName }}</div>
+                    @endif
+                    <div class="small text-muted">Số lượng: {{ $detail->quantity }}</div>
+                </div>
+
+                <!-- Giá -->
+                <div class="col-md-4 text-end">
+                    <div class="small">Giá cây: <strong>{{ number_format($priceCay, 0, ',', '.') }}đ</strong></div>
+                    @if ($potPrice > 0)
+                        <div class="small">Giá chậu: <strong>{{ number_format($potPrice, 0, ',', '.') }}đ</strong></div>
+                    @endif
+                </div>
             </div>
         </div>
     @endforeach
@@ -113,15 +134,42 @@
                     <a href="{{ route('client.orders.index') }}" class="btn btn-outline-secondary">
                         <i class="fa fa-arrow-left me-1"></i> Quay lại đơn hàng
                     </a>
-                    @if ($order->status === 'pending')
-                        <form action="{{ route('client.orders.cancel', $order->id) }}" method="POST" class="d-inline-block ms-2">
-                            @csrf
-                            @method('PUT')
-                            <button type="submit" class="btn btn-outline-danger"
-                                onclick="return confirm('Bạn có chắc muốn hủy đơn hàng này không?')">
-                                <i class="fa fa-times-circle me-1"></i> Hủy đơn hàng
-                            </button>
-                        </form>
+                    @if (in_array($order->status, ['pending','confirmed']))
+    <!-- Nút mở modal -->
+                        <button type="button" class="btn btn-outline-danger ms-2" data-bs-toggle="modal" data-bs-target="#cancelModal-{{ $order->id }}">
+                            <i class="fa fa-times-circle me-1"></i> Hủy đơn hàng
+                        </button>
+
+                        <!-- Modal nhập lý do hủy -->
+                        <div class="modal fade" id="cancelModal-{{ $order->id }}" tabindex="-1" aria-labelledby="cancelModalLabel-{{ $order->id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <form action="{{ route('client.orders.cancel', $order->id) }}" method="POST">
+                                        @csrf
+                                        @method('PUT')
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="cancelModalLabel-{{ $order->id }}">
+                                                Hủy đơn hàng #{{ $order->order_code }}
+                                            </h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="mb-3">
+                                                <label for="reason-{{ $order->id }}" class="form-label">Lý do hủy</label>
+                                                <textarea name="reason" id="reason-{{ $order->id }}" class="form-control" rows="3" required></textarea>
+                                            </div>
+                                            <p class="text-muted">
+                                                <small>💡 Vui lòng nhập lý do để chúng tôi cải thiện dịch vụ.</small>
+                                            </p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                            <button type="submit" class="btn btn-danger">Xác nhận hủy</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
                     @endif
 
                     @if ($order->status === 'cancelled')
@@ -134,15 +182,15 @@
 @endif
 
 @if ($order->status === 'delivered')
-    <form action="{{ route('client.orders.return', $order->id) }}" method="POST" class="d-inline-block ms-2">
-        @csrf
-        @method('PUT')
-        <button type="submit" class="btn btn-outline-warning"
-            onclick="return confirm('Bạn có chắc muốn trả lại đơn hàng này?')">
-            <i class="fa fa-undo me-1"></i> Trả hàng
-        </button>
-    </form>
+    {{-- Nút + modal TẠO YÊU CẦU TRẢ HÀNG THEO DÒNG HÀNG (line item) --}}
+    @include('client.orders.partials.return_button')
+
+    {{-- Link xem lịch sử yêu cầu trả hàng của đơn --}}
+    <a class="btn btn-link" href="{{ route('client.orders.returns.index', $order) }}">
+        Lịch sử trả hàng
+    </a>
 @endif
+
 
 
                 </div>

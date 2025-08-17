@@ -16,6 +16,7 @@ return new class extends Migration
         $table->decimal('product_price', 10, 2);
         $table->string('product_height')->nullable();
         $table->string('product_pot')->nullable();
+        $table->decimal('pot_price', 10, 2)->nullable();
     });
 }
 

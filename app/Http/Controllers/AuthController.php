@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use Laravel\Socialite\Facades\Socialite;
+
 class AuthController extends Controller
 {
     // GET: /login
@@ -15,40 +16,35 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
-
     // POST: /login
     public function loginPost(Request $request)
     {
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required'],
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|string|min:6',
+        ], [
+            'email.required' => 'Email không được để trống.',
+            'email.email' => 'Email không hợp lệ.',
+            'password.required' => 'Mật khẩu không được để trống.',
+            'password.min' => 'Mật khẩu phải có ít nhất :min ký tự.',
         ]);
 
-        if (Auth::attempt($credentials)) {
+        if (Auth::attempt($request->only('email', 'password'), $request->remember)) {
             $user = Auth::user();
+
             if ($user->is_ban == false) {
-                if ($user->role === 'admin') {
-                    return redirect()->route('admin.dashboard');
-                } elseif ($user->role === 'staff') {
-                    return redirect()->route('admin.dashboard');
+                if ($user->role === 'admin' || $user->role === 'staff') {
+                    return redirect()->route('admin.dashboard')->with('success', 'Đăng nhập thành công!');
                 } elseif ($user->role === 'customer' || $user->role === 'guest') {
-                    return redirect()->route('home')->with('success', 'Đăng nhập thành công');
-                } else {
-                    Auth::logout(); // tránh truy cập lạ
-                    return redirect()->route('auth.login')->withErrors([
-                        'role' => 'Vai trò không hợp lệ.',
-                    ]);
+                    return redirect()->route('home')->with('success', 'Đăng nhập thành công!');
                 }
             } else {
-                return redirect()->route('auth.login')->withErrors([
-                    'email' => 'Tài khoản của bạn đã bị cấm. Vui lòng liên hệ quản trị viên.'
-                ])->withInput();
+                Auth::logout();
+                return back()->withErrors(['email' => 'Tài khoản của bạn đã bị khóa.']);
             }
         }
 
-        return back()->withErrors([
-            'email' => 'Sai tài khoản hoặc mật khẩu',
-        ])->withInput();
+        return back()->withErrors(['email' => 'Sai tài khoản hoặc mật khẩu.'])->withInput();
     }
 
     // GET: /register
@@ -61,61 +57,35 @@ class AuthController extends Controller
     public function registerPost(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:100',
-            'email' => 'required|email|unique:users',
-            'phone' => 'nullable|string|max:20',
-            'password' => 'required|min:6|confirmed',
-            'date_of_birth' => 'nullable|date',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:6|confirmed',
+        ], [
+            'name.required' => 'Họ và tên không được để trống.',
+            'name.max' => 'Họ và tên không được vượt quá 255 ký tự.',
+            'email.required' => 'Email không được để trống.',
+            'email.email' => 'Email không hợp lệ.',
+            'email.unique' => 'Email đã tồn tại.',
+            'password.required' => 'Mật khẩu không được để trống.',
+            'password.min' => 'Mật khẩu phải có ít nhất :min ký tự.',
+            'password.confirmed' => 'Mật khẩu xác nhận không khớp.',
         ]);
 
-        $user = User::create([
+        User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'phone' => $request->phone,
             'password' => Hash::make($request->password),
             'role' => 'customer',
-            'date_of_birth' => $request->date_of_birth,
+            'is_ban' => false
         ]);
 
-        Auth::login($user);
-        return redirect('auth/login')->with('success', 'Đăng kí thành công');
+        return redirect()->route('auth.login')->with('success', 'Đăng ký thành công! Vui lòng đăng nhập.');
     }
 
-    // POST: /logout
-    public function logout(Request $request)
+    // GET: /logout
+    public function logout()
     {
         Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return redirect()->route('auth.login')->with('success', 'Đăng xuất thành công');
-    }
-
-
-    public function redirectToGoogle()
-    {
-        return Socialite::driver('google')->redirect();
-    }
-
-    public function handleGoogleCallback()
-    {
-        try {
-            $googleUser = Socialite::driver('google')->user();
-
-            $user = User::firstOrCreate(
-                ['email' => $googleUser->getEmail()],
-                [
-                    'name' => $googleUser->getName(),
-                    'password' => bcrypt('google-login'), // placeholder
-                    'email_verified_at' => now(),
-                ]
-            );
-
-            Auth::login($user);
-
-            return redirect()->route('home');
-        } catch (\Exception $e) {
-            return redirect()->route('auth.login')->with('error', 'Đăng nhập Google thất bại!');
-        }
+        return redirect()->route('auth.login')->with('success', 'Đăng xuất thành công!');
     }
 }

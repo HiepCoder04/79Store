@@ -53,8 +53,9 @@
                                         <th>Chậu</th>
                                         <th>Chiều cao</th>
                                         <th>Số lượng</th>
-                                        <th>Giá</th>
-                                        <th>Thành tiền</th>
+                                        <th>Giá cây</th>
+                                        <th>Giá chậu</th>
+                                        <th>Tổng</th>
                                         <th>Thao tác</th>
                                     </tr>
                                 </thead>
@@ -68,31 +69,50 @@
                                             $imageUrl = $image
                                                 ? (Str::startsWith($image, 'http') ? $image : asset(ltrim($image, '/')))
                                                 : asset('assets/img/bg-img/default.jpg');
+
+                                            $productPrice = $variant->price;
+                                            $potPrice = $item->pot?->price ?? 0;
                                         @endphp
                                         <tr data-item-id="{{ $item->id }}">
                                             <td>
-                                                <input type="checkbox" name="selected_items[]" value="{{ $item->id }}" class="item-checkbox">
+                                                <input type="checkbox"
+                                                    name="selected_items[]"
+                                                    value="{{ $item->id }}"
+                                                    class="item-checkbox"
+                                                    @if($item->out_of_stock) disabled @endif>
                                             </td>
                                             <td class="text-start">
                                                 <div class="d-flex align-items-center gap-3">
                                                     <img src="{{ $imageUrl }}" alt="{{ $product->name }}" width="80" class="img-thumbnail">
                                                     <strong>{{ $product->name }}</strong>
+                                                     @if($item->out_of_stock)
+                                                        <div class="text-danger small">{{ $item->out_of_stock_message }}</div>
+                                                    @endif
                                                 </div>
                                             </td>
-                                            <td>{{ $variant->pot }}</td>
-                                            <td>
-                                                {{ $variant->height ? $variant->height . ' cm' : 'Không rõ' }}
+                                            
+                                            <td>{{ $item->pot?->name ?? 'Không có chậu' }}
+                                                
                                             </td>
+                                            
+                                            <td>{{ $variant->height ? $variant->height . ' cm' : 'Không rõ' }}</td>
+
                                             <td>
                                                 <input type="number" name="quantity" value="{{ $item->quantity }}" min="1"
                                                     class="form-control quantity-input text-center" style="width: 80px;">
                                             </td>
-                                            <td class="unit-price" data-price="{{ $variant->price }}">
-                                                {{ number_format($variant->price, 0, ',', '.') }}đ
-                                            </td>
+
+                                            {{-- Giá cây --}}
+                                            <td>{{ number_format($productPrice, 0, ',', '.') }}đ</td>
+
+                                            {{-- Giá chậu --}}
+                                            <td>{{ $potPrice > 0 ? number_format($potPrice, 0, ',', '.') . 'đ' : '0đ' }}</td>
+
+                                            {{-- Tổng = (giá cây + giá chậu) * số lượng --}}
                                             <td class="item-subtotal">
-                                                {{ number_format($variant->price * $item->quantity, 0, ',', '.') }}đ
+                                                {{ number_format(($productPrice + $potPrice) * $item->quantity, 0, ',', '.') }}đ
                                             </td>
+
                                             <td>
                                                 <form method="POST" action="{{ route('cart.remove', $item->id) }}">
                                                     @csrf @method('DELETE')
@@ -103,7 +123,7 @@
                                             </td>
                                         </tr>
                                     @endforeach
-                                    </tbody>
+                                </tbody>
 
                             </table>
                         </div>
@@ -178,13 +198,14 @@
     function updateSelectedTotal(discountInfo = null) {
         let subtotal = 0;
 
-        document.querySelectorAll('.item-checkbox:checked').forEach(checkbox => {
+        document.querySelectorAll('.item-checkbox:checked:not(:disabled)').forEach(checkbox => {
             const row = checkbox.closest('tr');
-            const price = parseInt(row.querySelector('.unit-price').dataset.price);
-            const qty = parseInt(row.querySelector('.quantity-input').value);
-            subtotal += price * qty;
+            const productPrice = parseInt(row.querySelectorAll('td')[5].textContent.replace(/\D/g, '')) || 0;
+            const potPrice = parseInt(row.querySelectorAll('td')[6].textContent.replace(/\D/g, '')) || 0;
+            const qty = parseInt(row.querySelector('.quantity-input').value) || 0;
+            subtotal += (productPrice + potPrice) * qty;
         });
-
+        
         document.getElementById('subtotal-value').textContent = formatCurrency(subtotal);
 
         let discount = 0;
@@ -344,6 +365,73 @@
             document.getElementById('checkout-form-selected').submit();
         });
     });
+    // Lấy danh sách mã giảm giá
+    function renderVoucherSuggestions(vouchers) {
+    const input = document.getElementById('voucher_code_input');
+    let suggestionBox = document.getElementById('voucher-suggestion-box');
+
+    if (suggestionBox) suggestionBox.remove();
+
+    suggestionBox = document.createElement('div');
+    suggestionBox.id = "voucher-suggestion-box";
+    suggestionBox.style.top = "100%";  // đẩy xuống ngay dưới input
+suggestionBox.style.marginTop = "10px"; // thêm khoảng cách
+    suggestionBox.style.zIndex = 999;
+    suggestionBox.style.width = "100%";
+    suggestionBox.style.background = "#fff";
+    suggestionBox.style.border = "1px solid #ccc";
+    suggestionBox.style.boxShadow = "0 2px 6px rgba(0,0,0,0.1)";
+    suggestionBox.innerHTML = vouchers.map(v => `
+        <div class="voucher-item p-2 border-bottom" style="cursor: pointer" data-code="${v.code}">
+            <strong>${v.code}</strong> - ${parseInt(v.discount_percent)}%<br>
+
+            HSD: ${new Date(v.end_date).toLocaleDateString('vi-VN')}<br>
+            Giá giảm tối đa: ${parseInt(v.max_discount)}đ | Giá hóa đơn tối thiểu: ${parseInt(v.min_order_amount)}đ
+
+        </div>
+    `).join('');
+
+    input.parentElement.style.position = "relative";
+    input.parentElement.appendChild(suggestionBox);
+
+    document.querySelectorAll('.voucher-item').forEach(item => {
+        item.addEventListener('click', function () {
+            input.value = this.dataset.code;
+            suggestionBox.remove();
+        });
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    const input = document.getElementById('voucher_code_input');
+
+    input.addEventListener('focus', function () {
+        fetch('/vouchers/suggestions')
+  .then(response => response.json())
+  .then(data => {
+    // Nếu response là object có dạng { data: [...] }
+    const vouchers = Array.isArray(data) ? data : data.data;
+
+    if (!Array.isArray(vouchers)) {
+      throw new Error("Invalid vouchers format");
+    }
+
+    renderVoucherSuggestions(vouchers);
+
+  })
+  .catch(error => {
+    console.error("LỖI API voucher:", error);
+  });
+
+
+    document.addEventListener('click', function (e) {
+        const box = document.getElementById('voucher-suggestion-box');
+        if (box && !box.contains(e.target) && e.target !== input) {
+            box.remove();
+        }
+    });
+});
+})
 </script>
 @endpush
 
