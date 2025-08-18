@@ -66,5 +66,11 @@ class HomeController extends Controller
             : collect();
 
         return view('client.home', compact('banners', 'products', 'vouchers', 'userVouchers', 'bestSellers'));
+        
+    }
+    public function about()
+    {
+         $banners = Banner::where('is_active', 1)->latest()->get();
+        return view('client.users.about-detail',compact('banners'));
     }
 }

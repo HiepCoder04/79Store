@@ -22,6 +22,7 @@ class ProductVariant extends Controller
         $query = Product::query()
         ->with(['category', 'galleries', 'variants'])
         ->leftJoin('product_variants', 'products.id', '=', 'product_variants.product_id')
+        ->where('products.is_active', 1)
         ->select(
             'products.id',
             'products.name',

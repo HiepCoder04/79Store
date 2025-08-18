@@ -20,6 +20,7 @@ class UserController extends Controller
                 'is_ban' => 'exact', // lọc theo trạng thái cấm
             ]);
 
+
         // Lọc trạng thái xác minh email (do không nằm trong trait filter)
         if ($request->filled('verified')) {
             if ($request->verified == 1) {

@@ -41,6 +41,10 @@
     border-radius: 8px;
     padding: 6px 12px;
   }
+   .filter-box{border-radius:12px;padding:12px;background:#fff}
+  .filter-box label{font-size:.9rem;color:#6b7280;margin-bottom:.35rem}
+  .filter-field.form-control{border:1.5px solid #d1d5db;border-radius:10px}
+  .filter-field:focus{border-color:#e91e63;box-shadow:0 0 0 .2rem rgba(233,30,99,.12);outline:0}
 </style>
 
 <div class="container table-container">
@@ -58,6 +62,23 @@
   @if(session('error'))
     <div class="alert alert-danger">{{ session('error') }}</div>
   @endif
+<form method="GET" action="{{ route('admin.category_blogs.index') }}" class="card mb-4 p-3">
+  <div class="row g-3 align-items-end">
+    <div class="col-md-6">
+      <div class="filter-box">
+        <label class="form-label">Tên danh mục</label>
+        <input type="text" name="q" class="form-control filter-field"
+               placeholder="Nhập tên danh mục…" value="{{ request('q') }}">
+      </div>
+    </div>
+
+    <div class="col-md-6 d-flex gap-2">
+      <button type="submit" class="btn btn-primary">Lọc</button>
+      <a href="{{ route('admin.category_blogs.index') }}" class="btn btn-outline-secondary">Xoá lọc</a>
+    </div>
+  </div>
+</form>
+
 
   <div class="table-responsive">
     <table class="table custom-table table-bordered align-middle mb-0">

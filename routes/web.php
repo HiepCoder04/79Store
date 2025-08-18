@@ -134,11 +134,10 @@ Route::prefix('auth')->name('auth.')->controller(AuthController::class)->group(f
     Route::post('/logout', 'logout')->name('logout');
 });
 //gg login
-Route::get('/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
-Route::get('/google/callback', [AuthController::class, 'handleGoogleCallback']);
 
-Route::get('/auth/google', [GoogleController::class, 'redirectToGoogle']);
-Route::get('/auth/google/callback', [GoogleController::class, 'handleGoogleCallback']);
+Route::get('/auth/google', [GoogleController::class, 'redirectToGoogle'])->name('auth.google');
+Route::get('/auth/google/callback', [GoogleController::class, 'handleGoogleCallback'])->name('auth.google.callback');
+
 // -------------------- CLIENT (AUTHENTICATED) --------------------
 Route::middleware(['auth', 'ban'])->group(function () {
     // Giỏ hàng
@@ -202,7 +201,7 @@ Route::get('/vnpay-callback', [PaymentController::class, 'vnpayCallback'])->name
 // -------------------- TRANG CHÍNH & GIỚI THIỆU --------------------
 Route::get('/', [HomeController::class, 'index'])->name('home')->middleware('ban');
 Route::get('/home', [HomeController::class, 'index']);
-Route::get('/about', fn() => view('client.users.about-detail'))->middleware('ban')->name('about');
+Route::get('/about', [HomeController::class ,'about'])->middleware('ban')->name('about');
 
 // -------------------- SHOP --------------------
 Route::get('/shop', [ProductVariant::class, 'product'])->middleware('ban')->name('shop');

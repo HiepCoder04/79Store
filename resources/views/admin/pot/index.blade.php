@@ -1,6 +1,19 @@
 @extends('admin.layouts.dashboard')
 
 @section('content')
+
+<style>
+  .filter-box{border-radius:12px;padding:12px;background:#fff}
+  .filter-box label{font-size:.9rem;color:#6b7280;margin-bottom:.35rem}
+  .filter-field.form-control{border:1.5px solid #d1d5db;border-radius:10px}
+  .filter-field:focus{border-color:#e91e63;box-shadow:0 0 0 .2rem rgba(233,30,99,.12);outline:0}
+  .search h2 {
+    font-size: 1.5rem;
+    color: #333;
+    margin: 20px;
+  }
+</style>
+
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
 <style>
@@ -46,6 +59,7 @@
         </div>
     @endif
 
+
     <div class="table-container">
         @if ($pots->isEmpty())
             <div class="text-center text-muted py-4">Chưa có chậu nào.</div>
@@ -73,6 +87,7 @@
                                         <a href="{{ route('admin.pot.edit', $pot->id) }}" 
                                            class="btn btn-sm btn-primary">
                                             Sửa
+
                                         </a>
                                         <form action="{{ route('admin.pot.destroy', $pot->id) }}" 
                                               method="POST" 

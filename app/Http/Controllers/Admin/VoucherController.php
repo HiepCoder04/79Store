@@ -12,6 +12,7 @@ class VoucherController extends Controller
 {
     public function index(Request $request)
     {
+
         $query = Voucher::query()
             ->search($request, ['code']) // tìm kiếm theo code và mô tả
             ->filter($request, [
@@ -51,6 +52,7 @@ class VoucherController extends Controller
         $vouchers = $query->latest()->paginate(10)->appends($request->query());
 
         return view('admin.vouchers.index', compact('vouchers'));
+
     }
 
 

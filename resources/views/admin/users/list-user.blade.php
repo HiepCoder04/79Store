@@ -64,15 +64,21 @@ QUẢN LÍ TÀI KHOẢN
         gap: 8px;
         flex-wrap: wrap;
     }
+      .filter-box{border-radius:12px;padding:12px;background:#fff}
+  .filter-box label{font-size:.9rem;color:#6b7280;margin-bottom:.35rem}
+  .filter-field.form-control{border:1.5px solid #d1d5db;border-radius:10px}
+  .filter-field:focus{border-color:#e91e63;box-shadow:0 0 0 .2rem rgba(233,30,99,.12);outline:0}
+
 </style>
 
 <div class="container table-container">
     <div class="mb-4">
-        <h5 class="mb-0"><i class="bi bi-people-fill me-2 text-primary"></i>QUẢN LÍ TÀI KHOẢN</h5>
-        <p class="text-muted">Danh sách tài khoản người dùng</p>
+        <h5 class="mb-0">QUẢN LÍ TÀI KHOẢN</h5>
     </div>
 
     <div class="table-responsive">
+
+
         <form method="GET" class="row g-2 mb-3">
     <div class="col-md-3">
         <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="Tìm tên, email, SĐT...">
