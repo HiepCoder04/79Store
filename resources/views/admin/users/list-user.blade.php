@@ -73,8 +73,7 @@ QUẢN LÍ TÀI KHOẢN
 
 <div class="container table-container">
     <div class="mb-4">
-        <h5 class="mb-0"><i class="bi bi-people-fill me-2 text-primary"></i>QUẢN LÍ TÀI KHOẢN</h5>
-        <p class="text-muted">Danh sách tài khoản người dùng</p>
+        <h5 class="mb-0">QUẢN LÍ TÀI KHOẢN</h5>
     </div>
 
     <div class="table-responsive">
@@ -115,7 +114,6 @@ QUẢN LÍ TÀI KHOẢN
         <a href="{{ route('admin.users.list') }}" class="btn btn-secondary">Xóa lọc</a>
     </div>
 </form>
->>>>>>> hiep
         <table class="table custom-table table-bordered align-middle mb-0">
             <thead>
                 <tr>
