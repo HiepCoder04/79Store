@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class OrderDetail extends Model
 {
     use HasFactory;
-     protected $table = 'order_details';
+    protected $table = 'order_details';
 
     protected $fillable = [
         'order_id',
@@ -65,5 +65,8 @@ class OrderDetail extends Model
             ->whereIn('status', ['approved', 'refunded', 'exchanged'])
             ->sum('quantity');
     }
-
+    public function review()
+    {
+        return $this->hasOne(\App\Models\Review::class, 'order_detail_id');
+    }
 }
