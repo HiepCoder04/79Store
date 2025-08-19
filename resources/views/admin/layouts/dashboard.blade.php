@@ -16,6 +16,9 @@
 
     <!-- Fonts and icons -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:300,400,500,600,700,900&display=swap" />
+    <!-- Font Awesome 5 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
     <!-- Nucleo Icons -->
     <link href="{{ asset('assets/css/nucleo-icons.css') }}" rel="stylesheet" />
     <link href="{{ asset('assets/css/nucleo-svg.css') }}" rel="stylesheet" />

@@ -117,6 +117,14 @@ Route::middleware(['auth', 'role:admin', 'ban'])->prefix('admin')->name('admin.'
         Route::put('/{cancellation}/approve', [AdminCancellationController::class, 'approve'])->name('approve');
         Route::put('/{cancellation}/reject', [AdminCancellationController::class, 'reject'])->name('reject');
     });
+
+    //đánh giá
+    Route::get('/reviews', [App\Http\Controllers\Admin\ReviewController::class, 'index'])->name('reviews.index');
+    Route::post('/reviews/{review}/reply', [App\Http\Controllers\Admin\ReviewController::class, 'reply'])->name('reviews.reply');
+    Route::delete('/reviews/{review}', [App\Http\Controllers\Admin\ReviewController::class, 'destroy'])
+    ->name('reviews.destroy');
+
+    
 });
 
 // Quản lý người dùng
