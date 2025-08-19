@@ -7,7 +7,7 @@
 
 <div class="breadcrumb-area">
     <div class="top-breadcrumb-area bg-img bg-overlay d-flex align-items-center justify-content-center"
-         style="background-image: url('https://i.imgur.com/T6dAash.jpeg');">
+         style="background-image: url({{ asset('assets/img/bg-img/24.jpg') }});">
         <h2>{{ $product->name }}</h2>
     </div>
     <div class="container">
@@ -97,63 +97,217 @@
             </div>
         </div>
     </div>
+    <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="product_details_tab clearfix">
+                        <!-- Tabs -->
+                        <ul class="nav nav-tabs" role="tablist" id="product-details-tab">
+                            <li class="nav-item">
+                                <a href="#reviews" class="nav-link active" data-toggle="tab" role="tab">Đánh giá</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#comment" class="nav-link" data-toggle="tab" role="tab">Bình luận <span class="text-muted">(1)</span></a>
+                            </li>
+                        </ul>
+                        <!-- Tab Content -->
+                        <div class="tab-content">
+                            <div role="tabpanel" class="tab-pane fade" id="comment">
+                                <div class="container d-flex justify-content-center">
+                                    <div class="col-md-8 col-lg-6 mt-4">
+                                        <h5 class="mb-3 fw-semibold text-center">Bình luận sản phẩm</h5>
 
-     <!-- ==== Bình luận sản phẩm ==== -->
-<div class="container d-flex justify-content-center">
-    <div class="col-md-8 col-lg-6 mt-4">
-        <h5 class="mb-3 fw-semibold text-center">Bình luận sản phẩm</h5>
+                                        {{-- Form gửi bình luận --}}
+                                        @auth
+                                            <form action="{{ route('comments.store') }}" method="POST" class="mb-3">
+                                                @csrf
+                                                <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                                <textarea name="content" rows="2" class="form-control form-control-sm mb-2" placeholder="Nhập bình luận..."></textarea>
+                                                <div class="d-flex justify-content-end">
+                                                    <button type="submit" class="btn btn-sm btn-primary">Gửi</button>
+                                                </div>
+                                            </form>
+                                        @else
+                                            <p class="text-muted text-center">Vui lòng <a href="{{ route('auth.login') }}">đăng nhập</a> để bình luận.</p>
+                                        @endauth
 
-        {{-- Form gửi bình luận --}}
-        @auth
-            <form action="{{ route('comments.store') }}" method="POST" class="mb-3">
-                @csrf
-                <input type="hidden" name="product_id" value="{{ $product->id }}">
-                <textarea name="content" rows="2" class="form-control form-control-sm mb-2" placeholder="Nhập bình luận..."></textarea>
-                <div class="d-flex justify-content-end">
-                    <button type="submit" class="btn btn-sm btn-primary">Gửi</button>
-                </div>
-            </form>
-        @else
-             <p class="text-muted text-center">Vui lòng <a href="{{ route('auth.login') }}">đăng nhập</a> để bình luận.</p>
-        @endauth
+                                        {{-- Danh sách bình luận --}}
+                                        @foreach($product->comments()->whereNull('parent_id')->latest()->get() as $comment)
+                                            <div class="border rounded p-2 mb-2 bg-light-subtle small">
+                                                <div class="d-flex justify-content-between mb-1">
+                                                    <strong>{{ $comment->user->name }}</strong>
+                                                    <small class="text-muted">{{ $comment->created_at->diffForHumans() }}</small>
+                                                </div>
+                                                <div class="text-muted">{{ $comment->content }}</div>
 
-        {{-- Danh sách bình luận --}}
-        @foreach($product->comments()->whereNull('parent_id')->latest()->get() as $comment)
-            <div class="border rounded p-2 mb-2 bg-light-subtle small">
-                <div class="d-flex justify-content-between mb-1">
-                    <strong>{{ $comment->user->name }}</strong>
-                    <small class="text-muted">{{ $comment->created_at->diffForHumans() }}</small>
-                </div>
-                <div class="text-muted">{{ $comment->content }}</div>
+                                                {{-- Trả lời --}}
+                                                @foreach($comment->replies as $reply)
+                                                    <div class="ms-3 mt-2 p-2 bg-white border rounded small">
+                                                        <div class="d-flex justify-content-between mb-1">
+                                                            <small class="fw-semibold">{{ $reply->user->name }}</small>
+                                                            <small class="text-muted">{{ $reply->created_at->diffForHumans() }}</small>
+                                                        </div>
+                                                        <div class="text-muted">{{ $reply->content }}</div>
+                                                    </div>
+                                                @endforeach
 
-                {{-- Trả lời --}}
-                @foreach($comment->replies as $reply)
-                    <div class="ms-3 mt-2 p-2 bg-white border rounded small">
-                        <div class="d-flex justify-content-between mb-1">
-                            <small class="fw-semibold">{{ $reply->user->name }}</small>
-                            <small class="text-muted">{{ $reply->created_at->diffForHumans() }}</small>
-                        </div>
-                        <div class="text-muted">{{ $reply->content }}</div>
-                    </div>
-                @endforeach
+                                                {{-- Form trả lời --}}
+                                                @auth
+                                                    <form action="{{ route('comments.store') }}" method="POST" class="mt-2 ms-3">
+                                                        @csrf
+                                                        <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                                        <input type="hidden" name="parent_id" value="{{ $comment->id }}">
+                                                        <textarea name="content" rows="1" class="form-control form-control-sm mb-1" placeholder="Trả lời..."></textarea>
+                                                        <button class="btn btn-sm btn-outline-secondary">Trả lời</button>
+                                                    </form>
+                                                @endauth
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+                            <div role="tabpanel" class="tab-pane fade show active" id="reviews">
+    <div class="container d-flex justify-content-center">
+        <div class="col-md-8 col-lg-6 mt-4">
+            <h5 class="mb-3 fw-semibold">Đánh giá của khách hàng</h5>
 
-                {{-- Form trả lời --}}
-                @auth
-                    <form action="{{ route('comments.store') }}" method="POST" class="mt-2 ms-3">
-                        @csrf
-                        <input type="hidden" name="product_id" value="{{ $product->id }}">
-                        <input type="hidden" name="parent_id" value="{{ $comment->id }}">
-                        <textarea name="content" rows="1" class="form-control form-control-sm mb-1" placeholder="Trả lời..."></textarea>
-                        <button class="btn btn-sm btn-outline-secondary">Trả lời</button>
-                    </form>
-                @endauth
+            {{-- Hiển thị trung bình rating --}}
+            <div class="mb-3">
+                <span class="h4 text-warning">
+                    @for($i = 1; $i <= 5; $i++)
+                        <i class="fa fa-star{{ $i <= round($averageRating) ? '' : '-o' }}"></i>
+                    @endfor
+                </span>
+                <span class="ms-2">{{ number_format($averageRating,1) }}/5</span>
+                <small class="text-muted">({{ $reviewCount }} đánh giá)</small>
             </div>
-        @endforeach
+
+            {{-- Form gửi đánh giá --}}
+           @auth
+    @php
+        // tìm order_detail_id mà user này đã mua và chưa review
+        $orderDetailId = \App\Models\OrderDetail::where('product_id', $product->id)
+            ->whereHas('order', fn($q) => 
+                $q->where('user_id', auth()->id())
+                  ->where('status', 'delivered')
+            )
+            ->whereDoesntHave('review')
+            ->value('id'); // chỉ lấy 1 id
+    @endphp
+
+    @if($orderDetailId)
+        {{-- Form gửi đánh giá --}}
+<form action="{{ route('reviews.store') }}" method="POST" enctype="multipart/form-data" class="mb-3">
+    @csrf
+    <input type="hidden" name="product_id" value="{{ $product->id }}">
+    <input type="hidden" name="order_detail_id" value="{{ $orderDetailId }}">
+    <input type="hidden" name="rating" id="rating" required>
+
+    {{-- Chọn số sao --}}
+    <div class="mb-2">
+        <div id="star-rating" style="cursor: pointer; font-size: 20px; color: #ccc;">
+            @for ($i = 1; $i <= 5; $i++)
+                <i class="fa fa-star" data-value="{{ $i }}"></i>
+            @endfor
+        </div>
+    </div>
+
+    {{-- Ô nhập + nút gửi giống hình bạn gửi --}}
+    <div class="d-flex align-items-center border rounded p-2">
+        <textarea name="comment" rows="1" class="form-control border-0 flex-grow-1"
+                  placeholder="Viết nhận xét..." minlength="5" required></textarea>
+        <button type="submit" class="btn btn-dark ms-2">Gửi đánh giá</button>
+    </div>
+
+    {{-- Chọn ảnh --}}
+    <div class="mt-2">
+        <!-- input file ẩn -->
+        <input type="file" name="image_path" id="review-image" accept="image/*" 
+               style="display:none;" onchange="previewReviewImage(event)">
+        
+        <!-- icon chọn ảnh -->
+        <label for="review-image" class="btn btn-outline-secondary btn-sm mt-2">
+            <i class="fa fa-camera"></i> Thêm ảnh
+        </label>
+
+        <!-- preview ảnh -->
+        <div id="image-preview" class="mt-2"></div>
+    </div>
+</form>
+
+    @endif
+@endauth
+
+            {{-- Danh sách đánh giá --}}
+            <h6 class="mt-4">{{ $reviewCount }} Đánh giá</h6>
+            {{-- Danh sách đánh giá --}}
+<h6 class="mt-4">{{ $reviewCount }} Đánh giá</h6>
+@forelse($product->reviews as $review)
+    <div class="border rounded p-3 mb-3 bg-light">
+        <div class="d-flex align-items-center mb-2">
+            <img src="https://ui-avatars.com/api/?name={{ urlencode($review->user->name) }}&size=36"
+                 class="rounded-circle me-2" width="36" height="36">
+            <div>
+                <strong>{{ $review->user->name }}</strong>
+                <div class="text-warning small">
+                    @for($i=1;$i<=5;$i++)
+                        <i class="fa fa-star{{ $i <= $review->rating ? '' : '-o' }}"></i>
+                    @endfor
+                </div>
+            </div>
+        </div>
+
+        {{-- Nội dung review --}}
+        <p class="mb-2">{{ $review->comment }}</p>
+
+        @if ($review->image_path)
+            <div class="mt-2">
+                <img src="{{ asset('storage/' . $review->image_path) }}"
+                     alt="Ảnh đánh giá" class="review-img">
+            </div>
+        @endif
+
+        <small class="text-muted d-block">{{ $review->created_at->diffForHumans() }}</small>
+
+        {{-- Nếu admin đã reply --}}
+        @if($review->admin_reply)
+            <div class="mt-3 p-2 border-start border-3 border-primary bg-white rounded">
+                <strong class="text-primary">Phản hồi từ Admin:</strong>
+                <p class="mb-1">{{ $review->admin_reply }}</p>
+                <small class="text-muted">Cảm ơn bạn đã góp ý!</small>
+            </div>
+        @endif
+    </div>
+@empty
+    <p class="text-muted">Chưa có đánh giá nào cho sản phẩm này.</p>
+@endforelse
+
+        </div>
     </div>
 </div>
 
 
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+     <!-- ==== Bình luận sản phẩm ==== -->
+
+
+
 </section>
+<style>
+    .review-img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;   /* cắt ảnh để không bị méo */
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    margin-top: 5px;
+}
+
+</style>
 @endsection
 
 
@@ -303,5 +457,50 @@
             });
         });
     });
+    document.addEventListener("DOMContentLoaded", function () {
+    const stars = document.querySelectorAll("#star-rating i");
+    const ratingInput = document.getElementById("rating");
+    let selected = 0;
+
+    stars.forEach(star => {
+        star.addEventListener("mouseover", function () {
+            highlightStars(parseInt(this.dataset.value));
+        });
+        star.addEventListener("mouseout", function () {
+            highlightStars(selected);
+        });
+        star.addEventListener("click", function () {
+            selected = parseInt(this.dataset.value);
+            ratingInput.value = selected;
+            highlightStars(selected);
+        });
+    });
+
+    function highlightStars(value) {
+        stars.forEach(star => {
+            star.style.color = parseInt(star.dataset.value) <= value ? "#f5c518" : "#ccc";
+        });
+    }
+});
+
+function previewReviewImage(event) {
+    const previewContainer = document.getElementById('image-preview');
+    previewContainer.innerHTML = "";
+
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = document.createElement("img");
+            img.src = e.target.result;
+            img.className = "img-thumbnail mt-2";
+            img.style.maxHeight = "120px";
+            img.style.borderRadius = "6px";
+            previewContainer.appendChild(img);
+        }
+        reader.readAsDataURL(file);
+    }
+}
+
 </script>
 @endsection

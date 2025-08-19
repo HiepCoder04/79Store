@@ -33,13 +33,16 @@
   .btn-add { border-radius: 10px; font-weight: 500; }
 </style>
 
+
 <div class="container table-container">
   <div class="d-flex justify-content-between align-items-center mb-4">
+
     <h5 class="mb-0"><i class="bi bi-ticket-perforated-fill text-danger me-2"></i>Danh sách voucher</h5>
     <a href="{{ route('admin.vouchers.create') }}" class="btn btn-primary btn-add">
       <i class="bi bi-plus-circle me-1"></i> Thêm voucher
     </a>
   </div>
+
 
   {{-- Form lọc --}}
   <form method="GET" class="mb-4">
@@ -74,6 +77,7 @@
   </form>
 
   <div class="table-responsive">
+
     <table class="table custom-table table-bordered align-middle mb-0">
       <thead>
         <tr>

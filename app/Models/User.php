@@ -12,13 +12,8 @@ use App\Traits\Filterable;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable,Filterable;
+    use HasApiTokens, HasFactory, Notifiable, Filterable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $table = 'users';
 
     protected $fillable = [
@@ -30,6 +25,8 @@ class User extends Authenticatable
         'date_of_birth',
         'email_verified_at',
         'remember_token',
+        'is_ban',
+        'ban_reason',
     ];
 
     protected $hidden = [
@@ -43,17 +40,11 @@ class User extends Authenticatable
         'is_ban' => 'boolean',
     ];
 
-    public function cart()
-    {
-        return $this->hasOne(Cart::class);
-    }
-
+    // Quan hệ
     public function addresses()
     {
         return $this->hasMany(UserAddress::class);
     }
-
-
     public function defaultAddress()
     {
         return $this->hasOne(UserAddress::class)->where('is_default', 1);
@@ -68,9 +59,12 @@ class User extends Authenticatable
             ->withPivot(['is_used', 'used_at'])
             ->withTimestamps();
     }
-
     public function returnRequests()
     {
         return $this->hasMany(ReturnRequest::class);
+    }
+    public function cancellations()
+    {
+        return $this->hasMany(Cancellation::class);
     }
 }

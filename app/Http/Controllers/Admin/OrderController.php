@@ -12,10 +12,129 @@ use App\Mail\OrderStatusMail;
 class OrderController extends Controller
 {
     // Hiển thị danh sách đơn hàng
-    public function index()
+    public function index(Request $request)
     {
-        $orders = Order::with(['orderDetails', 'user'])->latest()->paginate(10);
+        $query = Order::with(['orderDetails', 'user']);
 
+        // ✅ Thêm các bộ lọc mà không thay đổi logic cũ
+        // Lọc theo trạng thái đơn hàng
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // Lọc theo thời gian
+        if ($request->filled('date_filter')) {
+            switch ($request->date_filter) {
+                case 'today':
+                    $query->whereDate('created_at', today());
+                    break;
+                case 'yesterday':
+                    $query->whereDate('created_at', today()->subDay());
+                    break;
+                case 'this_week':
+                    $query->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]);
+                    break;
+                case 'this_month':
+                    $query->whereMonth('created_at', now()->month)
+                          ->whereYear('created_at', now()->year);
+                    break;
+                case 'last_month':
+                    $query->whereMonth('created_at', now()->subMonth()->month)
+                          ->whereYear('created_at', now()->subMonth()->year);
+                    break;
+                case 'custom':
+                    if ($request->filled('start_date')) {
+                        $query->whereDate('created_at', '>=', $request->start_date);
+                    }
+                    if ($request->filled('end_date')) {
+                        $query->whereDate('created_at', '<=', $request->end_date);
+                    }
+                    break;
+            }
+        }
+
+        // Lọc theo phương thức thanh toán
+        if ($request->filled('payment_method')) {
+            $query->where('payment_method', $request->payment_method);
+        }
+
+        // Lọc theo trạng thái thanh toán
+        if ($request->filled('payment_status')) {
+            $query->where('payment_status', $request->payment_status);
+        }
+
+        // Tìm kiếm nâng cao
+        if ($request->filled('search')) {
+            $searchTerm = $request->search;
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('id', 'like', "%{$searchTerm}%")
+                  ->orWhere('name', 'like', "%{$searchTerm}%")
+                  ->orWhere('phone', 'like', "%{$searchTerm}%")
+                  ->orWhereHas('user', function ($userQuery) use ($searchTerm) {
+                      $userQuery->where('name', 'like', "%{$searchTerm}%")
+                               ->orWhere('email', 'like', "%{$searchTerm}%");
+                  })
+                  ->orWhereHas('orderDetails', function ($detailQuery) use ($searchTerm) {
+                      $detailQuery->where('product_name', 'like', "%{$searchTerm}%");
+                  });
+            });
+        }
+
+        // Lọc theo giá trị đơn hàng
+        if ($request->filled('amount_filter')) {
+            switch ($request->amount_filter) {
+                case 'under_500k':
+                    $query->where('total_after_discount', '<', 500000);
+                    break;
+                case '500k_1m':
+                    $query->whereBetween('total_after_discount', [500000, 1000000]);
+                    break;
+                case '1m_2m':
+                    $query->whereBetween('total_after_discount', [1000000, 2000000]);
+                    break;
+                case '2m_5m':
+                    $query->whereBetween('total_after_discount', [2000000, 5000000]);
+                    break;
+                case 'over_5m':
+                    $query->where('total_after_discount', '>', 5000000);
+                    break;
+                case 'custom':
+                    if ($request->filled('min_amount')) {
+                        $query->where('total_after_discount', '>=', $request->min_amount);
+                    }
+                    if ($request->filled('max_amount')) {
+                        $query->where('total_after_discount', '<=', $request->max_amount);
+                    }
+                    break;
+            }
+        }
+
+        // Sắp xếp (thêm vào logic cũ)
+        if ($request->filled('sort_by')) {
+            switch ($request->sort_by) {
+                case 'oldest':
+                    $query->oldest();
+                    break;
+                case 'highest_value':
+                    $query->orderBy('total_after_discount', 'desc');
+                    break;
+                case 'lowest_value':
+                    $query->orderBy('total_after_discount', 'asc');
+                    break;
+                case 'status_priority':
+                    $query->orderByRaw("FIELD(status, 'pending', 'confirmed', 'shipping', 'delivered', 'cancelled', 'returned')");
+                    break;
+                default:
+                    $query->latest();
+                    break;
+            }
+        } else {
+            $query->latest(); 
+        }
+
+        $orders = $query->paginate(10)->appends($request->query());
+
+       
         foreach ($orders as $order) {
             $order->total_amount = $order->orderDetails->sum(function ($item) {
                 return $item->quantity * $item->price;
@@ -46,6 +165,8 @@ class OrderController extends Controller
         if (!$this->isValidStatusTransition($currentStatus, $newStatus)) {
             return back()->with('error', 'Không thể chuyển từ trạng thái "' . $this->getStatusLabel($currentStatus) . '" sang "' . $this->getStatusLabel($newStatus) . '".');
         }
+        
+    
         if ($newStatus === 'delivered' && $currentStatus !== 'delivered') {
             $order->delivered_at = now();
         }
@@ -53,7 +174,7 @@ class OrderController extends Controller
         $order->status = $newStatus;
         $order->save();
 
-        // Gửi email thông báo trạng thái
+ 
         $statusText = match ($newStatus) {
             'pending' => 'Chờ xác nhận',
             'confirmed' => 'Đã xác nhận',
@@ -88,6 +209,7 @@ class OrderController extends Controller
     // Lấy danh sách trạng thái có thể chuyển đến
     public function getAvailableStatuses($currentStatus)
     {
+
         $allStatuses = [
             'pending' => 'Chờ xác nhận',
             'confirmed' => 'Đã xác nhận',
@@ -114,6 +236,7 @@ class OrderController extends Controller
     // Lấy nhãn hiển thị của trạng thái
     private function getStatusLabel($status)
     {
+
         $labels = [
             'pending' => 'Chờ xác nhận',
             'confirmed' => 'Đã xác nhận',
@@ -134,7 +257,7 @@ class OrderController extends Controller
             'orderDetails.productVariant'
         ])->findOrFail($id);
 
-        // Tổng tiền trước giảm
+ 
         $totalBeforeDiscount = 0;
         foreach ($order->orderDetails as $item) {
             $totalBeforeDiscount += $item->price * $item->quantity;
@@ -170,7 +293,6 @@ class OrderController extends Controller
         return redirect()->route('orders.index')->with('success', 'Cập nhật đơn hàng thành công.');
     }
 
-    // (Tuỳ chọn) Xoá đơn hàng
     public function destroy($id)
     {
         Order::destroy($id);

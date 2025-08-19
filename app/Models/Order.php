@@ -59,4 +59,14 @@ class Order extends Model
         $id = $this->id ?? 0;
         return '79ST' . $date . str_pad($id, 4, '0', STR_PAD_LEFT);
     }
+    public function cancellations()
+    {
+        return $this->hasMany(Cancellation::class);
+    }
+
+    // Nếu muốn lấy yêu cầu hủy mới nhất
+    public function latestCancellation()
+    {
+        return $this->hasOne(Cancellation::class)->latestOfMany();
+    }
 }

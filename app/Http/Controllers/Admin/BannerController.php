@@ -8,10 +8,21 @@ use App\Models\Banner;
 
 class BannerController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $banners = Banner::latest()->get();
-        return view('admin.banners.index', compact('banners'));
+       $q = Banner::query();
+
+    // Lọc theo trạng thái (0/1)
+    if ($request->filled('is_active') && in_array($request->is_active, ['0','1'], true)) {
+        $q->where('is_active', (int) $request->is_active);
+    }
+
+    $banners = $q->latest()
+        ->paginate(15)
+        ->appends($request->query()); // giữ tham số khi phân trang
+
+    return view('admin.banners.index', compact('banners'));
+
     }
 
     public function create()

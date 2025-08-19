@@ -23,6 +23,7 @@
                 <option value="confirmed" {{ request('status') === 'confirmed' ? 'selected' : '' }}>Đã xác nhận</option>
                 <option value="shipping"  {{ request('status') === 'shipping' ? 'selected' : '' }}>Đang giao hàng</option>
                 <option value="delivered" {{ request('status') === 'delivered' ? 'selected' : '' }}>Đã nhận hàng</option>
+                <option value="cancel_requested" {{ request('status') === 'cancel_requested' ? 'selected' : '' }}>Yêu cầu hủy</option>
                 <option value="cancelled" {{ request('status') === 'cancelled' ? 'selected' : '' }}>Đã hủy</option>
                 <option value="returned" {{ request('status') === 'returned' ? 'selected' : '' }}>Đã hoàn hàng</option>
             </select>
@@ -40,6 +41,7 @@
                 'confirmed' => ['label' => 'Đã xác nhận', 'class' => 'info'],
                 'shipping'  => ['label' => 'Đang giao hàng', 'class' => 'primary'],
                 'delivered' => ['label' => 'Đã nhận hàng', 'class' => 'success'],
+                'cancel_requested' => ['label' => 'Yêu cầu hủy', 'class' => 'secondary'],
                 'cancelled' => ['label' => 'Đã hủy', 'class' => 'danger'],
                 'returned'  => ['label' => 'Đã hoàn hàng', 'class' => 'secondary'], // đổi từ "Trả hàng" → "Đã hoàn hàng"
             ];
@@ -60,15 +62,7 @@
                 <span class="badge bg-{{ $status['class'] }} py-2 px-3">{{ $status['label'] }}</span>
             </div>
 
-            @if (in_array($order->status, ['pending', 'confirmed']))
-    <form action="{{ route('client.orders.cancel', $order->id) }}" method="POST" class="mb-3" onsubmit="return confirm('Bạn có chắc chắn muốn hủy đơn hàng này không?')">
-        @csrf
-        @method('PUT')
-        <button type="submit" class="btn btn-sm btn-danger">
-             Hủy đơn hàng
-        </button>
-    </form>
-@endif
+
 
 
             <div class="card-body">

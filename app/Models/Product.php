@@ -7,9 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Comment;
 use App\Traits\Filterable;
+
 class Product extends Model
 {
-    use HasFactory, SoftDeletes,Filterable;
+    use HasFactory, SoftDeletes, Filterable;
 
     protected $fillable = [
         'name',
@@ -54,7 +55,7 @@ class Product extends Model
 
     public function scopeWithActiveVariants($query)
     {
-        return $query->whereHas('variants', function($q) {
+        return $query->whereHas('variants', function ($q) {
             $q->where('stock_quantity', '>', 0);
         });
     }
@@ -75,16 +76,30 @@ class Product extends Model
         return $query->onlyTrashed();
     }
 
-public function comments()
-{
-    return $this->hasMany(Comment::class);
-}
-public function pots()
-{
-     return $this->belongsToMany(Pot::class, 'pot_product_variant', 'product_variant_id', 'pot_id');
-}
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
+    public function pots()
+    {
+        return $this->belongsToMany(Pot::class, 'pot_product_variant', 'product_variant_id', 'pot_id');
+    }
     public function returnRequests()
     {
         return $this->hasMany(ReturnRequest::class);
+    }
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    public function averageRating()
+    {
+        return $this->reviews()->avg('rating') ?? 0;
+    }
+
+    public function reviewCount()
+    {
+        return $this->reviews()->count();
     }
 }

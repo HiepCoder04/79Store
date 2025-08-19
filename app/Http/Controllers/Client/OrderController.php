@@ -9,6 +9,7 @@ use App\Models\Order;
 use App\Models\Pot;
 use App\Models\ProductVariant;
 use App\Models\CartItem;
+use App\Models\Cancellation;
 
 class OrderController extends Controller
 {
@@ -33,36 +34,64 @@ class OrderController extends Controller
 
         return view('client.users.order-detail', compact('order'));
     }
-    public function cancel(Order $order)
+    public function cancel(Request $request, Order $order)
     {
+        // Chỉ chủ đơn hàng mới được hủy
         if ($order->user_id !== auth()->id()) {
             abort(403, 'Không có quyền truy cập đơn hàng này.');
         }
 
-        // Chỉ được hủy khi trạng thái là 'pending' hoặc 'processing'
-        if (!in_array($order->status, ['pending', 'processing'])) {
-            return redirect()->route('client.orders.index')
-                ->with('error', 'Đơn hàng đã được xử lý, không thể hủy.');
-        }
-        foreach ($order->orderDetails as $detail) {
-            $variant = ProductVariant::find($detail->product_variant_id);
-            if ($variant) {
-                $variant->stock_quantity += $detail->quantity;
-                $variant->save();
-            }
+        if ($order->status === 'pending') {
+            // ❌ Không cần validate reason
 
-            if ($detail->product_pot) {
-                $pot = Pot::where('name', $detail->product_pot)->first();
-                if ($pot) {
-                    $pot->quantity += $detail->quantity;
-                    $pot->save();
+            // Hủy ngay khi đơn còn ở trạng thái chờ xác nhận
+            $order->update(['status' => 'cancelled']);
+
+            // Cộng lại số lượng hàng vào kho
+            foreach ($order->orderDetails as $detail) {
+                $variant = ProductVariant::find($detail->product_variant_id);
+                if ($variant) {
+                    $variant->stock_quantity += $detail->quantity;
+                    $variant->save();
+                }
+
+                if ($detail->product_pot) {
+                    $pot = Pot::where('name', $detail->product_pot)->first();
+                    if ($pot) {
+                        $pot->quantity += $detail->quantity;
+                        $pot->save();
+                    }
                 }
             }
-        }
-        $order->update(['status' => 'cancelled']);
 
-        return redirect()->route('client.orders.index')->with('success', 'Đơn hàng đã được hủy.');
+            return redirect()->route('client.orders.index')
+                ->with('success', 'Đơn hàng đã được hủy thành công.');
+        } elseif ($order->status === 'confirmed') {
+            // ✅ Phải nhập lý do
+            $request->validate([
+                'reason' => 'required|string|max:500',
+            ]);
+
+            // Tạo yêu cầu hủy
+            Cancellation::create([
+                'order_id' => $order->id,
+                'user_id'  => auth()->id(),
+                'reason'   => $request->reason,
+                'status'   => 'pending',
+            ]);
+
+            // Cập nhật trạng thái đơn hàng sang "Yêu cầu hủy"
+            $order->update(['status' => 'cancel_requested']);
+
+            return redirect()->route('client.orders.index')
+                ->with('success', 'Yêu cầu hủy đơn đã được gửi, vui lòng chờ xác nhận từ shop.');
+        }
+
+        // ❌ Không thể hủy khi đơn đã giao hoặc huỷ trước đó
+        return redirect()->route('client.orders.index')
+            ->with('error', 'Đơn hàng đã được giao hoặc không thể hủy.');
     }
+
     public function reorder($id)
     {
         $order = Order::with('orderDetails')->where('user_id', auth()->id())->findOrFail($id);
