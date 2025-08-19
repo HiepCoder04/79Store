@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\VoucherController;
+use App\Http\Controllers\Client\ReviewController;
 use App\Http\Controllers\Client\CartController;
 use App\Http\Controllers\Client\HomeController;
 use App\Http\Controllers\Client\OrderController;
@@ -236,6 +237,7 @@ Route::get('/chatbot/suggestions', [App\Http\Controllers\ChatbotController::clas
 
 Route::middleware(['auth'])->group(function () {
     Route::post('/comments', [CommentController::class, 'store'])->name('comments.store');
+    Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
 });
 Route::get('/test-mail', function () {
     try {

@@ -299,6 +299,9 @@
                             @case('delivered')
                                 <span class="badge bg-success">Hoàn tất</span>
                                 @break
+                            @case('cancel_requested')
+                                <span class="badge bg-secondary">Yêu cầu hủy</span>
+                                @break
                             @case('cancelled')
                                 <span class="badge bg-danger">Đã huỷ</span>
                                 @break
