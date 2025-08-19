@@ -34,12 +34,28 @@ public function store(StoreReturnRequest $request, Order $order) {
     $detail = OrderDetail::with(['product','variant'])->findOrFail($request->order_detail_id);
     if ($detail->order_id !== $order->id) abort(403);
 
-    $qtyBought   = (int) $detail->quantity;
-    $qtyReturned = (int) $detail->qtyReturned();
-    $qtyWant     = (int) $request->quantity;
+    $qtyWant = (int) $request->quantity;
 
-    if ($qtyWant < 1 || $qtyWant > ($qtyBought - $qtyReturned)) {
-        return back()->withErrors(['quantity' => 'Số lượng trả không hợp lệ.']);
+    // ✅ PHÂN TÍCH RETURN_ITEMS để tách plant_quantity và pot_quantity
+    $returnItems = $request->input('return_items', []);
+    $plantQuantity = 0;
+    $potQuantity = 0;
+    
+    // Logic tách dựa vào UI frontend
+    if (in_array('plant', $returnItems) && in_array('pot', $returnItems)) {
+        // Trả cả cây và chậu → số lượng bằng nhau
+        $plantQuantity = $qtyWant;
+        $potQuantity = $qtyWant;
+    } elseif (in_array('plant', $returnItems)) {
+        // Chỉ trả cây
+        $plantQuantity = $qtyWant;
+        $potQuantity = 0;
+    } elseif (in_array('pot', $returnItems)) {
+        // Chỉ trả chậu
+        $plantQuantity = 0;
+        $potQuantity = $qtyWant;
+    } else {
+        return back()->withErrors(['return_items' => 'Vui lòng chọn ít nhất cây hoặc chậu để trả.']);
     }
 
     $images = [];
@@ -56,7 +72,9 @@ public function store(StoreReturnRequest $request, Order $order) {
         'product_id'          => $detail->product_id,
         'product_variant_id'  => $detail->product_variant_id,
         'pot_id'              => $detail->pot_id ?? null,
-        'quantity'            => $qtyWant,
+        'quantity'            => $qtyWant, // Tổng số lượng
+        'plant_quantity'      => $plantQuantity, // ✅ Số lượng cây
+        'pot_quantity'        => $potQuantity,   // ✅ Số lượng chậu
         'reason'              => $request->reason,
         'images'              => $images,
         'status'              => 'pending',

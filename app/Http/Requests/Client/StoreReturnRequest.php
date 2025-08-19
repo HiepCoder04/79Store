@@ -16,6 +16,8 @@ public function rules(): array {
         'bank_name'           => ['required','string','min:3','max:100'],
         'bank_account_name'   => ['required','string','min:3','max:150'],
         'bank_account_number' => ['required','string','min:8','max:50','regex:/^[0-9\-\s]+$/'],
+        'return_items'        => ['required','array','min:1'],
+        'return_items.*'      => ['in:plant,pot'],
     ];
 }
 
@@ -41,6 +43,8 @@ public function messages(): array
         'bank_account_number.required' => 'Vui lòng nhập số tài khoản.',
         'bank_account_number.min'  => 'Số tài khoản phải có ít nhất 8 ký tự.',
         'bank_account_number.regex'=> 'Số tài khoản chỉ được chứa số, dấu gạch ngang và khoảng trắng.',
+        'return_items.required'    => 'Vui lòng chọn ít nhất cây hoặc chậu để trả.',
+        'return_items.min'         => 'Vui lòng chọn ít nhất một loại để trả.',
     ];
 }
 
@@ -73,26 +77,84 @@ public function withValidator($validator)
             return;
         }
 
-        // Kiểm tra số lượng có thể trả
-        $qtyBought = (int) $detail->quantity;
-        $qtyReturned = (int) $detail->qtyReturned();
+        // ✅ KIỂM TRA RIÊNG TỪNG LOẠI - LOGIC MỚI
+        $returnItems = $this->input('return_items', []);
         $qtyWant = (int) $this->input('quantity', 0);
-        $remain = $qtyBought - $qtyReturned;
-
-        if ($qtyWant > $remain) {
-            $v->errors()->add('quantity', "Số lượng trả vượt quá giới hạn. Còn có thể trả: {$remain}");
+        
+        $wantPlant = in_array('plant', $returnItems);
+        $wantPot = in_array('pot', $returnItems);
+        
+        // ✅ Nếu trả cả 2 loại → mỗi loại cần kiểm tra với số lượng riêng
+        if ($wantPlant && $wantPot) {
+            // Trả cả cây và chậu → số lượng phải <= min(remainingPlant, remainingPot)
+            $remainingPlant = $detail->remainingPlantQty();
+            $remainingPot = $detail->remainingPotQty();
+            
+            if ($qtyWant > $remainingPlant) {
+                $v->errors()->add('quantity', "Số lượng cây trả vượt quá giới hạn. Còn có thể trả: {$remainingPlant} cây");
+                return;
+            }
+            
+            if ($qtyWant > $remainingPot) {
+                $v->errors()->add('quantity', "Số lượng chậu trả vượt quá giới hạn. Còn có thể trả: {$remainingPot} chậu");
+                return;
+            }
+            
+            if (($detail->pot_price ?? 0) <= 0) {
+                $v->errors()->add('return_items', 'Sản phẩm này không có chậu để trả.');
+                return;
+            }
+        }
+        // ✅ Chỉ trả cây
+        elseif ($wantPlant && !$wantPot) {
+            $remainingPlant = $detail->remainingPlantQty();
+            if ($qtyWant > $remainingPlant) {
+                $v->errors()->add('quantity', "Số lượng cây trả vượt quá giới hạn. Còn có thể trả: {$remainingPlant} cây");
+                return;
+            }
+        }
+        // ✅ Chỉ trả chậu  
+        elseif (!$wantPlant && $wantPot) {
+            $remainingPot = $detail->remainingPotQty();
+            if ($qtyWant > $remainingPot) {
+                $v->errors()->add('quantity', "Số lượng chậu trả vượt quá giới hạn. Còn có thể trả: {$remainingPot} chậu");
+                return;
+            }
+            
+            // Kiểm tra sản phẩm có chậu không
+            if (($detail->pot_price ?? 0) <= 0) {
+                $v->errors()->add('return_items', 'Sản phẩm này không có chậu để trả.');
+                return;
+            }
+        }
+        else {
+            $v->errors()->add('return_items', 'Vui lòng chọn ít nhất cây hoặc chậu để trả.');
             return;
         }
 
-        // Kiểm tra yêu cầu pending chồng chéo
-        $pendingSum = (int) \App\Models\ReturnRequest::where('order_detail_id', $detail->id)
-            ->where('status', 'pending')
-            ->sum('quantity');
-
-        if ($qtyWant + $pendingSum > $remain) {
-            $remainAfterPending = max(0, $remain - $pendingSum);
-            $v->errors()->add('quantity', "Có yêu cầu chờ duyệt khác. Chỉ có thể yêu cầu thêm: {$remainAfterPending}");
-            return;
+        // ✅ Kiểm tra yêu cầu pending chồng chéo theo từng loại
+        if ($wantPlant) {
+            $pendingPlant = (int) \App\Models\ReturnRequest::where('order_detail_id', $detail->id)
+                ->where('status', 'pending')
+                ->sum('plant_quantity');
+            
+            $remainAfterPending = max(0, $detail->remainingPlantQty() - $pendingPlant);
+            if ($qtyWant > $remainAfterPending) {
+                $v->errors()->add('quantity', "Có yêu cầu trả cây chờ duyệt khác. Chỉ có thể yêu cầu thêm: {$remainAfterPending} cây");
+                return;
+            }
+        }
+        
+        if ($wantPot) {
+            $pendingPot = (int) \App\Models\ReturnRequest::where('order_detail_id', $detail->id)
+                ->where('status', 'pending')
+                ->sum('pot_quantity');
+            
+            $remainAfterPending = max(0, $detail->remainingPotQty() - $pendingPot);
+            if ($qtyWant > $remainAfterPending) {
+                $v->errors()->add('quantity', "Có yêu cầu trả chậu chờ duyệt khác. Chỉ có thể yêu cầu thêm: {$remainAfterPending} chậu");
+                return;
+            }
         }
 
         // Kiểm tra số lượng file upload

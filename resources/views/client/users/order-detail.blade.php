@@ -26,7 +26,6 @@
                         'delivered' => ['label' => 'Đã nhận hàng', 'class' => 'success'],
                         'cancel_requested' => ['label' => 'Yêu cầu hủy', 'class' => 'secondary'],
                         'cancelled' => ['label' => 'Đã hủy', 'class' => 'danger'],
-                        'returned' => ['label' => 'Trả hàng', 'class' => 'secondary'],
                     ];
                     $steps = ['pending', 'confirmed', 'shipping', 'delivered'];
                     $currentIndex = array_search($order->status, $steps);

@@ -26,12 +26,16 @@ public function show($id) {
     $item = ReturnRequest::with(['transactions','order','orderDetail','product','variant','pot','user'])
         ->findOrFail($id);
     
-    // Tính toán giá trị hoàn tiền đề xuất
+    // ✅ Tính toán giá trị hoàn tiền đề xuất ĐÚNG
     $suggestedAmount = 0;
     if ($item->orderDetail) {
         $productPrice = $item->orderDetail->product_price ?? 0;
         $potPrice = $item->orderDetail->pot_price ?? 0;
-        $suggestedAmount = ($productPrice + $potPrice) * $item->quantity;
+        
+        // Tính riêng từng loại
+        $plantRefund = $productPrice * ($item->plant_quantity ?? 0);
+        $potRefund = $potPrice * ($item->pot_quantity ?? 0);
+        $suggestedAmount = $plantRefund + $potRefund;
     }
     
     return view('admin.returns.show', compact('item', 'suggestedAmount'));
@@ -119,11 +123,15 @@ public function refund($id, Request $request)
             }
         }
 
+        // ✅ Lấy số điện thoại ưu tiên từ đơn hàng
+        $contactPhone = $item->order->phone ?? $item->user->phone ?? null;
+
+        // ✅ Tạo transaction với type = 'refund' (sẽ hiển thị là "Đã hoàn tiền")
         ReturnTransaction::create([
             'return_request_id'   => $item->id,
-            'type'                => 'refund',
+            'type'                => 'refund', // Được hiển thị thành "Đã hoàn tiền"
             'amount'              => (int) $request->amount,
-            'note'                => $request->note,
+            'note'                => $request->note . ($contactPhone ? " | SĐT: {$contactPhone}" : ''),
             'bank_name'           => $item->bank_name,
             'bank_account_name'   => $item->bank_account_name,
             'bank_account_number' => $item->bank_account_number,
@@ -144,7 +152,6 @@ public function refund($id, Request $request)
     return back()->with('success', 'Đã hoàn tiền & cập nhật tồn kho.');
 }
 
-
 public function exchange($id, Request $request) {
     $item = ReturnRequest::findOrFail($id);
     if ($item->status !== 'approved') {
@@ -152,9 +159,10 @@ public function exchange($id, Request $request) {
     }
 
     DB::transaction(function () use ($item, $request) {
+        // ✅ Tạo transaction với type = 'exchange' (sẽ hiển thị là "Đã đổi hàng")
         ReturnTransaction::create([
             'return_request_id' => $item->id,
-            'type'              => 'exchange',
+            'type'              => 'exchange', // Được hiển thị thành "Đã đổi hàng"
             'amount'            => 0,
             'note'              => $request->input('note'),
             'processed_at'      => now(),

@@ -66,4 +66,36 @@ class OrderDetail extends Model
             ->sum('quantity');
     }
 
+    // ✅ THÊM METHOD MỚI: Tính riêng số lượng cây đã trả
+    public function plantQtyReturned(): int
+    {
+        return (int) $this->returnRequests()
+            ->whereIn('status', ['approved', 'refunded', 'exchanged'])
+            ->sum('plant_quantity');
+    }
+
+    // ✅ THÊM METHOD MỚI: Tính riêng số lượng chậu đã trả
+    public function potQtyReturned(): int
+    {
+        return (int) $this->returnRequests()
+            ->whereIn('status', ['approved', 'refunded', 'exchanged'])
+            ->sum('pot_quantity');
+    }
+
+    // ✅ THÊM METHOD MỚI: Tính số lượng còn có thể trả cho cây
+    public function remainingPlantQty(): int
+    {
+        return max(0, $this->quantity - $this->plantQtyReturned());
+    }
+
+    // ✅ THÊM METHOD MỚI: Tính số lượng còn có thể trả cho chậu
+    public function remainingPotQty(): int
+    {
+        // Chỉ có thể trả chậu nếu orderDetail có chậu (pot_price > 0)
+        if (($this->pot_price ?? 0) <= 0) {
+            return 0; 
+        }
+        return max(0, $this->quantity - $this->potQtyReturned());
+    }
+
 }
