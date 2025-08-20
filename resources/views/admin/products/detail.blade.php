@@ -45,6 +45,45 @@
         </div>
     </div>
 
+    {{-- Chậu đã liên kết --}}
+<div class="card mt-4 shadow">
+    <div class="card-header text-white">
+        <h5 class="mb-0">Chậu đã liên kết</h5>
+    </div>
+    <div class="card-body">
+        @if(isset($allPots) && $allPots->isNotEmpty())
+            <div class="row row-cols-1 row-cols-md-3 g-3">
+                @foreach($allPots as $pot)
+                    <div class="col">
+                        <div class="border rounded p-3 h-100">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <div class="fw-semibold">{{ $pot->name ?? 'Chậu' }}</div>
+                                    @if(!empty($pot->code))
+                                        <div class="text-muted small">Mã: {{ $pot->code }}</div>
+                                    @endif
+                                </div>
+                                @if(is_numeric($pot->price))
+                                    <div class="fw-semibold">
+                                        {{ number_format($pot->price, 0, ',', '.') }}Đ
+                                    </div>
+                                @endif
+                            </div>
+
+                            @if(!empty($pot->description))
+                                <div class="mt-2 small text-muted">{!! $pot->description !!}</div>
+                            @endif
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        @else
+            <p class="text-muted mb-0">Chưa có chậu nào được liên kết.</p>
+        @endif
+    </div>
+</div>
+
+    {{-- Hình ảnh sản phẩm --}}
     <div class="card mt-4 shadow">
         <div class="card-header text-white">
             <h5 class="mb-0">Hình ảnh sản phẩm</h5>
