@@ -15,8 +15,10 @@
           enctype="multipart/form-data">
       @csrf
       
-      <!-- ✅ THÊM HIDDEN INPUT cho backend -->
+      <!-- ✅ THÊM HIDDEN INPUTs cho số lượng riêng -->
       <input type="hidden" name="quantity" id="total-quantity" value="0">
+      <input type="hidden" name="plant_quantity" id="plant-quantity-hidden" value="0">
+      <input type="hidden" name="pot_quantity" id="pot-quantity-hidden" value="0">
       
       <div class="modal-header"><h5 class="modal-title">Tạo yêu cầu trả hàng</h5></div>
       <div class="modal-body">
@@ -26,9 +28,13 @@
           <select name="order_detail_id" class="form-select" required>
             @foreach($order->orderDetails as $d)
               @php 
-                $remainingPlant = $d->remainingPlantQty(); // ✅ Dùng method mới
-                $remainingPot = $d->remainingPotQty();     // ✅ Dùng method mới
+                $remainingPlant = $d->remainingPlantQty(); // ✅ Đã tính cả pending
+                $remainingPot = $d->remainingPotQty();     // ✅ Đã tính cả pending
                 $hasAnythingToReturn = $remainingPlant > 0 || $remainingPot > 0;
+                
+                // ✅ THÊM thông tin pending để user hiểu
+                $pendingPlant = $d->plantQtyReturned() - $d->plantQtyActuallyReturned();
+                $pendingPot = $d->potQtyReturned() - $d->potQtyActuallyReturned();
               @endphp
               @if($hasAnythingToReturn)
                 <option value="{{ $d->id }}" 
@@ -37,12 +43,18 @@
                         data-has-pot="{{ ($d->pot_price ?? 0) > 0 ? 'true' : 'false' }}"
                         data-remaining-plant="{{ $remainingPlant }}"
                         data-remaining-pot="{{ $remainingPot }}">
-                  #{{ $d->id }} — {{ $d->product_name ?? $d->product->name }} 
-                  (Cây: {{ $remainingPlant }}, Chậu: {{ $remainingPot }})
+                  #{{ $d->id }} — {{ $d->product_name ?? $d->product->name }}
+                  @if($pendingPlant > 0 || $pendingPot > 0)
+                    <br>⏳ Đang chờ duyệt: 
+                    @if($pendingPlant > 0) {{ $pendingPlant }} cây @endif
+                    @if($pendingPot > 0) {{ $pendingPot }} chậu @endif
+                  @endif
+                  <br>(Có thể trả: {{ $remainingPlant }} cây, {{ $remainingPot }} chậu)
                 </option>
               @endif
             @endforeach
           </select>
+          
         </div>
 
         <!-- ✅ Giữ nguyên UI cây/chậu -->
@@ -343,14 +355,15 @@ document.addEventListener('DOMContentLoaded', function() {
         calculateTotalRefund();
     }
 
-    // ✅ QUAN TRỌNG: Cập nhật hidden input
+    // ✅ ĐƠN GIẢN HÓA: Chỉ cần lấy số lượng thực tế người dùng nhập
     function calculateTotalRefund() {
         const plantQty = parseInt(plantQuantityInput.value || 0);
         const potQty = parseInt(potQuantityInput.value || 0);
-        const totalQty = plantQty + potQty;
         
-        // ✅ Cập nhật hidden input cho backend
-        totalQuantityInput.value = totalQty;
+        // ✅ ĐƠN GIẢN: Cập nhật tất cả hidden inputs
+        document.getElementById('plant-quantity-hidden').value = plantQty;
+        document.getElementById('pot-quantity-hidden').value = potQty;
+        totalQuantityInput.value = Math.max(plantQty, potQty); // Để validation backend
         
         const plantTotal = currentProductPrice * plantQty;
         const potTotal = currentPotPrice * potQty;
@@ -369,7 +382,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         refundBreakdown.textContent = breakdownParts.join(' + ');
         
-        const hasSelection = totalQty > 0;
+        const hasSelection = plantQty > 0 || potQty > 0;
         submitBtn.disabled = !hasSelection;
         submitBtn.textContent = hasSelection ? 'Gửi yêu cầu' : 'Vui lòng chọn ít nhất 1 sản phẩm';
     }
@@ -397,12 +410,15 @@ document.addEventListener('DOMContentLoaded', function() {
         calculateTotalRefund();
     });
 
+    // ✅ THÊM validation đồng bộ số lượng - BỎ LOGIC ĐỒNG BỘ
     plantQuantityInput.addEventListener('input', function() {
         if (parseInt(this.value) > 0) {
             plantCheck.checked = true;
         } else {
             plantCheck.checked = false;
         }
+        
+        // ✅ BỎ đồng bộ số lượng - cho phép khác nhau
         calculateTotalRefund();
     });
 
@@ -412,45 +428,59 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             potCheck.checked = false;
         }
+        
+        // ✅ BỎ đồng bộ số lượng - cho phép khác nhau
         calculateTotalRefund();
     });
 
-    // ✅ Quick selection functions (sửa lại)
+    // ✅ Quick selection functions - SỬA LOGIC ĐÚNG
     window.selectAllItems = function() {
+        // Trả hết cây có trong đơn (nếu có)
         if (maxPlantQuantity > 0) {
             plantCheck.checked = true;
             plantQuantityInput.disabled = false;
-            plantQuantityInput.value = maxPlantQuantity; // ✅ Dùng max riêng
+            plantQuantityInput.value = maxPlantQuantity;
         }
+        
+        // Trả hết chậu có trong đơn (nếu có)
         if (hasPot && maxPotQuantity > 0) {
             potCheck.checked = true;
             potQuantityInput.disabled = false;
-            potQuantityInput.value = maxPotQuantity; // ✅ Dùng max riêng
+            potQuantityInput.value = maxPotQuantity;
         }
+        
         calculateTotalRefund();
     };
 
     window.selectOnlyPlant = function() {
+        // Chỉ trả hết cây
         if (maxPlantQuantity > 0) {
             plantCheck.checked = true;
             plantQuantityInput.disabled = false;
-            plantQuantityInput.value = maxPlantQuantity; // ✅ Dùng max riêng
+            plantQuantityInput.value = maxPlantQuantity;
         }
+        
+        // Bỏ chậu
         potCheck.checked = false;
         potQuantityInput.disabled = true;
         potQuantityInput.value = 0;
+        
         calculateTotalRefund();
     };
 
     window.selectOnlyPot = function() {
         if (!hasPot || maxPotQuantity === 0) return;
+        
+        // Bỏ cây
         plantCheck.checked = false;
         plantQuantityInput.disabled = true;
         plantQuantityInput.value = 0;
         
+        // Chỉ trả hết chậu
         potCheck.checked = true;
         potQuantityInput.disabled = false;
-        potQuantityInput.value = maxPotQuantity; // ✅ Dùng max riêng
+        potQuantityInput.value = maxPotQuantity;
+        
         calculateTotalRefund();
     };
     
@@ -502,21 +532,44 @@ document.addEventListener('DOMContentLoaded', function() {
         const bankAccountName = document.querySelector('input[name="bank_account_name"]').value.trim();
         const bankNumber = bankNumberInput.value.trim();
         
-        const totalQty = parseInt(totalQuantityInput.value || 0); // ✅ Dùng hidden input
+        const totalQty = parseInt(totalQuantityInput.value || 0);
+        const plantQty = parseInt(plantQuantityInput.value || 0);
+        const potQty = parseInt(potQuantityInput.value || 0);
         
-        // ✅ THÊM LOG DEBUG
-        console.log('=== DEBUG FORM SUBMIT ===');
-        console.log('Total quantity:', totalQty);
-        console.log('Plant quantity:', plantQuantityInput.value);
-        console.log('Pot quantity:', potQuantityInput.value);
-        console.log('Return items:', [...document.querySelectorAll('input[name="return_items[]"]:checked')].map(el => el.value));
-        console.log('Max plant quantity:', maxPlantQuantity);
-        console.log('Max pot quantity:', maxPotQuantity);
+        // ✅ THÊM LOG DEBUG CHI TIẾT HÔN
+        console.log('=== DEBUG FORM SUBMIT (FIXED) ===');
+        console.log('🔢 Total quantity (sent to backend):', totalQty);
+        console.log('🌱 Plant quantity (UI):', plantQty);
+        console.log('🪴 Pot quantity (UI):', potQty);
+        console.log('✅ Return items checked:', [...document.querySelectorAll('input[name="return_items[]"]:checked')].map(el => el.value));
+        console.log('📊 Max plant quantity available:', maxPlantQuantity);
+        console.log('📊 Max pot quantity available:', maxPotQuantity);
+        console.log('🔍 Has pot:', hasPot);
+        console.log('💰 Plant price:', currentProductPrice);
+        console.log('💰 Pot price:', currentPotPrice);
         
         const errors = [];
         
         if (totalQty === 0) {
             errors.push('Vui lòng chọn ít nhất 1 sản phẩm để trả');
+        }
+        
+        // ✅ SỬA VALIDATION: Kiểm tra từng loại riêng biệt, KHÔNG dùng totalQty
+        const returnItems = [...document.querySelectorAll('input[name="return_items[]"]:checked')].map(el => el.value);
+        const wantPlant = returnItems.includes('plant');
+        const wantPot = returnItems.includes('pot');
+        
+        // ✅ LOGIC MỚI: Kiểm tra riêng từng loại với số lượng thực tế
+        if (wantPlant && plantQty > 0) {
+            if (plantQty > maxPlantQuantity) {
+                errors.push(`Số lượng cây vượt quá giới hạn. Có thể trả: ${maxPlantQuantity} cây (bạn chọn: ${plantQty})`);
+            }
+        }
+        
+        if (wantPot && potQty > 0) {
+            if (potQty > maxPotQuantity) {
+                errors.push(`Số lượng chậu vượt quá giới hạn. Có thể trả: ${maxPotQuantity} chậu (bạn chọn: ${potQty})`);
+            }
         }
         
         if (reason.length < 3) {
@@ -538,11 +591,16 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (errors.length > 0) {
             e.preventDefault();
+            console.error('❌ Form validation errors:', errors);
             alert('Vui lòng kiểm tra lại:\n' + errors.join('\n'));
             return false;
         }
         
-        console.log('Form hợp lệ, đang gửi yêu cầu...');
+        console.log('✅ Form hợp lệ, đang gửi yêu cầu...');
+        console.log('📤 Final form data:');
+        console.log('  - plant_quantity:', plantQty);
+        console.log('  - pot_quantity:', potQty);
+        console.log('  - quantity (max):', totalQty);
         // ✅ Không prevent default → cho phép submit
     });
     

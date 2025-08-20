@@ -140,9 +140,12 @@ public function refund($id, Request $request)
         ]);
 
         // Cộng kho (dùng increment để an toàn concurrent)
-        if ($item->variant) $item->variant()->increment('stock_quantity', (int) $item->quantity);
-        if ($item->pot)     $item->pot()->increment('quantity', (int) $item->quantity);
-
+        if ($item->variant && $item->plant_quantity > 0) {
+            $item->variant()->increment('stock_quantity', (int) $item->plant_quantity);
+        }
+        if ($item->pot && $item->pot_quantity > 0) {
+            $item->pot()->increment('quantity', (int) $item->pot_quantity);
+        }
         $item->update([
             'status'      => 'refunded',
             'resolved_at' => now(),
