@@ -243,10 +243,11 @@
             {{-- Danh sách đánh giá --}}
 <h6 class="mt-4">{{ $reviewCount }} Đánh giá</h6>
 @forelse($product->reviews as $review)
-    <div class="border rounded p-3 mb-3 bg-light">
+    <div class="border rounded p-3 mb-3 bg-white shadow-sm">
+        {{-- User info --}}
         <div class="d-flex align-items-center mb-2">
             <img src="https://ui-avatars.com/api/?name={{ urlencode($review->user->name) }}&size=36"
-                 class="rounded-circle me-2" width="36" height="36">
+                 class="rounded-circle me-2" width="36" height="36" alt="avatar">
             <div>
                 <strong>{{ $review->user->name }}</strong>
                 <div class="text-warning small">
@@ -267,20 +268,26 @@
             </div>
         @endif
 
-        <small class="text-muted d-block">{{ $review->created_at->diffForHumans() }}</small>
+        <small class="text-muted d-block mb-2">{{ $review->created_at->diffForHumans() }}</small>
 
-        {{-- Nếu admin đã reply --}}
+        {{-- Phản hồi từ admin --}}
         @if($review->admin_reply)
-            <div class="mt-3 p-2 border-start border-3 border-primary bg-white rounded">
-                <strong class="text-primary">Phản hồi từ Admin:</strong>
+            <div class="mt-3 p-3 border rounded bg-light position-relative">
+                <div class="d-flex align-items-center mb-2">
+                    <span class="badge bg-primary me-2">
+                        <i class="fa fa-shield"></i> 79Store
+                    </span>
+                    <small class="text-muted">đã phản hồi</small>
+                </div>
                 <p class="mb-1">{{ $review->admin_reply }}</p>
-                <small class="text-muted">Cảm ơn bạn đã góp ý!</small>
+                <small class="text-muted">Cảm ơn bạn đã tin tưởng và ủng hộ sản phẩm của chúng tôi </small>
             </div>
         @endif
     </div>
 @empty
     <p class="text-muted">Chưa có đánh giá nào cho sản phẩm này.</p>
 @endforelse
+
 
         </div>
     </div>
@@ -298,6 +305,7 @@
 
 </section>
 <style>
+    
     .review-img {
     width: 120px;
     height: 120px;

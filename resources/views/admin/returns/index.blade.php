@@ -25,17 +25,66 @@
 <table class="table table-striped">
   <thead>
     <tr>
-      <th>ID</th><th>Order</th><th>User</th><th>SP</th><th>SL</th><th>Trạng thái</th><th>Ngày</th><th></th>
+      <th>ID</th><th>Order</th><th>User</th><th>SĐT</th><th>SP</th><th>SL trả</th><th>Giá trị ước tính</th><th>Trạng thái</th><th>Ngày</th><th></th>
     </tr>
   </thead>
   <tbody>
     @foreach($items as $it)
+      @php
+        // ✅ Tính đúng giá trị hoàn tiền ước tính
+        $estimatedRefund = 0;
+        if ($it->orderDetail) {
+            $productPrice = $it->orderDetail->product_price ?? 0;
+            $potPrice = $it->orderDetail->pot_price ?? 0;
+            $plantRefund = $productPrice * ($it->plant_quantity ?? 0);
+            $potRefund = $potPrice * ($it->pot_quantity ?? 0);
+            $estimatedRefund = $plantRefund + $potRefund;
+        }
+        
+        // ✅ Lấy số điện thoại ưu tiên từ đơn hàng
+        $phone = $it->order->phone ?? $it->user->phone ?? null;
+      @endphp
       <tr>
         <td>{{ $it->id }}</td>
         <td>#{{ $it->order_id }}</td>
         <td>{{ $it->user->name ?? 'User' }}</td>
+        <td>
+          @if($phone)
+            <a href="tel:{{ $phone }}" class="text-decoration-none">
+              <i class="fas fa-phone-alt text-primary"></i> {{ $phone }}
+            </a>
+          @else
+            <span class="text-muted">-</span>
+          @endif
+        </td>
         <td>{{ $it->product->name ?? 'Sản phẩm' }}</td>
-        <td>{{ $it->quantity }}</td>
+        <td>
+          {{-- ✅ Hiển thị chi tiết SL trả với tên cụ thể --}}
+          @if($it->plant_quantity > 0 && $it->pot_quantity > 0)
+            <div class="fw-bold text-success">🌱 {{ $it->plant_quantity }} × {{ $it->product->name ?? 'Cây' }}</div>
+            <div class="fw-bold text-info">🪴 {{ $it->pot_quantity }} × {{ $it->orderDetail->product_pot ?? 'Chậu' }}</div>
+            <small class="badge bg-light text-dark">Cả cây + chậu</small>
+          @elseif($it->plant_quantity > 0)
+            <div class="fw-bold text-success">
+              🌱 {{ $it->plant_quantity }} × {{ $it->product->name ?? 'Cây' }}
+            </div>
+            <small class="badge bg-success">Chỉ cây</small>
+          @elseif($it->pot_quantity > 0)
+            <div class="fw-bold text-info">
+              🪴 {{ $it->pot_quantity }} × {{ $it->orderDetail->product_pot ?? 'Chậu' }}
+            </div>
+            <small class="badge bg-info">Chỉ chậu</small>
+          @else
+            <div class="text-muted">
+              ❓ {{ $it->quantity }} (không rõ)
+            </div>
+            <small class="badge bg-secondary">Dữ liệu cũ</small>
+          @endif
+        </td>
+        <td>
+          {{-- ✅ Hiển thị giá trị ước tính đúng --}}
+          {{ number_format($estimatedRefund, 0, ',', '.') }}đ
+        </td>
         <td>
           @switch($it->status)
             @case('pending')

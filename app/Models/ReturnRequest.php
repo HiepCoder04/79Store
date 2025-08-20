@@ -8,7 +8,7 @@ class ReturnRequest extends Model
 {
     protected $fillable = [
         'order_id','order_detail_id','user_id','product_id','product_variant_id','pot_id',
-        'quantity','reason','images','status',
+        'quantity','plant_quantity','pot_quantity','reason','images','status',
         'bank_name','bank_account_name','bank_account_number',
         'tracking_code','admin_note','resolved_at',
     ];
@@ -25,4 +25,16 @@ class ReturnRequest extends Model
     public function variant()      { return $this->belongsTo(ProductVariant::class, 'product_variant_id'); }
     public function pot()          { return $this->belongsTo(Pot::class, 'pot_id'); }
     public function transactions() { return $this->hasMany(ReturnTransaction::class, 'return_request_id'); }
+    
+    // ✅ Helper method để lấy số điện thoại liên hệ
+    public function getContactPhoneAttribute()
+    {
+        return $this->order->phone ?? $this->user->phone ?? null;
+    }
+    
+    // ✅ Helper method để lấy email liên hệ
+    public function getContactEmailAttribute()
+    {
+        return $this->user->email ?? null;
+    }
 }

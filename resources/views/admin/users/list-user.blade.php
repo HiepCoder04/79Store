@@ -58,13 +58,27 @@
             border-radius: 10px;
         }
 
-        .table-actions {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-    </style>
+<<<<<<<<< Temporary merge branch 1
+    .table-actions {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+      .filter-box{border-radius:12px;padding:12px;background:#fff}
+  .filter-box label{font-size:.9rem;color:#6b7280;margin-bottom:.35rem}
+  .filter-field.form-control{border:1.5px solid #d1d5db;border-radius:10px}
+  .filter-field:focus{border-color:#e91e63;box-shadow:0 0 0 .2rem rgba(233,30,99,.12);outline:0}
+
+=========
+.table-actions {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+>>>>>>>>> Temporary merge branch 2
+</style>
 
     <div class="container table-container">
         <div class="mb-4">
