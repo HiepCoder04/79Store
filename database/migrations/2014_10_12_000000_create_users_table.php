@@ -1,36 +1,37 @@
-    <?php
+<?php
 
-    use Illuminate\Database\Migrations\Migration;
-    use Illuminate\Database\Schema\Blueprint;
-    use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-    return new class extends Migration
+return new class extends Migration {
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
     {
-        /**
-         * Run the migrations.
-         */
-        public function up(): void
-        {
-            Schema::create('users', function (Blueprint $table) {
-                $table->id();
-                $table->string('name');
-                $table->string('email')->unique();
-                $table->string('phone')->nullable();
-                $table->string('password');
-                $table->enum('role', ['admin', 'staff', 'customer', 'guest'])->default('customer');
-                $table->date('date_of_birth')->nullable();
-                $table->timestamp('email_verified_at')->nullable();
-                $table->rememberToken();
-                $table->timestamps();
-                $table->softDeletes();
-            });
-        }
+        Schema::create('users', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('email')->unique();
+            $table->string('phone')->nullable();
+            $table->string('password');
+            $table->enum('role', ['admin', 'staff', 'customer', 'guest'])->default('customer');
+            $table->date('date_of_birth')->nullable();
+            $table->timestamp('email_verified_at')->nullable();
+            $table->boolean('is_ban')->default(false);   // trạng thái cấm
+            $table->string('ban_reason')->nullable();   // lý do cấm
+            $table->rememberToken();
+            $table->timestamps();
+            $table->softDeletes();
+        });
+    }
 
-        /**
-         * Reverse the migrations.
-         */
-        public function down(): void
-        {
-            Schema::dropIfExists('users');
-        }
-    };
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('users');
+    }
+};
