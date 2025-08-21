@@ -84,13 +84,6 @@ QUẢN LÍ TÀI KHOẢN
         <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="Tìm tên, email, SĐT...">
     </div>
 
-    <div class="col-md-2">
-        <select name="role" class="form-select">
-            <option value="">-- Quyền --</option>
-            <option value="admin" {{ request('role')=='admin' ? 'selected' : '' }}>Admin</option>
-            <option value="customer" {{ request('role')=='customer' ? 'selected' : '' }}>Customer</option>
-        </select>
-    </div>
 
     <div class="col-md-2">
         <select name="is_ban" class="form-select">
@@ -143,7 +136,7 @@ QUẢN LÍ TÀI KHOẢN
                                 @method('PUT')
                                 <input type="hidden" name="id_user" value="{{ $user->id }}">
                                 <button class="btn btn-sm {{ $user->is_ban ? 'btn-success' : 'btn-danger' }}">
-                                    {{ $user->is_ban ? 'Mở cấm' : 'Cấm' }}
+                                    {{ $user->is_ban ? 'Mở cấm' : 'BAN' }}
                                 </button>
                             </form>
                         </div>
