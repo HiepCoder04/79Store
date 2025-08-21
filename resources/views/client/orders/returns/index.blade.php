@@ -12,7 +12,7 @@
 <section class="breadcrumb-area">
     <div class="top-breadcrumb-area bg-img bg-overlay d-flex align-items-center justify-content-center"
          style="background-image: url('{{ asset('assets/img/bg-img/24.jpg') }}'); height: 250px;">
-        <h2 class="text-white">Lịch sử trả hàng của đơn #{{ $order->id }}</h2>
+        <h2 class="text-white">Lịch sử trả hàng</h2>
     </div>
 </section>
 
