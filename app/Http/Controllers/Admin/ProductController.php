@@ -459,8 +459,12 @@ class ProductController extends Controller
 
     public function show(Product $product)
     {
-        $product->load('variants', 'galleries', 'category');
-        return view('admin.products.detail', compact('product'));
+        $product->load('variants.pots', 'galleries', 'category');
+        $allPots = $product->variants
+        ->flatMap(fn ($v) => $v->pots ?? collect())
+        ->unique('id')
+        ->values();
+        return view('admin.products.detail', compact('product', 'allPots'));
     }
 
     public function thongke()
