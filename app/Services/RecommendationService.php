@@ -29,13 +29,12 @@ class RecommendationService
                 ->limit($limit)
                 ->get();
 
-            $ids = $rows->pluck('product_id')->all();
+            $ids = $rows->pluck('product_id')->all(); // ✅ chuyển thành array
 
-            // Trả về danh sách Product
             return Product::with(['galleries' => fn($q) => $q->limit(1), 'variants'])
                 ->whereIn('id', $ids)
                 ->get()
-                ->sortBy(fn($p) => array_search($p->id, $ids))
+                ->sortBy(fn($p) => array_search($p->id, $ids)) // giữ nguyên thứ tự
                 ->values();
         });
     }
@@ -49,12 +48,13 @@ class RecommendationService
             ->groupBy('product_id')
             ->orderByDesc('qty')
             ->limit($limit)
-            ->pluck('product_id');
+            ->pluck('product_id')
+            ->all(); // ✅ thêm ->all() để thành array
 
         return Product::with(['galleries' => fn($q) => $q->limit(1), 'variants'])
             ->whereIn('id', $ids)
             ->get()
-            ->sortBy(fn($p) => array_search($p->id, $ids))
+            ->sortBy(fn($p) => array_search($p->id, $ids)) // giữ thứ tự đúng
             ->values();
     }
 }
