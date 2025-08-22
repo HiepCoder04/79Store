@@ -167,6 +167,8 @@
                                 </div>
                             </div>
                             <div role="tabpanel" class="tab-pane fade show active" id="reviews">
+                        </div>
+                    </div>
     <div class="container d-flex justify-content-center">
         <div class="col-md-8 col-lg-6 mt-4">
             <h5 class="mb-3 fw-semibold">Đánh giá của khách hàng</h5>
@@ -237,73 +239,120 @@
 
     @endif
 @endauth
-
             {{-- Danh sách đánh giá --}}
             <h6 class="mt-4">{{ $reviewCount }} Đánh giá</h6>
-            {{-- Danh sách đánh giá --}}
-<h6 class="mt-4">{{ $reviewCount }} Đánh giá</h6>
-@forelse($product->reviews as $review)
-    <div class="border rounded p-3 mb-3 bg-white shadow-sm">
-        {{-- User info --}}
-        <div class="d-flex align-items-center mb-2">
-            <img src="https://ui-avatars.com/api/?name={{ urlencode($review->user->name) }}&size=36"
-                 class="rounded-circle me-2" width="36" height="36" alt="avatar">
-            <div>
-                <strong>{{ $review->user->name }}</strong>
-                <div class="text-warning small">
-                    @for($i=1;$i<=5;$i++)
-                        <i class="fa fa-star{{ $i <= $review->rating ? '' : '-o' }}"></i>
-                    @endfor
-                </div>
-            </div>
-        </div>
-
-        {{-- Nội dung review --}}
-        <p class="mb-2">{{ $review->comment }}</p>
-
-        @if ($review->image_path)
-            <div class="mt-2">
-                <img src="{{ asset('storage/' . $review->image_path) }}"
-                     alt="Ảnh đánh giá" class="review-img">
-            </div>
-        @endif
-
-        <small class="text-muted d-block mb-2">{{ $review->created_at->diffForHumans() }}</small>
-
-        {{-- Phản hồi từ admin --}}
-        @if($review->admin_reply)
-            <div class="mt-3 p-3 border rounded bg-light position-relative">
-                <div class="d-flex align-items-center mb-2">
-                    <span class="badge bg-primary me-2">
-                        <i class="fa fa-shield"></i> 79Store
-                    </span>
-                    <small class="text-muted">đã phản hồi</small>
-                </div>
-                <p class="mb-1">{{ $review->admin_reply }}</p>
-                <small class="text-muted">Cảm ơn bạn đã tin tưởng và ủng hộ sản phẩm của chúng tôi </small>
-            </div>
-        @endif
-    </div>
-@empty
-    <p class="text-muted">Chưa có đánh giá nào cho sản phẩm này.</p>
-@endforelse
-
-
-        </div>
-    </div>
-</div>
-
-
+            @forelse($product->reviews as $review)
+                <div class="border rounded p-3 mb-3 bg-white shadow-sm">
+                    {{-- User info --}}
+                    <div class="d-flex align-items-center mb-2">
+                        <img src="https://ui-avatars.com/api/?name={{ urlencode($review->user->name) }}&size=36"
+                            class="rounded-circle me-2" width="36" height="36" alt="avatar">
+                        <div>
+                            <strong>{{ $review->user->name }}</strong>
+                            <div class="text-warning small">
+                                @for($i=1;$i<=5;$i++)
+                                    <i class="fa fa-star{{ $i <= $review->rating ? '' : '-o' }}"></i>
+                                @endfor
+                            </div>
                         </div>
                     </div>
+
+                    {{-- Nội dung review --}}
+                    <p class="mb-2">{{ $review->comment }}</p>
+
+                    @if ($review->image_path)
+                        <div class="mt-2">
+                            <img src="{{ asset('storage/' . $review->image_path) }}"
+                                alt="Ảnh đánh giá" class="review-img">
+                        </div>
+                    @endif
+
+                    <small class="text-muted d-block mb-2">{{ $review->created_at->diffForHumans() }}</small>
+
+                    {{-- Phản hồi từ admin --}}
+                    @if($review->admin_reply)
+                        <div class="mt-3 p-3 border rounded bg-light position-relative">
+                            <div class="d-flex align-items-center mb-2">
+                                <span class="badge bg-primary me-2">
+                                    <i class="fa fa-shield"></i> 79Store
+                                </span>
+                                <small class="text-muted">đã phản hồi</small>
+                            </div>
+                            <p class="mb-1">{{ $review->admin_reply }}</p>
+                            <small class="text-muted">Cảm ơn bạn đã tin tưởng và ủng hộ sản phẩm của chúng tôi </small>
+                        </div>
+                    @endif
+                </div>
+            @empty
+                <p class="text-muted">Chưa có đánh giá nào cho sản phẩm này.</p>
+            @endforelse
+</section>
+@if(isset($recommended) && $recommended->isNotEmpty())
+    <!-- ==================== Sản phẩm gợi ý ==================== -->
+    <section class="recommended-products-area section-padding-80">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 text-center mb-50">
+                    <h3 class="section-title wow fadeInUp" data-wow-delay="100ms">
+                        Có thể bạn cũng thích
+                    </h3>
+                    <p class="text-muted">Những sản phẩm thường được mua cùng sản phẩm này</p>
+                </div>
+            </div>
+
+            <div class="row">
+                @foreach ($recommended as $index => $product)
+                    <div class="col-12 col-sm-6 col-lg-3">
+                        <div class="single-product-area mb-50 wow fadeInUp" data-wow-delay="{{ ($index + 1) * 100 }}ms">
+                            <!-- Product Image -->
+                            <div class="product-img">
+                                <a href="{{ route('shop-detail', $product->id) }}">
+                                    @php
+                                        $image = optional($product->galleries->first())->image;
+                                        $imagePath = $image
+                                            ? asset(ltrim($image, '/'))
+                                            : asset('assets/img/bg-img/default.jpg');
+                                    @endphp
+                                    <img src="{{ $imagePath }}" alt="{{ $product->name }}" class="img-fluid fixed-img">
+                                </a>
+
+                                <!-- Optional Tag -->
+                                <div class="product-tag">
+                                    <a href="#">Hot</a>
+                                </div>
+                            </div>
+
+                            <!-- Product Info -->
+                            <div class="product-info mt-15 text-center">
+                                <a href="{{ route('shop-detail', $product->id) }}">
+                                    <p>{{ $product->name }}</p>
+                                </a>
+
+                                @php
+                                    $min = $product->variants->min('price');
+                                    $max = $product->variants->max('price');
+                                @endphp
+                                <h6 class="text-success fw-bold">
+                                    {{ number_format($min, 0, ',', '.') }}đ
+                                    @if ($min != $max)
+                                        – {{ number_format($max, 0, ',', '.') }}đ
+                                    @endif
+                                </h6>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+
+            <div class="row">
+                <div class="col-12 text-center">
+                    <a href="{{ route('shop') }}" class="btn alazea-btn">Xem tất cả</a>
                 </div>
             </div>
         </div>
-     <!-- ==== Bình luận sản phẩm ==== -->
+    </section>
+@endif
 
-
-
-</section>
 <style>
     
     .review-img {

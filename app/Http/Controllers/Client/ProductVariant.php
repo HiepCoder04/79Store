@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use Illuminate\Support\Facades\DB;
 use App\Models\Pot;
+use App\Services\RecommendationService;
 
 class ProductVariant extends Controller
 {
@@ -84,7 +85,7 @@ class ProductVariant extends Controller
             'keyword'            => $keyword,
         ]);
     }
-    public function productDetail($id)
+    public function productDetail($id, RecommendationService $recommendationService)
     {
         $product = Product::with([
             'category',
@@ -135,16 +136,19 @@ class ProductVariant extends Controller
 
         // Lấy pot thực sự hiển thị: có liên kết & còn hàng
         $potsToShow = $linkedPotIds->map(fn($id) => $allPots[$id] ?? null)->filter();
-
-         return view('client.shopDetail', compact(
+        $recommended = $recommendationService->getRecommendations($product->id, 6);
+        if (empty($recommended) || $recommended->isEmpty()) {
+            $recommended = $recommendationService->bestSellers(6);
+        }
+        return view('client.shopDetail', compact(
             'product',
             'comments',
             'variants',
             'allPots',
             'potsToShow',
             'averageRating',
-            'reviewCount'
+            'reviewCount',
+            'recommended' 
         ));
-        
     }
 }
