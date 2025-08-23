@@ -8,7 +8,7 @@
 
 <div class="card mb-3">
   <div class="card-body">
-    <p><strong>Mã đơn hàng:</strong> #{{ $item->order_id }}</p>
+    <p><strong>Mã đơn hàng:</strong> {{ $item->order->order_code }}</p>
     <p><strong>Người dùng:</strong> {{ $item->user->name ?? 'User' }}</p>
     <p><strong>Liên hệ:</strong> 
       @if($item->contact_phone)
@@ -16,7 +16,7 @@
           <i class="fas fa-phone-alt text-primary"></i> {{ $item->contact_phone }}
         </a>
       @else
-        <span class="text-warning">Chưa có SĐT</span>
+        <span class="text-warning">Chưa có Số điện thoại</span>
       @endif
       
       @if($item->contact_email)
@@ -34,7 +34,7 @@
          Giá chậu: {{ number_format($item->orderDetail->pot_price ?? 0, 0, ',', '.') }}đ
        @endif
     </p>
-    <p><strong>SL trả:</strong> 
+    <p><strong>Số lượng trả:</strong> 
        {{-- ✅ HIỂN THỊ CHI TIẾT VỚI TÊN CỤ THỂ --}}
        @if($item->plant_quantity > 0 && $item->pot_quantity > 0)
          <div class="mt-1">
@@ -232,7 +232,7 @@
 
 <h5 class="mt-4">Lịch sử giao dịch</h5>
 <table class="table">
-  <thead><tr><th>ID</th><th>Loại giao dịch</th><th>Số tiền</th><th>Bằng chứng</th><th>Ghi chú</th><th>Thời gian xử lý</th></tr></thead>
+  <thead><tr><th>STT</th><th>Loại giao dịch</th><th>Số tiền</th><th>Bằng chứng</th><th>Ghi chú</th><th>Thời gian xử lý</th></tr></thead>
   <tbody>
     @forelse($item->transactions as $t)
       <tr>

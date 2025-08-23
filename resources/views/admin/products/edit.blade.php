@@ -18,7 +18,7 @@
 
         {{-- THÔNG TIN CƠ BẢN --}}
         <div class="card shadow-sm mb-4">
-            <div class="card-header bg-primary text-white">
+            <div class="card-header bg-success text-white">
                 <div class="d-flex align-items-center justify-content-between">
                     <span class="fw-semibold">Thông tin cơ bản</span>
                     <span class="small opacity-75">Điền đầy đủ các trường bắt buộc *</span>
@@ -53,7 +53,7 @@
 
         {{-- BIẾN THỂ --}}
         <div class="card shadow-sm mb-4">
-            <div class="card-header bg-primary text-white d-flex align-items-center justify-content-between">
+            <div class="card-header bg-success text-white d-flex align-items-center justify-content-between">
                 <span class="fw-semibold">Biến thể theo chiều cao</span>
                 <button type="button" id="addVariant" class="btn btn-light btn-sm">+ Thêm biến thể</button>
             </div>
@@ -95,7 +95,7 @@
 
         {{-- CHỌN CHẬU --}}
         <div class="card shadow-sm mb-4">
-            <div class="card-header bg-primary text-white">
+            <div class="card-header bg-success text-white">
                 <span class="fw-semibold">Chọn chậu liên kết</span>
             </div>
             <div class="card-body">
@@ -129,7 +129,7 @@
 
         {{-- ẢNH SẢN PHẨM --}}
         <div class="card shadow-sm mb-4">
-            <div class="card-header bg-primary text-white d-flex align-items-center justify-content-between">
+            <div class="card-header bg-success text-white d-flex align-items-center justify-content-between">
                 <span class="fw-semibold">Hình ảnh sản phẩm</span>
                 <label class="btn btn-light btn-sm mb-0" for="imageInput">+ Thêm ảnh</label>
             </div>
@@ -163,7 +163,7 @@
         <div class="card shadow-sm sticky-bottom z-1">
             <div class="card-body d-flex justify-content-end gap-2">
                 <a href="{{ route('admin.products.index') }}" class="btn btn-outline-secondary">Huỷ</a>
-                <button class="btn btn-primary">Cập nhật</button>
+                <button class="btn btn-success">Cập nhật</button>
             </div>
         </div>
     </form>

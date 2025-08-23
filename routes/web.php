@@ -259,3 +259,9 @@ Route::get('/test-mail', function () {
         return '❌ Lỗi: ' . $e->getMessage();
     }
 });
+Route::prefix('admin/users')->name('admin.users.')->group(function () {
+    Route::get('/', [UserController::class, 'listUser'])->name('list');
+    Route::put('/ban', [UserController::class, 'banUser'])->name('ban');
+    Route::put('/unban', [UserController::class, 'unbanUser'])->name('unban');
+    Route::put('/update-role', [UserController::class, 'UpdateRole'])->name('updateRole');
+});

@@ -74,15 +74,30 @@ class OrderDetail extends Model
     public function plantQtyReturned(): int
     {
         return (int) $this->returnRequests()
+            ->whereIn('status', ['pending', 'approved', 'refunded', 'exchanged']) // ✅ THÊM 'pending'
+            ->sum('plant_quantity');
+    }
+
+    // ✅ SỬA METHOD: Tính cả pending requests  
+    public function potQtyReturned(): int
+    {
+        return (int) $this->returnRequests()
+            ->whereIn('status', ['pending', 'approved', 'refunded', 'exchanged']) // ✅ THÊM 'pending'
+            ->sum('pot_quantity');
+    }
+
+    // ✅ THÊM METHOD MỚI: Chỉ tính approved/refunded (để admin tracking)
+    public function plantQtyActuallyReturned(): int
+    {
+        return (int) $this->returnRequests()
             ->whereIn('status', ['approved', 'refunded', 'exchanged'])
             ->sum('plant_quantity');
     }
 
-    // ✅ THÊM METHOD MỚI: Tính riêng số lượng chậu đã trả
-    public function potQtyReturned(): int
+    public function potQtyActuallyReturned(): int
     {
         return (int) $this->returnRequests()
-            ->whereIn('status', ['approved', 'refunded', 'exchanged'])
+            ->whereIn('status', ['approved', 'refunded', 'exchanged']) 
             ->sum('pot_quantity');
     }
 

@@ -97,7 +97,7 @@
                                     <small>
                                         Chậu: {{ $potName }} ({{ number_format($potPrice, 0, ',', '.') }}đ) <br>
                                         Giá: {{ number_format($productPrice, 0, ',', '.') }}đ <br>
-                                        SL: {{ $item->quantity }}
+                                        Số Lượng: {{ $item->quantity }}
                                     </small>
                                 </div>
                             </div>

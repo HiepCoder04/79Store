@@ -15,9 +15,6 @@
     </select>
   </div>
   <div class="col-auto">
-    <input type="number" name="order_id" value="{{ request('order_id') }}" class="form-control" placeholder="Order ID">
-  </div>
-  <div class="col-auto">
     <button class="btn btn-primary">Lọc</button>
   </div>
 </form>
@@ -25,7 +22,7 @@
 <table class="table table-striped">
   <thead>
     <tr>
-      <th>ID</th><th>Order</th><th>User</th><th>SĐT</th><th>SP</th><th>SL trả</th><th>Giá trị ước tính</th><th>Trạng thái</th><th>Ngày</th><th></th>
+      <th>ID</th><th>Mã đơn hàng</th><th>Tài khoản</th><th>SĐT</th><th>Sản phẩm</th><th>Số lượng trả</th><th>Giá trị ước tính</th><th>Trạng thái</th><th>Ngày</th><th></th>
     </tr>
   </thead>
   <tbody>
@@ -46,7 +43,7 @@
       @endphp
       <tr>
         <td>{{ $it->id }}</td>
-        <td>#{{ $it->order_id }}</td>
+        <td>{{ $it->order->order_code }}</td>
         <td>{{ $it->user->name ?? 'User' }}</td>
         <td>
           @if($phone)

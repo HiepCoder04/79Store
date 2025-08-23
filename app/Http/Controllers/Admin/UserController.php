@@ -8,21 +8,20 @@ use App\Models\User;
 
 class UserController extends Controller
 {
-    // public function listUser(){
-    //     return view('admin.users.list-user');
-    // }
     public function listUser(Request $request)
     {
         $query = User::query()
+
         ->where('role', 'customer')
             ->search($request, ['name', 'email', 'phone']) // tìm kiếm
+
+            
+
             ->filter($request, [
-                'role'   => 'exact', // lọc theo quyền
-                'is_ban' => 'exact', // lọc theo trạng thái cấm
+                'role'   => 'exact',
+                'is_ban' => 'exact',
             ]);
 
-
-        // Lọc trạng thái xác minh email (do không nằm trong trait filter)
         if ($request->filled('verified')) {
             if ($request->verified == 1) {
                 $query->whereNotNull('email_verified_at');
@@ -32,42 +31,55 @@ class UserController extends Controller
         }
 
         $users = $query->latest()->paginate(10)->appends($request->query());
-
         return view('admin.users.list-user', compact('users'));
     }
 
     public function banUser(Request $request)
     {
-        $user_id = $request->id_user;
+        $request->validate([
+            'id_user' => 'required|exists:users,id',
+            'reason'  => 'required|string|max:255',
+        ]);
 
-        $user = User::findOrFail($user_id);
+        $user = User::findOrFail($request->id_user);
         $user->is_ban = true;
+        $user->ban_reason = $request->reason;
         $user->save();
-        return back()->with('success', 'Tài khoản đã bị cấm');
+
+        return back()->with('success', 'Đã cấm tài khoản: ' . $user->name . ' - Lý do: ' . $request->reason);
     }
+
     public function unbanUser(Request $request)
     {
-        $user = User::findOrFail($request->id_user);
+        $request->validate([
+            'id_user' => 'required|exists:users,id',
+        ]);
 
+        $user = User::findOrFail($request->id_user);
         $user->is_ban = false;
+        $user->ban_reason = null;
         $user->save();
 
-        return back()->with('success', 'Tài khoản đã được mở cấm');
+        return back()->with('success', 'Đã mở cấm tài khoản: ' . $user->name);
     }
+
     public function UpdateRole(Request $request)
     {
-        $role = $request->role;
-        $user_id = $request->id_user;
+        $request->validate([
+            'id_user' => 'required|exists:users,id',
+            'role'    => 'required|in:1,2',
+        ]);
 
-        $user = User::findOrFail($user_id);
-        if ($role == 1) {
+        $user = User::findOrFail($request->id_user);
+        if ($request->role == 1) {
             $user->role = 'staff';
-            $user->save();
-            return back()->with('success', 'User đã lên nhân viên');
-        } elseif ($role == 2) {
+            $msg = 'User đã lên nhân viên';
+        } else {
             $user->role = 'customer';
-            $user->save();
-            return back()->with('success', 'User đã là khách hàng');
+            $msg = 'User đã là khách hàng';
         }
+        $user->save();
+
+        return back()->with('success', $msg);
     }
 }

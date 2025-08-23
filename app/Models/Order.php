@@ -9,6 +9,7 @@ use App\Traits\Filterable;
 class Order extends Model
 {
     use HasFactory, Filterable;
+
     protected $table = 'orders';
 
     protected $fillable = [
@@ -26,47 +27,123 @@ class Order extends Model
         'sale_channel',
     ];
 
-    /**
-     * Mối quan hệ: Order thuộc về User
-     */
+    // Nếu muốn các accessor tự có mặt khi ->toArray()/JSON
+    protected $appends = [
+        'order_code',
+        'total_refunded_amount',
+        'has_returns',
+        'return_requests_count',
+        'return_percentage',
+        'return_status_text',
+    ];
+
+    /** Quan hệ: Order thuộc về User */
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * Mối quan hệ: Order có địa chỉ giao hàng
-     */
+    /** Quan hệ: Order có địa chỉ giao hàng */
     public function address()
     {
         return $this->belongsTo(UserAddress::class, 'address_id');
     }
 
-    /**
-     * Mối quan hệ: Order có nhiều chi tiết đơn hàng
-     */
+    /** Quan hệ: Order có nhiều chi tiết đơn hàng */
     public function orderDetails()
     {
         return $this->hasMany(OrderDetail::class);
     }
+
     public function voucher()
     {
         return $this->belongsTo(Voucher::class);
     }
+
+    public function cancellations()
+    {
+        return $this->hasMany(Cancellation::class);
+    }
+
+    /** Yêu cầu hủy mới nhất */
+    public function latestCancellation()
+    {
+        return $this->hasOne(Cancellation::class)->latestOfMany();
+    }
+
+    /** Quan hệ: Các yêu cầu trả hàng */
+    public function returnRequests()
+    {
+        return $this->hasMany(ReturnRequest::class);
+    }
+
+    /** Mã đơn: 79ST + Ymd + id pad 4 */
     public function getOrderCodeAttribute()
     {
         $date = $this->created_at ? $this->created_at->format('Ymd') : now()->format('Ymd');
         $id = $this->id ?? 0;
         return '79ST' . $date . str_pad($id, 4, '0', STR_PAD_LEFT);
     }
-    public function cancellations()
+
+    /** Tổng tiền đã hoàn (từ các yêu cầu trạng thái refunded) */
+    public function getTotalRefundedAmountAttribute()
     {
-        return $this->hasMany(Cancellation::class);
+        return $this->returnRequests()
+            ->whereIn('status', ['refunded'])
+            ->get()
+            ->sum(function ($request) {
+                if ($request->orderDetail) {
+                    $productPrice = $request->orderDetail->product_price ?? 0;
+                    $potPrice     = $request->orderDetail->pot_price ?? 0;
+                    return ($productPrice * ((int) ($request->plant_quantity ?? 0)))
+                         + ($potPrice     * ((int) ($request->pot_quantity   ?? 0)));
+                }
+                return 0;
+            });
     }
 
-    // Nếu muốn lấy yêu cầu hủy mới nhất
-    public function latestCancellation()
+    /** Có trả hàng không */
+    public function getHasReturnsAttribute()
     {
-        return $this->hasOne(Cancellation::class)->latestOfMany();
+        return $this->returnRequests()->exists();
+    }
+
+    /** Số yêu cầu trả hàng */
+    public function getReturnRequestsCountAttribute()
+    {
+        return $this->returnRequests()->count();
+    }
+
+    /** % hoàn tiền so với tổng đơn */
+    public function getReturnPercentageAttribute()
+    {
+        $total = (float) ($this->total_after_discount ?? 0);
+        if ($total <= 0) {
+            return 0;
+        }
+        $pct = ($this->total_refunded_amount / $total) * 100;
+        return min(100, round($pct, 1));
+    }
+
+    /** Text trạng thái trả hàng gộp */
+    public function getReturnStatusTextAttribute()
+    {
+        $pendingCount  = $this->returnRequests()->where('status', 'pending')->count();
+        $refundedCount = $this->returnRequests()->where('status', 'refunded')->count();
+        $rejectedCount = $this->returnRequests()->where('status', 'rejected')->count();
+
+        if ($pendingCount > 0) {
+            return "Có {$pendingCount} yêu cầu chờ duyệt";
+        }
+        if ($refundedCount > 0 && $rejectedCount > 0) {
+            return "Đã hoàn {$refundedCount} yêu cầu, từ chối {$rejectedCount}";
+        }
+        if ($refundedCount > 0) {
+            return "Đã hoàn {$refundedCount} yêu cầu";
+        }
+        if ($rejectedCount > 0) {
+            return "Đã từ chối {$rejectedCount} yêu cầu";
+        }
+        return $this->has_returns ? "Có yêu cầu trả hàng" : "Không có yêu cầu trả hàng";
     }
 }
