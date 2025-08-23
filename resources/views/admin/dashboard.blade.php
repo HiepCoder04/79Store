@@ -54,8 +54,8 @@
 
     <div class="container py-4">
 
-        <h2 class="mb-4 fw-bold text-primary">
-            📊 Thống kê đơn hàng
+        <h2 class="mb-4 fw-bold ">
+             Thống kê đơn hàng
         </h2>
 
         {{-- Form lọc theo ngày --}}
@@ -87,7 +87,8 @@
             </div>
             <div class="col-md-3">
                 <div class="stats-card bg-info">
-                    <h5>Doanh thu sau khi trả hàng</h5>
+                    <h5>Doanh thu thực tế</h5>
+                    <small>Đã trừ tiền hàng return</small>
                     <p>{{ number_format($doanhThuThucTe, 0, ',', '.') }} đ</p>
                 </div>
             </div>
@@ -130,13 +131,13 @@
         <div class="row g-4">
             <div class="col-md-6">
                 <div class="chart-card">
-                    <h5 class="mb-3 fw-semibold">📈 Doanh thu theo ngày</h5>
+                    <h5 class="mb-3 fw-semibold"> Doanh thu theo ngày</h5>
                     <canvas id="chartDoanhThu"></canvas>
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="chart-card">
-                    <h5 class="mb-3 fw-semibold">📦 Số lượng đơn hàng theo ngày</h5>
+                    <h5 class="mb-3 fw-semibold"> Số lượng đơn hàng theo ngày</h5>
                     <canvas id="chartSoDonHang"></canvas>
                 </div>
             </div>
@@ -145,33 +146,28 @@
         <div class="row g-4 mt-2">
             <div class="col-md-6">
                 <div class="chart-card">
-                    <h5 class="mb-3 fw-semibold">💰 Doanh thu 7 ngày gần nhất</h5>
+                    <h5 class="mb-3 fw-semibold"> Doanh thu 7 ngày gần nhất</h5>
                     <canvas id="chartWeeklyRevenue"></canvas>
                 </div>
             </div>
             <div class="col-md-6">
-                <div class="chart-card">
-                    <h5 class="mb-3 fw-semibold">🏆 Top 5 sản phẩm bán chạy</h5>
-                    <table class="table table-striped table-hover mb-0 shadow-sm rounded">
-                        <thead class="table-dark">
-                            <tr>
-                                <th>#</th>
-                                <th>Sản phẩm</th>
-                                <th>Số lượng bán</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($topProductsData['labels'] as $index => $productName)
-                                <tr>
-                                    <td>{{ $index + 1 }}</td>
-                                    <td>{{ $productName }}</td>
-                                    <td class="fw-bold">{{ $topProductsData['totals'][$index] }}</td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+    <div class="chart-card">
+        <h5 class="mb-3 fw-semibold"> Top 5 sản phẩm bán chạy</h5>
+        <div class="list-group">
+            @foreach($topProductsData['labels'] as $index => $productName)
+                <div class="list-group-item d-flex justify-content-between align-items-center mb-2 shadow-sm rounded">
+                    <div class="d-flex align-items-center">
+                        <span class="badge bg-primary me-3 fs-6">{{ $index + 1 }}</span>
+                        <div>
+                            <h6 class="mb-0">{{ $productName }}</h6>
+                        </div>
+                    </div>
+                    <span class="fw-bold text-success">{{ $topProductsData['totals'][$index] }} <i class="fas fa-shopping-cart"></i></span>
                 </div>
-            </div>
+            @endforeach
+        </div>
+    </div>
+</div>
         </div>
     </div>
 
