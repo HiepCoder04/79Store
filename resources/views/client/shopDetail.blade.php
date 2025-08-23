@@ -268,54 +268,73 @@
 </section>
 
 @if(isset($recommended) && $recommended->isNotEmpty())
-    <!-- Gợi ý sản phẩm -->
-    <section class="recommended-products-area section-padding-80">
-        <div class="container">
-            <div class="row">
-                <div class="col-12 text-center mb-50">
-                    <h3 class="section-title wow fadeInUp" data-wow-delay="100ms">Có thể bạn cũng thích</h3>
-                    <p class="text-muted">Những sản phẩm thường được mua cùng sản phẩm này</p>
+<section class="recommended-products-area section-padding-80">
+  <div class="container">
+    <div class="row">
+      <div class="col-12 text-center mb-50">
+        <h3 class="section-title wow fadeInUp" data-wow-delay="100ms">Có thể bạn cũng thích</h3>
+        <p class="text-muted">Những sản phẩm thường được mua cùng sản phẩm này</p>
+      </div>
+    </div>
+
+    <div class="row">
+      @foreach ($recommended as $index => $rec)
+        <div class="col-12 col-sm-6 col-lg-3">
+          <div class="single-product-area mb-50 wow fadeInUp" data-wow-delay="{{ ($index + 1) * 100 }}ms">
+            <div class="product-img">
+              <a href="{{ route('shop-detail', $rec->id) }}">
+                <div id="rec-{{ $rec->id }}" class="carousel slide carousel-fade rec-carousel" data-bs-ride="carousel">
+                  <div class="carousel-inner">
+                    @forelse ($rec->galleries as $gIndex => $gallery)
+                      @php
+                        $raw = $gallery->image ?? '';
+                        if (!$raw) {
+                            $src = asset('assets/img/bg-img/default.jpg');
+                        } elseif (preg_match('~^https?://~', $raw)) {
+                            $src = $raw;
+                        } elseif (\Illuminate\Support\Str::startsWith($raw, ['storage/', '/storage/'])) {
+                            $src = asset(ltrim($raw, '/'));
+                        } else {
+                            $src = asset('storage/' . ltrim($raw, '/'));
+                        }
+                      @endphp
+                      <div class="carousel-item {{ $gIndex === 0 ? 'active' : '' }}">
+                        <img src="{{ $src }}" class="d-block w-100 fixed-img" alt="{{ $rec->name }} - ảnh {{ $gIndex + 1 }}">
+                      </div>
+                    @empty
+                      <div class="carousel-item active">
+                        <img src="{{ asset('assets/img/bg-img/default.jpg') }}" class="d-block w-100 fixed-img" alt="No image">
+                      </div>
+                    @endforelse
+                  </div>
                 </div>
+              </a>
+              <div class="product-tag"><a href="#">Hot</a></div>
             </div>
 
-            <div class="row">
-                @foreach ($recommended as $index => $product)
-                    <div class="col-12 col-sm-6 col-lg-3">
-                        <div class="single-product-area mb-50 wow fadeInUp" data-wow-delay="{{ ($index + 1) * 100 }}ms">
-                            <div class="product-img">
-                                <a href="{{ route('shop-detail', $product->id) }}">
-                                    @php
-                                        $image = optional($product->galleries->first())->image;
-                                        $imagePath = $image ? asset(ltrim($image, '/')) : asset('assets/img/bg-img/default.jpg');
-                                    @endphp
-                                    <img src="{{ $imagePath }}" alt="{{ $product->name }}" class="img-fluid fixed-img">
-                                </a>
-                                <div class="product-tag"><a href="#">Hot</a></div>
-                            </div>
-                            <div class="product-info mt-15 text-center">
-                                <a href="{{ route('shop-detail', $product->id) }}"><p>{{ $product->name }}</p></a>
-                                @php
-                                    $min = $product->variants->min('price');
-                                    $max = $product->variants->max('price');
-                                @endphp
-                                <h6 class="text-success fw-bold">
-                                    {{ number_format($min, 0, ',', '.') }}đ
-                                    @if ($min != $max) – {{ number_format($max, 0, ',', '.') }}đ @endif
-                                </h6>
-                            </div>
-                        </div>
-                    </div>
-                @endforeach
+            <div class="product-info mt-15 text-center">
+              <a href="{{ route('shop-detail', $rec->id) }}"><p>{{ $rec->name }}</p></a>
+              @php $min = $rec->variants->min('price'); $max = $rec->variants->max('price'); @endphp
+              <h6 class="text-success fw-bold">
+                {{ number_format($min, 0, ',', '.') }}đ
+                @if ($min != $max) – {{ number_format($max, 0, ',', '.') }}đ @endif
+              </h6>
             </div>
-
-            <div class="row">
-                <div class="col-12 text-center">
-                    <a href="{{ route('shop') }}" class="btn alazea-btn">Xem tất cả</a>
-                </div>
-            </div>
+          </div>
         </div>
-    </section>
+      @endforeach
+    </div>
+
+    <div class="row">
+      <div class="col-12 text-center">
+        <a href="{{ route('shop') }}" class="btn alazea-btn">Xem tất cả</a>
+      </div>
+    </div>
+  </div>
+</section>
 @endif
+
+
 
 <style>
     .review-img {
@@ -520,6 +539,18 @@ function previewReviewImage(event) {
         reader.readAsDataURL(file);
     }
 }
+document.addEventListener("DOMContentLoaded", function () {
+    const carousels = document.querySelectorAll(".rec-carousel");
+
+    carousels.forEach((carousel) => {
+        let bsCarousel = new bootstrap.Carousel(carousel, {
+            interval: 2500, // chạy mỗi 2.5 giây
+            ride: "carousel",
+            pause: false,  // không dừng khi hover
+            wrap: true     // chạy vòng lặp vô hạn
+        });
+    });
+});
 
 </script>
 @endsection
