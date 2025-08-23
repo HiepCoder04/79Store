@@ -13,12 +13,12 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         $statusLabels = [
-            'pending'   => 'Chờ xác nhận',
+            'pending' => 'Chờ xác nhận',
             'confirmed' => 'Đã xác nhận',
-            'shipping'  => 'Đang giao',
+            'shipping' => 'Đang giao',
             'delivered' => 'Đã giao',
             'cancelled' => 'Đã hủy',
-            'returned'  => 'Đã trả hàng',
+            'returned' => 'Đã trả hàng',
         ];
 
         // ======== Lọc ngày cho Orders ========
@@ -32,8 +32,10 @@ class DashboardController extends Controller
 
         // ======== Đếm theo trạng thái ========
         $donHangChoXuLy = (clone $ordersQ)->where('status', 'pending')->count();
-        $donHangDaGiao  = (clone $ordersQ)->where('status', 'delivered')->count();
-        $donHangDaHuy   = (clone $ordersQ)->where('status', 'cancelled')->count();
+        $donHangDaXuLy = (clone $ordersQ)->where('status', 'confirmed')->count();
+        $donHangDangGiao = (clone $ordersQ)->where('status', 'shipping')->count();
+        $donHangDaGiao = (clone $ordersQ)->where('status', 'delivered')->count();
+        $donHangDaHuy = (clone $ordersQ)->where('status', 'cancelled')->count();
 
         // Đã trả: lấy từ return_requests
         $returnReqQ = DB::table('return_requests');
@@ -147,6 +149,8 @@ class DashboardController extends Controller
         return view('admin.dashboard', compact(
             'statusLabels',
             'donHangChoXuLy',
+            'donHangDaXuLy',
+            'donHangDangGiao',
             'donHangDaGiao',
             'donHangDaHuy',
             'donHangDaTra',
