@@ -55,7 +55,7 @@
     <div class="container py-4">
 
         <h2 class="mb-4 fw-bold ">
-             Thống kê đơn hàng
+            Thống kê đơn hàng
         </h2>
 
         {{-- Form lọc theo ngày --}}
@@ -97,6 +97,22 @@
                     <div class="stats-card bg-pink">
                         <h5>Chờ xác nhận</h5>
                         <p>{{ $donHangChoXuLy }}</p>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="{{ route('admin.orders.index', ['status' => 'confirmed']) }}" class="text-decoration-none">
+                    <div class="stats-card bg-warning">
+                        <h5>Đã xác nhận</h5>
+                        <p>{{ $donHangDaXuLy }}</p>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="{{ route('admin.orders.index', ['status' => 'shipping']) }}" class="text-decoration-none">
+                    <div class="stats-card bg-secondary">
+                        <h5>Đang giao</h5>
+                        <p>{{ $donHangDangGiao}}</p>
                     </div>
                 </a>
             </div>
@@ -151,23 +167,25 @@
                 </div>
             </div>
             <div class="col-md-6">
-    <div class="chart-card">
-        <h5 class="mb-3 fw-semibold"> Top 5 sản phẩm bán chạy</h5>
-        <div class="list-group">
-            @foreach($topProductsData['labels'] as $index => $productName)
-                <div class="list-group-item d-flex justify-content-between align-items-center mb-2 shadow-sm rounded">
-                    <div class="d-flex align-items-center">
-                        <span class="badge bg-primary me-3 fs-6">{{ $index + 1 }}</span>
-                        <div>
-                            <h6 class="mb-0">{{ $productName }}</h6>
-                        </div>
+                <div class="chart-card">
+                    <h5 class="mb-3 fw-semibold"> Top 5 sản phẩm bán chạy</h5>
+                    <div class="list-group">
+                        @foreach($topProductsData['labels'] as $index => $productName)
+                            <div
+                                class="list-group-item d-flex justify-content-between align-items-center mb-2 shadow-sm rounded">
+                                <div class="d-flex align-items-center">
+                                    <span class="badge bg-primary me-3 fs-6">{{ $index + 1 }}</span>
+                                    <div>
+                                        <h6 class="mb-0">{{ $productName }}</h6>
+                                    </div>
+                                </div>
+                                <span class="fw-bold text-success">{{ $topProductsData['totals'][$index] }} <i
+                                        class="fas fa-shopping-cart"></i></span>
+                            </div>
+                        @endforeach
                     </div>
-                    <span class="fw-bold text-success">{{ $topProductsData['totals'][$index] }} <i class="fas fa-shopping-cart"></i></span>
                 </div>
-            @endforeach
-        </div>
-    </div>
-</div>
+            </div>
         </div>
     </div>
 
