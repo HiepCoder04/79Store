@@ -19,8 +19,10 @@ class ProductController extends Controller
     {
         $categories = Category::all();
 
-        $query = Product::with(['category', 'variants', 'galleries'])
-            ->search($request, ['name', 'slug', 'description']);
+        $query = Product::with(['category', 'galleries'])
+    ->withMin('variants', 'price')
+    ->withMax('variants', 'price')
+    ->search($request, ['name', 'slug', 'description']);
 
         // Lọc danh mục
         if ($request->filled('category_id')) {
