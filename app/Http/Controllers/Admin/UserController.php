@@ -11,7 +11,12 @@ class UserController extends Controller
     public function listUser(Request $request)
     {
         $query = User::query()
-            ->search($request, ['name', 'email', 'phone'])
+
+        ->where('role', 'customer')
+            ->search($request, ['name', 'email', 'phone']) // tìm kiếm
+
+            
+
             ->filter($request, [
                 'role'   => 'exact',
                 'is_ban' => 'exact',

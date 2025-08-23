@@ -58,7 +58,7 @@
             border-radius: 10px;
         }
 
-<<<<<<<<< Temporary merge branch 1
+
     .table-actions {
         display: flex;
         justify-content: center;
@@ -70,14 +70,14 @@
   .filter-field.form-control{border:1.5px solid #d1d5db;border-radius:10px}
   .filter-field:focus{border-color:#e91e63;box-shadow:0 0 0 .2rem rgba(233,30,99,.12);outline:0}
 
-=========
+
 .table-actions {
     display: flex;
     justify-content: center;
     gap: 8px;
     flex-wrap: wrap;
 }
->>>>>>>>> Temporary merge branch 2
+
 </style>
 
     <div class="container table-container">
@@ -94,6 +94,7 @@
                         placeholder="Tìm tên, email, SĐT...">
                 </div>
 
+
                 <div class="col-md-2">
                     <select name="role" class="form-select">
                         <option value="">-- Quyền --</option>
@@ -102,6 +103,7 @@
                     </select>
                 </div>
 
+
                 <div class="col-md-2">
                     <select name="is_ban" class="form-select">
                         <option value="">-- Trạng thái --</option>
@@ -109,6 +111,8 @@
                         <option value="1" {{ request('is_ban') === '1' ? 'selected' : '' }}>Bị cấm</option>
                     </select>
                 </div>
+
+
 
                 <div class="col-md-3 d-flex gap-2">
                     <button type="submit" class="btn btn-primary">Lọc</button>
@@ -203,6 +207,7 @@
                         <div class="modal-header">
                             <h5 class="modal-title">Cấm người dùng</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
                         </div>
                         <div class="modal-body">
                             <p id="banUserName"></p>

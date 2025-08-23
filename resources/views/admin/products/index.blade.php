@@ -144,7 +144,9 @@
                             @endif
                         </td>
                         <td>{{ $product->category->name ?? 'N/A' }}</td>
-                        <td>{{ number_format($product->variants->first()->price ?? 0) }}đ</td>
+<td>
+    {{ number_format($product->variants_min_price) }}đ - {{ number_format($product->variants_max_price) }}đ
+</td>
                         <td>
                             <input 
                                 type="checkbox" 
