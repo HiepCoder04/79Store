@@ -18,11 +18,50 @@ class OrderController extends Controller
     {
         $orders = Order::where('user_id', auth()->id())
             ->when($request->status, function ($query) use ($request) {
-                $query->where('status', $request->status); // chỉ lọc theo status
+                // ✅ XỬ LÝ CÁC TRẠNG THÁI TRẢ HÀNG MỚI
+                if (in_array($request->status, ['delivered_with_returns', 'delivered_fully_returned', 'delivered_partial_returned'])) {
+                    $query->where('status', 'delivered')
+                          ->whereHas('returnRequests', function ($returnQuery) use ($request) {
+                              $returnQuery->whereIn('status', ['refunded', 'exchanged']);
+                              
+                              // Lọc theo loại trả hàng
+                              if ($request->status === 'delivered_fully_returned') {
+                                  // Logic sẽ được xử lý trong eager loading
+                              } elseif ($request->status === 'delivered_partial_returned') {
+                                  // Logic sẽ được xử lý trong eager loading
+                              }
+                          });
+                } else {
+                    $query->where('status', $request->status); // chỉ lọc theo status
+                }
             })
+            ->with(['returnRequests' => function ($query) {
+                $query->whereIn('status', ['refunded', 'exchanged']);
+            }])
             ->latest()
-            ->paginate(10)
+            ->paginate(6) // ✅ THÊM PHÂN TRANG (6 đơn hàng mỗi trang)
             ->appends($request->query());
+
+        // ✅ LỌC THÊM SAU KHI LOAD DỮ LIỆU
+        if (in_array($request->status, ['delivered_fully_returned', 'delivered_partial_returned'])) {
+            $filteredCollection = $orders->getCollection()->filter(function ($order) use ($request) {
+                if (!$order) return false; // ✅ Kiểm tra order không null
+                
+                $returnedQty = $order->total_returned_quantity ?? 0;
+                $totalQty = $order->total_items_quantity ?? 0;
+                
+                if ($request->status === 'delivered_fully_returned') {
+                    return $returnedQty >= $totalQty && $returnedQty > 0;
+                } elseif ($request->status === 'delivered_partial_returned') {
+                    return $returnedQty > 0 && $returnedQty < $totalQty;
+                }
+                
+                return true;
+            })->values(); // ✅ Reset keys để tránh lỗi index
+
+            // Update the collection in the paginator
+            $orders->setCollection($filteredCollection);
+        }
 
         return view('client.users.order', compact('orders'));
     }

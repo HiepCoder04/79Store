@@ -25,6 +25,7 @@ class StoreReturnRequest extends FormRequest
             'bank_account_number' => ['required','string','min:8','max:50','regex:/^[0-9\-\s]+$/'],
             'return_items'        => ['required','array','min:1'],
             'return_items.*'      => ['in:plant,pot'],
+            'agree_terms'         => ['required','accepted'], // ✅ THÊM VALIDATION CHO ĐIỀU KHOẢN
         ];
     }
 
@@ -56,6 +57,8 @@ class StoreReturnRequest extends FormRequest
             'bank_account_number.regex'=> 'Số tài khoản chỉ được chứa số, dấu gạch ngang và khoảng trắng.',
             'return_items.required'    => 'Vui lòng chọn ít nhất cây hoặc chậu để trả.',
             'return_items.min'         => 'Vui lòng chọn ít nhất một loại để trả.',
+            'agree_terms.required'    => 'Bạn phải đồng ý với điều khoản đổi trả hàng.',
+            'agree_terms.accepted'    => 'Bạn phải chấp nhận điều khoản đổi trả hàng để tiếp tục.',
         ];
     }
 

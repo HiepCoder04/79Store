@@ -146,4 +146,42 @@ class Order extends Model
         }
         return $this->has_returns ? "Có yêu cầu trả hàng" : "Không có yêu cầu trả hàng";
     }
+
+    /** ✅ THÊM METHOD MỚI: Tính tổng số lượng sản phẩm trong đơn */
+    public function getTotalItemsQuantityAttribute()
+    {
+        return $this->orderDetails->sum('quantity');
+    }
+
+    /** ✅ THÊM METHOD MỚI: Tính tổng số lượng đã trả (cả cây và chậu) */
+    public function getTotalReturnedQuantityAttribute()
+    {
+        return $this->returnRequests()
+            ->whereIn('status', ['refunded', 'exchanged'])
+            ->get()
+            ->sum(function ($request) {
+                return max($request->plant_quantity ?? 0, $request->pot_quantity ?? 0);
+            });
+    }
+
+    /** ✅ THÊM METHOD MỚI: Text hiển thị trạng thái trả hàng ngắn gọn */
+    public function getReturnBadgeTextAttribute()
+    {
+        if (!$this->has_returns || $this->status !== 'delivered') {
+            return null;
+        }
+
+        $returnedQty = $this->total_returned_quantity;
+        $totalQty = $this->total_items_quantity;
+
+        if ($returnedQty <= 0) {
+            return null;
+        }
+
+        if ($returnedQty >= $totalQty) {
+            return "Đã hoàn trả hết";
+        }
+
+        return "Có {$returnedQty} sản phẩm đã trả";
+    }
 }

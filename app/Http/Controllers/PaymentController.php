@@ -144,6 +144,7 @@ class PaymentController extends Controller
             // Thêm phương thức thanh toán là vnpay và đã thanh toán
             $checkoutData['payment_method'] = 'vnpay';
             $checkoutData['payment_status'] = 'paid'; // Đánh dấu đã thanh toán
+            // ✅ Không tự động đặt order_status, để CheckoutController xử lý
             
             // Đảm bảo selected_ids được truyền qua
             if (session()->has('vnpay_selected_ids')) {

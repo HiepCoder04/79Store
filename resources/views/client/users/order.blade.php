@@ -26,6 +26,10 @@
                 <option value="cancel_requested" {{ request('status') === 'cancel_requested' ? 'selected' : '' }}>Yêu cầu hủy</option>
                 <option value="cancelled" {{ request('status') === 'cancelled' ? 'selected' : '' }}>Đã hủy</option>
                 <option value="returned" {{ request('status') === 'returned' ? 'selected' : '' }}>Đã hoàn hàng</option>
+                {{-- ✅ THÊM CÁC OPTION LỌC TRẢ HÀNG --}}
+                <option value="delivered_with_returns" {{ request('status') === 'delivered_with_returns' ? 'selected' : '' }}>Đã nhận - Có trả hàng</option>
+                <option value="delivered_fully_returned" {{ request('status') === 'delivered_fully_returned' ? 'selected' : '' }}>Đã nhận - Hoàn trả hết</option>
+                <option value="delivered_partial_returned" {{ request('status') === 'delivered_partial_returned' ? 'selected' : '' }}>Đã nhận - Trả một phần</option>
             </select>
         </div>
         <div>
@@ -59,7 +63,18 @@
                     <h5 class="mb-0">🧾 Mã đơn: <strong>{{ $order->order_code }}</strong></h5>
                     <small class="text-muted">📅 Ngày đặt: {{ $order->created_at->format('d/m/Y H:i') }}</small>
                 </div>
-                <span class="badge bg-{{ $status['class'] }} py-2 px-3">{{ $status['label'] }}</span>
+                <div class="text-end">
+                    <span class="badge bg-{{ $status['class'] }} py-2 px-3">{{ $status['label'] }}</span>
+                    {{-- ✅ THÊM NHÃN PHỤ VỚI LINK CHO ĐƠN HÀNG ĐÃ GIAO --}}
+                    @if($order->status === 'delivered' && $order->return_badge_text)
+                        <br>
+                        <a href="{{ route('client.orders.returns.index', $order->id) }}" 
+                           class="badge bg-secondary mt-1 px-2 py-1 text-decoration-none" 
+                           title="Xem lịch sử trả hàng">
+                            {{ $order->return_badge_text }}
+                        </a>
+                    @endif
+                </div>
             </div>
 
 
@@ -102,6 +117,21 @@
     @empty
         <p class="text-muted">Bạn chưa có đơn hàng nào.</p>
     @endforelse
+
+    {{-- ✅ THÊM PHÂN TRANG --}}
+    @if($orders->hasPages())
+        <div class="d-flex justify-content-between align-items-center mt-4">
+            <div>
+                <small class="text-muted">
+                    Hiển thị {{ $orders->firstItem() ?? 0 }} - {{ $orders->lastItem() ?? 0 }} 
+                    trong tổng số {{ $orders->total() }} đơn hàng
+                </small>
+            </div>
+            <nav aria-label="Phân trang đơn hàng">
+                {{ $orders->appends(request()->query())->links('pagination::bootstrap-4') }}
+            </nav>
+        </div>
+    @endif
 </div>
 
 {{-- Style cho tiến trình --}}
@@ -141,6 +171,41 @@
         color: #6c757d;
     }
 
+    /* ✅ THÊM STYLE CHO NHÃN PHỤ LINK */
+    .badge.bg-secondary:hover {
+        background-color: #495057 !important;
+        transform: scale(1.05);
+        transition: all 0.2s ease;
+    }
+
+    .badge.text-decoration-none:hover {
+        text-decoration: underline !important;
+    }
+
+    /* ✅ THÊM STYLE CHO PHÂN TRANG */
+    .pagination .page-link {
+        color: #28a745;
+        border-color: #28a745;
+        border-radius: 0.5rem;
+        margin: 0 2px;
+    }
+
+    .pagination .page-link:hover {
+        color: #fff;
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+
+    .pagination .page-item.active .page-link {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+
+    .pagination .page-item.disabled .page-link {
+        color: #6c757d;
+        border-color: #dee2e6;
+    }
+
     @media (max-width: 576px) {
         .steps {
             flex-direction: column;
@@ -152,6 +217,15 @@
             height: 30px;
             font-size: 14px;
             line-height: 30px;
+        }
+        
+        /* Mobile pagination */
+        .pagination {
+            font-size: 0.875rem;
+        }
+        
+        .pagination .page-link {
+            padding: 0.375rem 0.5rem;
         }
     }
 </style>
