@@ -86,14 +86,8 @@
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="stats-card bg-warning">
-                    <h5>Doanh thu bị trừ</h5>
-                    <p>{{ number_format($doanhThuBiTru, 0, ',', '.') }} đ</p>
-                </div>
-            </div>
-            <div class="col-md-3">
                 <div class="stats-card bg-info">
-                    <h5>Doanh thu thực tế</h5>
+                    <h5>Doanh thu sau khi trả hàng</h5>
                     <p>{{ number_format($doanhThuThucTe, 0, ',', '.') }} đ</p>
                 </div>
             </div>
