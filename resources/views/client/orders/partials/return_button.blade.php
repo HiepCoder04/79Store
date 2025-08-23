@@ -194,12 +194,79 @@
                  required minlength="8" maxlength="50" pattern="[0-9\s\-]+">
           <small class="text-muted">Chỉ được nhập số, dấu gạch ngang và khoảng trắng</small>
         </div>
+
+        <!-- ✅ THÊM PHẦN ĐIỀU KHOẢN ĐỔI TRẢ -->
+        <hr class="my-4">
+        <div class="mb-3">
+          <h6 class="fw-bold text-primary"><i class="fas fa-file-contract"></i> Điều khoản đổi trả hàng</h6>
+          
+          <div class="card">
+            <div class="card-body p-3" style="max-height: 200px; overflow-y: auto; background-color: #f8f9fa;">
+              <div class="small text-dark">
+                <p class="mb-2"><strong>🕐 Thời hạn:</strong> Chỉ chấp nhận đổi trả trong vòng 7 ngày kể từ ngày nhận hàng.</p>
+                
+                <p class="mb-2"><strong>📦 Điều kiện sản phẩm:</strong></p>
+                <ul class="mb-2 ps-3">
+                  <li>Cây còn nguyên vẹn, chưa bị héo úa do chăm sóc không đúng cách</li>
+                  <li>Chậu không bị vỡ, nứt do tác động bên ngoài</li>
+                  <li>Còn đầy đủ phụ kiện đi kèm (nếu có)</li>
+                </ul>
+
+                <p class="mb-2"><strong>✅ Trường hợp được chấp nhận:</strong></p>
+                <ul class="mb-2 ps-3">
+                  <li>Sản phẩm bị lỗi từ nhà sản xuất</li>
+                  <li>Giao sai sản phẩm so với đơn hàng</li>
+                  <li>Sản phẩm bị hư hỏng trong quá trình vận chuyển</li>
+                  <li>Cây không đúng mô tả trên website</li>
+                </ul>
+
+                <p class="mb-2"><strong>❌ Trường hợp KHÔNG được chấp nhận:</strong></p>
+                <ul class="mb-2 ps-3">
+                  <li>Cây héo, chết do chăm sóc không đúng cách</li>
+                  <li>Chậu bị vỡ do va đập sau khi nhận hàng</li>
+                  <li>Thay đổi ý định mua hàng không có lý do chính đáng</li>
+                  <li>Sản phẩm đã sử dụng quá 24 giờ</li>
+                </ul>
+
+                <p class="mb-2"><strong>💰 Hoàn tiền:</strong></p>
+                <ul class="mb-2 ps-3">
+                  <li>Hoàn 100% giá trị sản phẩm nếu lỗi từ shop</li>
+                  <li>Thời gian xử lý: 3-7 ngày làm việc sau khi duyệt</li>
+                  <li>Phí vận chuyển trả hàng do khách hàng chi trả (trừ trường hợp lỗi từ shop)</li>
+                </ul>
+
+                <p class="mb-2"><strong>📋 Quy trình:</strong></p>
+                <ol class="mb-0 ps-3">
+                  <li>Khách hàng gửi yêu cầu đổi trả qua website</li>
+                  <li>79Store xem xét và phản hồi trong 24 giờ</li>
+                  <li>Nếu được duyệt, khách hàng gửi hàng về theo địa chỉ shop cung cấp</li>
+                  <li>Shop kiểm tra hàng và thực hiện hoàn tiền</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-check mt-3">
+            <input class="form-check-input" type="checkbox" id="agree-terms" name="agree_terms" required>
+            <label class="form-check-label" for="agree-terms">
+              <strong>Tôi đã đọc, hiểu và đồng ý với các điều khoản đổi trả hàng của 79Store</strong> <span class="text-danger">*</span>
+            </label>
+          </div>
+          
+          <div class="alert alert-warning mt-2 py-2">
+            <small><i class="fas fa-exclamation-triangle"></i> 
+              <strong>Lưu ý:</strong> Việc gửi yêu cầu không đồng nghĩa với việc tự động được chấp nhận. 
+              79Store sẽ xem xét từng trường hợp cụ thể và phản hồi trong thời gian sớm nhất.
+            </small>
+          </div>
+        </div>
       </div>
 
       <div class="modal-footer">
         <button type="button" class="btn btn-light" data-bs-dismiss="modal">Hủy</button>
         <button type="submit" class="btn btn-danger" id="submit-btn" disabled>Gửi yêu cầu</button>
       </div>
+
     </form>
   </div>
 </div>
@@ -531,6 +598,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const bankName = bankSelect.value;
         const bankAccountName = document.querySelector('input[name="bank_account_name"]').value.trim();
         const bankNumber = bankNumberInput.value.trim();
+        const agreeTerms = document.querySelector('#agree-terms').checked; // ✅ THÊM CHECK ĐIỀU KHOẢN
         
         const totalQty = parseInt(totalQuantityInput.value || 0);
         const plantQty = parseInt(plantQuantityInput.value || 0);
@@ -589,6 +657,11 @@ document.addEventListener('DOMContentLoaded', function() {
             errors.push('Số tài khoản phải có ít nhất 8 chữ số');
         }
         
+        // ✅ THÊM VALIDATION CHO ĐIỀU KHOẢN
+        if (!agreeTerms) {
+            errors.push('Bạn phải đồng ý với điều khoản đổi trả hàng để tiếp tục');
+        }
+        
         if (errors.length > 0) {
             e.preventDefault();
             console.error('❌ Form validation errors:', errors);
@@ -603,6 +676,58 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('  - quantity (max):', totalQty);
         // ✅ Không prevent default → cho phép submit
     });
+    
+    // ✅ THÊM VALIDATION CHO SUBMIT BUTTON - CẬP NHẬT TRẠNG THÁI KHI CHECKBOX THAY ĐỔI
+    const agreeTermsCheckbox = document.querySelector('#agree-terms');
+    
+    function updateSubmitButtonState() {
+        const hasSelection = parseInt(totalQuantityInput.value || 0) > 0;
+        const agreeTerms = agreeTermsCheckbox.checked;
+        const canSubmit = hasSelection && agreeTerms;
+        
+        submitBtn.disabled = !canSubmit;
+        
+        if (!hasSelection) {
+            submitBtn.textContent = 'Vui lòng chọn ít nhất 1 sản phẩm';
+        } else if (!agreeTerms) {
+            submitBtn.textContent = 'Vui lòng đồng ý với điều khoản';
+        } else {
+            submitBtn.textContent = 'Gửi yêu cầu';
+        }
+    }
+    
+    // ✅ CẬP NHẬT HÀM calculateTotalRefund() ĐỂ GỌI updateSubmitButtonState()
+    function calculateTotalRefund() {
+        const plantQty = parseInt(plantQuantityInput.value || 0);
+        const potQty = parseInt(potQuantityInput.value || 0);
+        
+        // ✅ ĐƠN GIẢN: Cập nhật tất cả hidden inputs
+        document.getElementById('plant-quantity-hidden').value = plantQty;
+        document.getElementById('pot-quantity-hidden').value = potQty;
+        totalQuantityInput.value = Math.max(plantQty, potQty); // Để validation backend
+        
+        const plantTotal = currentProductPrice * plantQty;
+        const potTotal = currentPotPrice * potQty;
+        const grandTotal = plantTotal + potTotal;
+        
+        plantTotalPrice.textContent = plantTotal.toLocaleString('vi-VN') + 'đ';
+        potTotalPrice.textContent = potTotal.toLocaleString('vi-VN') + 'đ';
+        totalRefundAmount.textContent = grandTotal.toLocaleString('vi-VN') + 'đ';
+        
+        const breakdownParts = [];
+        if (plantQty > 0) {
+            breakdownParts.push(`${plantQty} cây × ${currentProductPrice.toLocaleString('vi-VN')}đ`);
+        }
+        if (potQty > 0) {
+            breakdownParts.push(`${potQty} chậu × ${currentPotPrice.toLocaleString('vi-VN')}đ`);
+        }
+        refundBreakdown.textContent = breakdownParts.join(' + ');
+        
+        updateSubmitButtonState(); // ✅ THAY THẾ LOGIC CŨ
+    }
+    
+    // ✅ THÊM EVENT LISTENER CHO CHECKBOX ĐIỀU KHOẢN
+    agreeTermsCheckbox.addEventListener('change', updateSubmitButtonState);
     
     productSelect.addEventListener('change', updateProductInfo);
     

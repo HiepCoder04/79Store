@@ -15,10 +15,17 @@ use App\Models\ReturnRequest;
 class ReturnController extends Controller
 {
     public function index(Request $request) {
-    $q = ReturnRequest::with(['order','user','product','variant','pot']);
+    $q = ReturnRequest::with(['order','user','product','variant','pot'])
+        ->latest();
+
+    // ✅ THÊM LỌC THEO ORDER_ID
+    if ($request->filled('order_id')) {
+        $q->where('order_id', $request->order_id);
+    }
+
     if ($request->filled('status'))   $q->where('status', $request->status);
     if ($request->filled('order_id')) $q->where('order_id', $request->order_id);
-    $items = $q->latest()->paginate(20);
+    $items = $q->paginate(20);
     return view('admin.returns.index', compact('items'));
 }
 

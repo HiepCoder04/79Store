@@ -52,6 +52,17 @@
     align-items: center;
     gap: 8px;
   }
+
+  /* ✅ THÊM STYLE CHO NHÃN PHỤ LINK */
+  .badge.bg-secondary:hover {
+    background-color: #495057 !important;
+    transform: scale(1.05);
+    transition: all 0.2s ease;
+  }
+
+  .badge.text-decoration-none:hover {
+    text-decoration: underline !important;
+  }
 </style>
 
 <div class="card">
@@ -125,6 +136,10 @@
                                 <option value="delivered" @selected(request('status') === 'delivered')>Hoàn tất</option>
                                 <option value="cancelled" @selected(request('status') === 'cancelled')>Đã hủy</option>
                                 <option value="returned" @selected(request('status') === 'returned')>Trả hàng</option>
+                                {{-- ✅ THÊM CÁC OPTION LỌC TRẢ HÀNG --}}
+                                <option value="delivered_with_returns" @selected(request('status') === 'delivered_with_returns')>Hoàn tất - Có trả hàng</option>
+                                <option value="delivered_fully_returned" @selected(request('status') === 'delivered_fully_returned')>Hoàn tất - Hoàn trả hết</option>
+                                <option value="delivered_partial_returned" @selected(request('status') === 'delivered_partial_returned')>Hoàn tất - Trả một phần</option>
                             </select>
                         </div>
 
@@ -298,6 +313,23 @@
                                 @break
                             @case('delivered')
                                 <span class="badge bg-success">Hoàn tất</span>
+                                {{-- ✅ THÊM NHÃN PHỤ VỚI LINK CHO ĐƠN HÀNG ĐÃ GIAO --}}
+                                @if($order->return_badge_text)
+                                    <br>
+                                    @php
+                                        // Lấy yêu cầu trả hàng đầu tiên (hoặc mới nhất) để xem chi tiết
+                                        $firstReturnRequest = $order->returnRequests()->whereIn('status', ['pending', 'approved', 'refunded', 'exchanged'])->latest()->first();
+                                    @endphp
+                                    @if($firstReturnRequest)
+                                        <a href="{{ route('admin.returns.show', $firstReturnRequest->id) }}" 
+                                           class="badge bg-secondary mt-1 text-decoration-none" 
+                                           title="Xem chi tiết yêu cầu trả hàng">
+                                            {{ $order->return_badge_text }}
+                                        </a>
+                                    @else
+                                        <span class="badge bg-secondary mt-1">{{ $order->return_badge_text }}</span>
+                                    @endif
+                                @endif
                                 @break
                             @case('cancel_requested')
                                 <span class="badge bg-secondary">Yêu cầu hủy</span>

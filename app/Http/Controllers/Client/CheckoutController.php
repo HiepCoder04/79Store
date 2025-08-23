@@ -181,7 +181,7 @@ class CheckoutController extends Controller
             } elseif ($request->payment_method == 'vnpay') {
                 if (isset($request->payment_status) && $request->payment_status == 'paid') {
                     $paymentStatus = 'paid';
-                    $orderStatus = 'confirmed';
+                    $orderStatus = 'pending'; // ✅ Thay đổi từ 'confirmed' thành 'pending'
                 } else {
                     $paymentStatus = 'pending';
                     $orderStatus = 'pending';
@@ -383,7 +383,7 @@ class CheckoutController extends Controller
                 $orderStatus = 'pending';
             } elseif ($request->payment_method == 'vnpay' && $request->has('payment_status') && $request->payment_status == 'paid') {
                 $paymentStatus = 'paid';
-                $orderStatus = 'confirmed';
+                $orderStatus = 'pending';
             }
 
             $order = Order::create([
@@ -537,9 +537,17 @@ class CheckoutController extends Controller
         $order = Order::with('orderDetails')->findOrFail($orderId);
         return view('client.users.thank_you', compact('order'));
     }
+    
     public function thankYouvnpay()
     {
-        return view('client.users.thank_youvnpay');
+        // ✅ THÊM LOGIC GIỐNG THANKYOU() ĐỂ TRUYỀN $ORDER
+        $orderId = session('order_id');
+        if (!$orderId) {
+            return redirect()->route('shop')->with('error', 'Không tìm thấy đơn hàng.');
+        }
+
+        $order = Order::with('orderDetails')->findOrFail($orderId);
+        return view('client.users.thank_youvnpay', compact('order'));
     }
     //luu dia chi ng dung
     public function saveAddress(Request $request)

@@ -11,7 +11,7 @@ use App\Models\Category;
 class ChatbotController extends Controller
 {
     private $geminiApiKey;
-    private string $geminiApiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
+    private string $geminiApiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
 
     public function __construct()
     {
