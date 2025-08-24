@@ -14,7 +14,7 @@
     </div>
 
     <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white">
+        <div class="card-header bg-success text-white">
             <h6 class="mb-0">Thông tin danh mục</h6>
         </div>
         

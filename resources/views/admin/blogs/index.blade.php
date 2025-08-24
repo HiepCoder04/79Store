@@ -135,7 +135,7 @@
     <table class="table custom-table table-bordered align-middle mb-0">
       <thead>
         <tr>
-          <th>ID</th>
+          <th>STT</th>
           <th>Hình ảnh</th>
           <th>Tiêu đề</th>
           <th>Danh mục</th>

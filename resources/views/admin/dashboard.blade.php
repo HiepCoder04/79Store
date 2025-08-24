@@ -133,12 +133,12 @@
                 </a>
             </div>
             <div class="col-md-3">
-                <a href="{{ route('admin.orders.index', ['status' => 'returned']) }}" class="text-decoration-none">
+          
                     <div class="stats-card bg-purple">
                         <h5>Đã trả</h5>
                         <p>{{ $donHangDaTra }}</p>
                     </div>
-                </a>
+             
             </div>
 
         </div>

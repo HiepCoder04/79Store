@@ -95,14 +95,6 @@
                 </div>
 
 
-                <div class="col-md-2">
-                    <select name="role" class="form-select">
-                        <option value="">-- Quyền --</option>
-                        <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Admin</option>
-                        <option value="customer" {{ request('role') == 'customer' ? 'selected' : '' }}>Customer</option>
-                    </select>
-                </div>
-
 
                 <div class="col-md-2">
                     <select name="is_ban" class="form-select">

@@ -39,23 +39,6 @@
                             <p>Hiển thị {{ $products->firstItem() }}–{{ $products->lastItem() }} trên tổng số {{ $products->total() }} sản phẩm</p>
                         </div>
                         <!-- Search by Terms -->
-                        <div class="search_by_terms">
-                            <form action="#" method="get" class="form-inline">
-                                <select class="custom-select widget-title" name="sort_by">
-                                    <option value="popularity" selected>Sắp xếp theo: Phổ biến</option>
-                                    <option value="newest">Mới nhất</option>
-                                    <option value="sales">Bán chạy</option>
-                                    <option value="ratings">Đánh giá</option>
-                                </select>
-                                <select class="custom-select widget-title" name="per_page">
-                                    <option value="9" selected>Hiện: 9</option>
-                                    <option value="12">12</option>
-                                    <option value="18">18</option>
-                                    <option value="24">24</option>
-                                </select>
-                                <button type="submit" class="btn btn-sm alazea-btn ml-2">Lọc</button>
-                            </form>
-                        </div>
                     </div>
                 </div>
             </div>

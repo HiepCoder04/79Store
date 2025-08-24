@@ -131,7 +131,7 @@
             <footer class="footer position-absolute bottom-2 py-2 w-100 text-white text-center">
                 <div class="container">
                     ©
-                    <script>document.write(new Date().getFullYear())</script> 79Store. Powered by Creative Tim.
+                    <script>document.write(new Date().getFullYear())</script> 79Store
                 </div>
             </footer>
         </div>

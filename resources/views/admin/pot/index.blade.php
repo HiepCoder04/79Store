@@ -68,7 +68,7 @@
                 <table class="table table-bordered align-middle mb-0">
                     <thead>
                         <tr>
-                            <th>#</th>
+                            <th>STT</th>
                             <th>Tên chậu</th>
                             <th>Giá</th>
                             <th>Ngày tạo</th>
