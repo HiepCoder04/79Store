@@ -10,7 +10,9 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\ReturnRequest;
-
+use Illuminate\Support\Facades\Mail;
+use App\Mail\OrderStatusMail;
+use Illuminate\Support\Facades\Log;
 
 class ReturnController extends Controller
 {
@@ -62,6 +64,14 @@ public function approve($id, Request $request) {
     $item->status = 'approved';
     $item->admin_note = $request->input('admin_note');
     $item->save();
+    if ($item->user && $item->user->email) {
+        $statusText = "Yêu cầu trả hàng của bạn đã được duyệt và chúng tôi đã hoàn tiền vào tài khoản của bạn";
+        try {
+            Mail::to($item->user->email)->send(new OrderStatusMail($item->order, $statusText));
+        } catch (\Exception $ex) {
+            Log::error('Lỗi gửi mail duyệt trả hàng: ' . $ex->getMessage());
+        }
+    }
     return back()->with('success', 'Đã duyệt yêu cầu.');
 }
 
@@ -182,7 +192,14 @@ public function exchange($id, Request $request) {
         $item->resolved_at = now();
         $item->save();
     });
-
+    if ($item->user && $item->user->email) {
+        $statusText = "Yêu cầu trả hàng của bạn đã bị từ chối. Lý do: " . $item->admin_note;
+        try {
+            Mail::to($item->user->email)->send(new OrderStatusMail($item->order, $statusText));
+        } catch (\Exception $ex) {
+            Log::error('Lỗi gửi mail từ chối trả hàng: ' . $ex->getMessage());
+        }
+    }
     return back()->with('success', 'Đã xử lý đổi hàng.');
 }
 
