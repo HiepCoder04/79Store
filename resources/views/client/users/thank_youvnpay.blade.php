@@ -76,12 +76,15 @@
 
         {{-- Thông tin đơn hàng --}}
         <div class="order-info text-start bg-light p-4 rounded shadow-sm">
-            <p><strong>Mã đơn hàng:</strong> <span class="text-dark">{{ $orderId }}</span></p>
+            <p><strong>Mã đơn hàng:</strong> {{ $order->order_code }}</p>
             <p><strong>Ngày:</strong> {{ Carbon::now()->translatedFormat('l, d F Y') }}</p>
-            <p><strong>Tổng cộng:</strong> <span class="text-success fw-bold">{{ number_format($orderTotal, 0, ',', '.') }}đ</span></p>
+            <p><strong>Tổng cộng:</strong> <span class="text-success fw-bold">{{ number_format($order->total_after_discount, 0, ',', '.') }}đ</span></p>
             <p><strong>Phương thức thanh toán:</strong> <span class="text-primary">VNPAY</span></p>
             <p><strong>Trạng thái thanh toán:</strong> <span class="text-success">Đã thanh toán</span></p>
             
+            @php
+                $vnpayInfo = session('vnpay_transaction_info', []);
+            @endphp
             @if(!empty($vnpayInfo))
                 @if(isset($vnpayInfo['txn_ref']) && $vnpayInfo['txn_ref'])
                     <p><strong>Mã tham chiếu:</strong> <span class="text-muted">{{ $vnpayInfo['txn_ref'] }}</span></p>

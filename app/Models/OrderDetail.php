@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class OrderDetail extends Model
 {
     use HasFactory;
-     protected $table = 'order_details';
+    protected $table = 'order_details';
 
     protected $fillable = [
         'order_id',
@@ -65,5 +65,59 @@ class OrderDetail extends Model
             ->whereIn('status', ['approved', 'refunded', 'exchanged'])
             ->sum('quantity');
     }
+    public function review()
+    {
+        return $this->hasOne(\App\Models\Review::class, 'order_detail_id');
+    }
 
+        // ✅ THÊM METHOD MỚI: Tính riêng số lượng cây đã trả
+    public function plantQtyReturned(): int
+    {
+        return (int) $this->returnRequests()
+            ->whereIn('status', ['pending', 'approved', 'refunded', 'exchanged']) // ✅ THÊM 'pending'
+            ->sum('plant_quantity');
+    }
+
+    // ✅ SỬA METHOD: Tính cả pending requests  
+    public function potQtyReturned(): int
+    {
+        return (int) $this->returnRequests()
+            ->whereIn('status', ['pending', 'approved', 'refunded', 'exchanged']) // ✅ THÊM 'pending'
+            ->sum('pot_quantity');
+    }
+
+    // ✅ THÊM METHOD MỚI: Chỉ tính approved/refunded (để admin tracking)
+    public function plantQtyActuallyReturned(): int
+    {
+        return (int) $this->returnRequests()
+            ->whereIn('status', ['approved', 'refunded', 'exchanged'])
+            ->sum('plant_quantity');
+    }
+
+    public function potQtyActuallyReturned(): int
+    {
+        return (int) $this->returnRequests()
+            ->whereIn('status', ['approved', 'refunded', 'exchanged']) 
+            ->sum('pot_quantity');
+    }
+
+    // ✅ THÊM METHOD MỚI: Tính số lượng còn có thể trả cho cây
+    public function remainingPlantQty(): int
+    {
+        return max(0, $this->quantity - $this->plantQtyReturned());
+    }
+
+    // ✅ THÊM METHOD MỚI: Tính số lượng còn có thể trả cho chậu
+    public function remainingPotQty(): int
+    {
+        // Chỉ có thể trả chậu nếu orderDetail có chậu (pot_price > 0)
+        if (($this->pot_price ?? 0) <= 0) {
+            return 0;
+        }
+        return max(0, $this->quantity - $this->potQtyReturned());
+    }
 }
+
+
+
+

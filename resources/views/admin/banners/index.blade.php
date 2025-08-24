@@ -56,6 +56,10 @@
         font-size: 1.3rem;
         margin-right: 8px;
     }
+     .filter-box{border-radius:12px;padding:12px;background:#fff}
+  .filter-box label{font-size:.9rem;color:#6b7280;margin-bottom:.35rem}
+  .filter-field.form-select{border:1.5px solid #d1d5db;border-radius:10px}
+  .filter-field:focus{border-color:#e91e63;box-shadow:0 0 0 .2rem rgba(233,30,99,.12);outline:0}
 </style>
 
 <div class="container table-container">
@@ -65,6 +69,26 @@
             <i class="bi bi-plus-circle me-1"></i> Thêm banner
         </a>
     </div>
+    {{-- tim kiem --}}
+    <form method="GET" action="{{ route('admin.banners.index') }}" class="card mb-4 p-3">
+  <div class="row g-3 align-items-end">
+    <div class="col-md-3">
+      <div class="filter-box">
+        <label class="form-label">Trạng thái</label>
+        <select name="is_active" class="form-select filter-field">
+          <option value="">-- Tất cả --</option>
+          <option value="1" @selected(request('is_active')==='1')>Hoạt động</option>
+          <option value="0" @selected(request('is_active')==='0')>Tắt</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="col-md-3 d-flex gap-2">
+      <button type="submit" class="btn btn-primary">Lọc</button>
+      <a href="{{ route('admin.banners.index') }}" class="btn btn-outline-secondary">Xoá lọc</a>
+    </div>
+  </div>
+</form>
 
     <table class="table custom-table table-bordered align-middle">
         <thead>
@@ -115,5 +139,21 @@
             @endforeach
         </tbody>
     </table>
+</div>
+
+{{-- Thêm phần pagination để đồng bộ --}}
+<div class="d-flex justify-content-between align-items-center mt-3">
+    <div>
+        @if($banners->total() > 0)
+            Hiển thị {{ $banners->firstItem() }} - {{ $banners->lastItem() }} 
+            trong tổng số {{ $banners->total() }} banner
+        @else
+            Không có banner nào
+        @endif
+    </div>
+</div>
+
+<div class="d-flex justify-content-center mt-3">
+    {{ $banners->appends(request()->query())->onEachSide(1)->links('pagination::bootstrap-4') }}
 </div>
 @endsection

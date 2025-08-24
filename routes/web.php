@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\VoucherController;
+use App\Http\Controllers\Client\ReviewController;
 use App\Http\Controllers\Client\CartController;
 use App\Http\Controllers\Client\HomeController;
 use App\Http\Controllers\Client\OrderController;
@@ -116,6 +117,14 @@ Route::middleware(['auth', 'role:admin', 'ban'])->prefix('admin')->name('admin.'
         Route::put('/{cancellation}/approve', [AdminCancellationController::class, 'approve'])->name('approve');
         Route::put('/{cancellation}/reject', [AdminCancellationController::class, 'reject'])->name('reject');
     });
+
+    //đánh giá
+    Route::get('/reviews', [App\Http\Controllers\Admin\ReviewController::class, 'index'])->name('reviews.index');
+    Route::post('/reviews/{review}/reply', [App\Http\Controllers\Admin\ReviewController::class, 'reply'])->name('reviews.reply');
+    Route::delete('/reviews/{review}', [App\Http\Controllers\Admin\ReviewController::class, 'destroy'])
+    ->name('reviews.destroy');
+
+    
 });
 
 // Quản lý người dùng
@@ -134,11 +143,10 @@ Route::prefix('auth')->name('auth.')->controller(AuthController::class)->group(f
     Route::post('/logout', 'logout')->name('logout');
 });
 //gg login
-Route::get('/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
-Route::get('/google/callback', [AuthController::class, 'handleGoogleCallback']);
 
-Route::get('/auth/google', [GoogleController::class, 'redirectToGoogle']);
-Route::get('/auth/google/callback', [GoogleController::class, 'handleGoogleCallback']);
+Route::get('/auth/google', [GoogleController::class, 'redirectToGoogle'])->name('auth.google');
+Route::get('/auth/google/callback', [GoogleController::class, 'handleGoogleCallback'])->name('auth.google.callback');
+
 // -------------------- CLIENT (AUTHENTICATED) --------------------
 Route::middleware(['auth', 'ban'])->group(function () {
     // Giỏ hàng
@@ -202,7 +210,7 @@ Route::get('/vnpay-callback', [PaymentController::class, 'vnpayCallback'])->name
 // -------------------- TRANG CHÍNH & GIỚI THIỆU --------------------
 Route::get('/', [HomeController::class, 'index'])->name('home')->middleware('ban');
 Route::get('/home', [HomeController::class, 'index']);
-Route::get('/about', fn() => view('client.users.about-detail'))->middleware('ban')->name('about');
+Route::get('/about', [HomeController::class ,'about'])->middleware('ban')->name('about');
 
 // -------------------- SHOP --------------------
 Route::get('/shop', [ProductVariant::class, 'product'])->middleware('ban')->name('shop');
@@ -237,6 +245,7 @@ Route::get('/chatbot/suggestions', [App\Http\Controllers\ChatbotController::clas
 
 Route::middleware(['auth'])->group(function () {
     Route::post('/comments', [CommentController::class, 'store'])->name('comments.store');
+    Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
 });
 Route::get('/test-mail', function () {
     try {
@@ -249,4 +258,10 @@ Route::get('/test-mail', function () {
     } catch (\Exception $e) {
         return '❌ Lỗi: ' . $e->getMessage();
     }
+});
+Route::prefix('admin/users')->name('admin.users.')->group(function () {
+    Route::get('/', [UserController::class, 'listUser'])->name('list');
+    Route::put('/ban', [UserController::class, 'banUser'])->name('ban');
+    Route::put('/unban', [UserController::class, 'unbanUser'])->name('unban');
+    Route::put('/update-role', [UserController::class, 'UpdateRole'])->name('updateRole');
 });

@@ -6,7 +6,7 @@
     <div class="col-12">
       <div class="card my-4">
         <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-          <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between align-items-center">
+          <div class="bg-gradient-success shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between align-items-center">
             <h6 class="text-white text-capitalize ps-3">Thêm danh mục blog mới</h6>
             <a href="{{ route('admin.category_blogs.index') }}" class="btn btn-sm btn-light me-3">
               <i class="material-icons text-sm">Quay lại</i> 
@@ -25,7 +25,7 @@
             </div>
 
             <div class="text-center">
-              <button type="submit" class="btn bg-gradient-primary">Lưu danh mục</button>
+              <button type="submit" class="btn bg-gradient-success">Lưu danh mục</button>
               <a href="{{ route('admin.category_blogs.index') }}" class="btn bg-gradient-secondary">Hủy</a>
             </div>
           </form>

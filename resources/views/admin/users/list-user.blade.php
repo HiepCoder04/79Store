@@ -1,62 +1,63 @@
 @extends('admin.layouts.dashboard')
 
 @section('title')
-@parent
-QUẢN LÍ TÀI KHOẢN
+    @parent
+    QUẢN LÍ TÀI KHOẢN
 @endsection
 
 @section('content')
-<style>
-    .table-container {
-        background: #fff;
-        padding: 30px;
-        border-radius: 14px;
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
-        margin-top: 30px;
-    }
+    <style>
+        .table-container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 14px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+            margin-top: 30px;
+        }
 
-    .custom-table thead {
-        background-color: #e2e3e5;
-        color: #000;
-        font-weight: 600;
-    }
+        .custom-table thead {
+            background-color: #e2e3e5;
+            color: #000;
+            font-weight: 600;
+        }
 
-    .custom-table th,
-    .custom-table td {
-        text-align: center;
-        vertical-align: middle;
-        padding: 14px;
-    }
+        .custom-table th,
+        .custom-table td {
+            text-align: center;
+            vertical-align: middle;
+            padding: 14px;
+        }
 
-    .badge-status {
-        padding: 6px 12px;
-        border-radius: 999px;
-        font-size: 0.8rem;
-        font-weight: 500;
-    }
+        .badge-status {
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
 
-    .badge-active {
-        background-color: #28a745;
-        color: #fff;
-    }
+        .badge-active {
+            background-color: #28a745;
+            color: #fff;
+        }
 
-    .badge-banned {
-        background-color: #dc3545;
-        color: #fff;
-    }
+        .badge-banned {
+            background-color: #dc3545;
+            color: #fff;
+        }
 
-    .dropdown .btn {
-        border-radius: 8px;
-        padding: 6px 12px;
-    }
+        .dropdown .btn {
+            border-radius: 8px;
+            padding: 6px 12px;
+        }
 
-    .btn-role {
-        padding: 4px 10px;
-    }
+        .btn-role {
+            padding: 4px 10px;
+        }
 
-    .modal .form-control {
-        border-radius: 10px;
-    }
+        .modal .form-control {
+            border-radius: 10px;
+        }
+
 
     .table-actions {
         display: flex;
@@ -64,147 +65,174 @@ QUẢN LÍ TÀI KHOẢN
         gap: 8px;
         flex-wrap: wrap;
     }
+      .filter-box{border-radius:12px;padding:12px;background:#fff}
+  .filter-box label{font-size:.9rem;color:#6b7280;margin-bottom:.35rem}
+  .filter-field.form-control{border:1.5px solid #d1d5db;border-radius:10px}
+  .filter-field:focus{border-color:#e91e63;box-shadow:0 0 0 .2rem rgba(233,30,99,.12);outline:0}
+
+
+.table-actions {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
 </style>
 
-<div class="container table-container">
-    <div class="mb-4">
-        <h5 class="mb-0"><i class="bi bi-people-fill me-2 text-primary"></i>QUẢN LÍ TÀI KHOẢN</h5>
-        <p class="text-muted">Danh sách tài khoản người dùng</p>
-    </div>
+    <div class="container table-container">
+        <div class="mb-4">
+            <h5 class="mb-0">QUẢN LÍ TÀI KHOẢN</h5>
+        </div>
 
-    <div class="table-responsive">
-        <form method="GET" class="row g-2 mb-3">
-    <div class="col-md-3">
-        <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="Tìm tên, email, SĐT...">
-    </div>
+        <div class="table-responsive">
 
-    <div class="col-md-2">
-        <select name="role" class="form-select">
-            <option value="">-- Quyền --</option>
-            <option value="admin" {{ request('role')=='admin' ? 'selected' : '' }}>Admin</option>
-            <option value="staff" {{ request('role')=='staff' ? 'selected' : '' }}>Staff</option>
-            <option value="customer" {{ request('role')=='customer' ? 'selected' : '' }}>Customer</option>
-        </select>
-    </div>
 
-    <div class="col-md-2">
-        <select name="is_ban" class="form-select">
-            <option value="">-- Trạng thái --</option>
-            <option value="0" {{ request('is_ban')==='0' ? 'selected' : '' }}>Hoạt động</option>
-            <option value="1" {{ request('is_ban')==='1' ? 'selected' : '' }}>Bị cấm</option>
-        </select>
-    </div>
+            <form method="GET" class="row g-2 mb-3">
+                <div class="col-md-3">
+                    <input type="text" name="search" value="{{ request('search') }}" class="form-control"
+                        placeholder="Tìm tên, email, SĐT...">
+                </div>
 
-    <div class="col-md-2">
-        <select name="verified" class="form-select">
-            <option value="">-- Xác minh --</option>
-            <option value="1" {{ request('verified')=='1' ? 'selected' : '' }}>Đã xác minh</option>
-            <option value="0" {{ request('verified')=='0' ? 'selected' : '' }}>Chưa xác minh</option>
-        </select>
-    </div>
 
-    <div class="col-md-3 d-flex gap-2">
-        <button type="submit" class="btn btn-primary">Lọc</button>
-        <a href="{{ route('admin.users.list') }}" class="btn btn-secondary">Xóa lọc</a>
-    </div>
-</form>
-        <table class="table custom-table table-bordered align-middle mb-0">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Họ tên</th>
-                    <th>Email</th>
-                    <th>SĐT</th>
-                    <th>Quyền</th>
-                    <th>Ngày sinh</th>
-                    <th>Xác minh</th>
-                    <th>Trạng thái</th>
-                    <th>Thao tác</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($users as $user)
-                <tr>
-                    <td>{{ $user->id }}</td>
-                    <td class="text-start">{{ $user->name }}</td>
-                    <td>{{ $user->email }}</td>
-                    <td>{{ $user->phone }}</td>
-                    <td>{{ ucfirst($user->role) }}</td>
-                    <td>{{ $user->date_of_birth ? $user->date_of_birth->format('d/m/Y') : '—' }}</td>
-                    <td>
-                        @if($user->email_verified_at)
-                            <span class="badge-status badge-active">✔ Xác minh</span>
-                        @else
-                            <span class="badge-status badge-banned">✘ Chưa xác minh</span>
-                        @endif
-                    </td>
-                    <td>
-                        @if($user->is_ban)
-                            <span class="badge-status badge-banned">Đã bị cấm</span>
-                        @else
-                            <span class="badge-status badge-active">Hoạt động</span>
-                        @endif
-                    </td>
-                    <td>
-                        @if($user->role != 'admin')
-                        <div class="table-actions">
 
-                            {{-- Phân quyền --}}
-                            <button type="button" class="btn btn-sm btn-outline-primary btn-role" data-bs-toggle="modal" data-bs-target="#modal-{{ $user->id }}">
-                                Phân quyền
-                            </button>
+                <div class="col-md-2">
+                    <select name="is_ban" class="form-select">
+                        <option value="">-- Trạng thái --</option>
+                        <option value="0" {{ request('is_ban') === '0' ? 'selected' : '' }}>Hoạt động</option>
+                        <option value="1" {{ request('is_ban') === '1' ? 'selected' : '' }}>Bị cấm</option>
+                    </select>
+                </div>
 
-                            {{-- Modal phân quyền --}}
-                            <div class="modal fade" id="modal-{{ $user->id }}" tabindex="-1" aria-labelledby="modalLabel{{ $user->id }}" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <form action="{{ route('update-role') }}" method="POST">
+
+
+                <div class="col-md-3 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">Lọc</button>
+                    <a href="{{ route('admin.users.list') }}" class="btn btn-secondary">Xóa lọc</a>
+                </div>
+            </form>
+
+            {{-- Thông báo --}}
+            @if(session('success'))
+                <div class="alert alert-success">{{ session('success') }}</div>
+            @endif
+            @if(session('error'))
+                <div class="alert alert-danger">{{ session('error') }}</div>
+            @endif
+
+            <table class="table table-bordered align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>STT</th>
+                        <th>Họ tên</th>
+                        <th>Email</th>
+                        <th>SĐT</th>
+                        <th>Quyền</th>
+                        <th>Trạng thái</th>
+                        <th>Lý do cấm</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($users as $user)
+                        <tr>
+                            <td>{{ $user->id }}</td>
+                            <td>{{ $user->name }}</td>
+                            <td>{{ $user->email }}</td>
+                            <td>{{ $user->phone ?? '-' }}</td>
+                            <td>{{ $user->role }}</td>
+                            <td>
+                                @if($user->is_ban)
+                                    <span class="badge bg-danger">Đã cấm</span>
+                                @else
+                                    <span class="badge bg-success">Hoạt động</span>
+                                @endif
+                            </td>
+                            <td>
+                                @if($user->is_ban && $user->ban_reason)
+                                    <span title="{{ $user->ban_reason }}">
+                                        {{ \Illuminate\Support\Str::limit($user->ban_reason, 20) }}
+                                    </span>
+                                @else
+                                    -
+                                @endif
+                            </td>
+                            <td>
+                                @if(!$user->is_ban)
+                                    <!-- Nút Ban (mở modal nhập lý do) -->
+                                    <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#banModal"
+                                        data-user-id="{{ $user->id }}" data-user-name="{{ $user->name }}">
+                                        Cấm
+                                    </button>
+                                @else
+                                    <!-- Nút Unban -->
+                                    <form action="{{ route('admin.users.unban') }}" method="POST" style="display:inline;">
                                         @csrf
                                         @method('PUT')
                                         <input type="hidden" name="id_user" value="{{ $user->id }}">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="modalLabel{{ $user->id }}">Chọn quyền cho user</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <select name="role" class="form-control">
-                                                    <option value="1" {{ $user->role == 'staff' ? 'selected' : '' }}>Staff</option>
-                                                    <option value="2" {{ $user->role == 'customer' ? 'selected' : '' }}>Customer</option>
-                                                </select>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Huỷ</button>
-                                                <button type="submit" class="btn btn-primary">Lưu</button>
-                                            </div>
-                                        </div>
+                                        <button type="submit" class="btn btn-sm btn-success"
+                                            onclick="return confirm('Mở cấm user {{ $user->name }}?')">
+                                            Mở cấm
+                                        </button>
                                     </form>
-                                </div>
-                            </div>
+                                @endif
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="8" class="text-center">Không có dữ liệu</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
 
-                            {{-- Ban / Unban --}}
-                            <form action="{{ route($user->is_ban ? 'unban-user' : 'ban-user') }}" method="POST">
-                                @csrf
-                                @method('PUT')
-                                <input type="hidden" name="id_user" value="{{ $user->id }}">
-                                <button class="btn btn-sm {{ $user->is_ban ? 'btn-success' : 'btn-danger' }}">
-                                    {{ $user->is_ban ? 'Mở cấm' : 'Cấm' }}
-                                </button>
-                            </form>
+        </div>
+
+        <!-- Modal nhập lý do cấm -->
+        <div class="modal fade" id="banModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <form action="{{ route('admin.users.ban') }}" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <input type="hidden" name="id_user" id="banUserId">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Cấm người dùng</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
                         </div>
-                        @endif
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="9" class="text-center">Không có tài khoản nào.</td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
+                        <div class="modal-body">
+                            <p id="banUserName"></p>
+                            <div class="mb-3">
+                                <label for="reason" class="form-label">Lý do cấm</label>
+                                <textarea name="reason" id="reason" class="form-control" required></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                            <button type="submit" class="btn btn-danger">Xác nhận</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
 
-    <div class="d-flex justify-content-end mt-3">
-        {{ $users->links() }}
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var banModal = document.getElementById('banModal');
+                banModal.addEventListener('show.bs.modal', function (event) {
+                    var button = event.relatedTarget;
+                    var userId = button.getAttribute('data-user-id');
+                    var userName = button.getAttribute('data-user-name');
+
+                    document.getElementById('banUserId').value = userId;
+                    document.getElementById('banUserName').innerText = "Bạn có chắc chắn muốn cấm user: " + userName + " ?";
+                });
+            });
+        </script>
+
+        <div class="d-flex justify-content-end mt-3">
+            {{ $users->links() }}
+        </div>
     </div>
-</div>
 @endsection

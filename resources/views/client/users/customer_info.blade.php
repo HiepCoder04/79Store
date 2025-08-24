@@ -13,9 +13,9 @@
                 value="{{ old('phone', $user->phone ?? '') }}" required>
         </div>
         <div class="col-12">
-            <label for="email" class="form-label">Email (Gmail)</label>
+            <label for="email" class="form-label">Gmail (Người đặt)</label>
             <input type="email" name="email" id="email" class="form-control"
-                value="{{ old('email', $user->email ?? '') }}" required>
+                value="{{ old('email', $user->email ?? '') }}" required disabled>
         </div>
     </div>
 

@@ -1,6 +1,8 @@
 @extends('client.layouts.default')
 
 @section('content')
+@include('client.layouts.banner')
+
 <div class="container py-5">
     <h2 class="mb-4 text-center">Liên hệ với chúng tôi</h2>
 

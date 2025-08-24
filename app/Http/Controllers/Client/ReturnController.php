@@ -34,13 +34,23 @@ public function store(StoreReturnRequest $request, Order $order) {
     $detail = OrderDetail::with(['product','variant'])->findOrFail($request->order_detail_id);
     if ($detail->order_id !== $order->id) abort(403);
 
-    $qtyBought   = (int) $detail->quantity;
-    $qtyReturned = (int) $detail->qtyReturned();
-    $qtyWant     = (int) $request->quantity;
-
-    if ($qtyWant < 1 || $qtyWant > ($qtyBought - $qtyReturned)) {
-        return back()->withErrors(['quantity' => 'Số lượng trả không hợp lệ.']);
+    // ✅ ĐƠN GIẢN HÓA: Lấy thẳng số lượng từ frontend
+    $returnItems = $request->input('return_items', []);
+    $plantQuantity = 0;
+    $potQuantity = 0;
+    
+    // Nếu chọn trả cây → lấy số lượng cây
+    if (in_array('plant', $returnItems)) {
+        $plantQuantity = (int) $request->input('plant_quantity', 0);
     }
+    
+    // Nếu chọn trả chậu → lấy số lượng chậu
+    if (in_array('pot', $returnItems)) {
+        $potQuantity = (int) $request->input('pot_quantity', 0);
+    }
+    
+    // Tổng số lượng để lưu
+    $totalQuantity = max($plantQuantity, $potQuantity);
 
     $images = [];
     if ($request->hasFile('images')) {
@@ -56,7 +66,9 @@ public function store(StoreReturnRequest $request, Order $order) {
         'product_id'          => $detail->product_id,
         'product_variant_id'  => $detail->product_variant_id,
         'pot_id'              => $detail->pot_id ?? null,
-        'quantity'            => $qtyWant,
+        'quantity'            => $totalQuantity,
+        'plant_quantity'      => $plantQuantity, // ✅ Số lượng cây thực tế
+        'pot_quantity'        => $potQuantity,   // ✅ Số lượng chậu thực tế
         'reason'              => $request->reason,
         'images'              => $images,
         'status'              => 'pending',
@@ -70,3 +82,4 @@ public function store(StoreReturnRequest $request, Order $order) {
 }
 
 }
+ 

@@ -66,8 +66,19 @@
                 </tbody>
             </table>
 
-            <div class="mt-3 d-flex justify-content-center">
-                {{ $cancellations->links() }}
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <div>
+                    @if($cancellations->total() > 0)
+                        Hiển thị {{ $cancellations->firstItem() }} - {{ $cancellations->lastItem() }} 
+                        trong tổng số {{ $cancellations->total() }} yêu cầu hủy đơn
+                    @else
+                        Không có yêu cầu hủy đơn nào
+                    @endif
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-center mt-3">
+                {{ $cancellations->appends(request()->query())->onEachSide(1)->links('pagination::bootstrap-4') }}
             </div>
         </div>
     </div>

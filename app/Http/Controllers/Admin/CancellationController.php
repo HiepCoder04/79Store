@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\Cancellation;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\OrderStatusMail;
+use App\Models\ProductVariant;
+use App\Models\Pot;
 
 class CancellationController extends Controller
 {
@@ -28,10 +30,26 @@ class CancellationController extends Controller
             'status' => 'approved',
             'admin_note' => $request->admin_note,
         ]);
-
         // Cập nhật trạng thái đơn hàng
-        $cancellation->order->update(['status' => 'cancelled']);
+        $order = $cancellation->order;
 
+        // Chuyển đơn sang trạng thái hủy
+        $order->update(['status' => 'cancelled']);
+        foreach ($order->orderDetails as $detail) {
+            $variant = ProductVariant::find($detail->product_variant_id);
+            if ($variant) {
+                $variant->stock_quantity += $detail->quantity;
+                $variant->save();
+            }
+
+            if ($detail->product_pot) {
+                $pot = Pot::where('name', $detail->product_pot)->first();
+                if ($pot) {
+                    $pot->quantity += $detail->quantity;
+                    $pot->save();
+                }
+            }
+        }
         // Gửi mail xác nhận hủy
         Mail::to($cancellation->user->email)->send(
             new OrderStatusMail(
@@ -49,7 +67,12 @@ class CancellationController extends Controller
             'status' => 'rejected',
             'admin_note' => $request->admin_note,
         ]);
+        $order = $cancellation->order;
 
+        // Trả lại trạng thái "đã xác nhận"
+        if ($order->status === 'cancel_requested') {
+            $order->update(['status' => 'confirmed']);
+        }
         // Gửi mail từ chối hủy
         Mail::to($cancellation->user->email)->send(
             new OrderStatusMail(

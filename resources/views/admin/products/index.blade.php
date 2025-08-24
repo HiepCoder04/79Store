@@ -125,7 +125,7 @@
             <table class="table table-bordered table-hover">
                 <thead class="table-light">
                     <tr>
-                        <th>ID</th>
+                        <th>STT</th>
                         <th>Tên sản phẩm</th>
                         <th>Danh mục</th>
                         <th>Giá</th>
@@ -144,7 +144,9 @@
                             @endif
                         </td>
                         <td>{{ $product->category->name ?? 'N/A' }}</td>
-                        <td>{{ number_format($product->variants->first()->price ?? 0) }}đ</td>
+<td>
+    {{ number_format($product->variants_min_price) }}đ - {{ number_format($product->variants_max_price) }}đ
+</td>
                         <td>
                             <input 
                                 type="checkbox" 
@@ -189,9 +191,28 @@
     </div>
 
     {{-- Phân trang --}}
-    <div class="d-flex justify-content-center mt-3">
+    {{-- <div class="d-flex justify-content-between align-items-center">
+        <div>
+            Hiển thị {{ $products->firstItem() ?? 0 }} - {{ $products->lastItem() ?? 0 }} 
+            trong tổng số {{ $products->total() }} sản phẩm
+        </div>
         {{ $products->appends(request()->query())->links() }}
-    </div>
+    </div> --}}
+
+        <div class="d-flex justify-content-between align-items-center">
+        <div>
+            Hiển thị {{$products->firstItem() ?? 0 }} - {{ $products->lastItem() ?? 0 }} 
+            trong tổng số {{ $products->total() }} sản phẩm
+        </div>
+        </div>
+
+        <div class="d-flex justify-content-center mt-3">
+            {{ $products->onEachSide(1)->links('pagination::bootstrap-4') }}
+        </div>
+
+    
+
+
 </div>
 
 {{-- JavaScript đặt ngay trong section --}}

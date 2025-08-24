@@ -8,10 +8,36 @@ use Illuminate\Support\Facades\DB;
 
 class PotController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $pots = Pot::all();
-        return view('admin.pot.index', compact('pots'));
+ $query = Pot::query();
+
+    // Lọc theo tên (q = keyword)
+    if ($request->filled('q')) {
+        $query->where('name', 'like', '%'.$request->q.'%');
+    }
+
+    // Lọc theo giá
+    $min = $request->input('price_min');
+    $max = $request->input('price_max');
+
+    // ép về số nguyên
+    if ($min !== null && $min !== '') $min = (int)$min;
+    if ($max !== null && $max !== '') $max = (int)$max;
+
+    // nếu nhập cả 2 và min > max thì hoán đổi
+    if (is_int($min) && is_int($max) && $min > $max) {
+        [$min, $max] = [$max, $min];
+    }
+
+    if (is_int($min)) $query->where('price', '>=', $min);
+    if (is_int($max)) $query->where('price', '<=', $max);
+
+    $pots = $query->latest()
+        ->paginate(10)
+        ->appends($request->query()); // giữ tham số khi phân trang
+
+    return view('admin.pot.index', compact('pots'));
     }
 
     public function create()

@@ -8,8 +8,23 @@
 
 <div class="card mb-3">
   <div class="card-body">
-    <p><strong>Order:</strong> #{{ $item->order_id }}</p>
-    <p><strong>User:</strong> {{ $item->user->name ?? 'User' }} (ID: {{ $item->user_id }})</p>
+    <p><strong>Mã đơn hàng:</strong> {{ $item->order->order_code }}</p>
+    <p><strong>Người dùng:</strong> {{ $item->user->name ?? 'User' }}</p>
+    <p><strong>Liên hệ:</strong> 
+      @if($item->contact_phone)
+        <a href="tel:{{ $item->contact_phone }}" class="text-decoration-none">
+          <i class="fas fa-phone-alt text-primary"></i> {{ $item->contact_phone }}
+        </a>
+      @else
+        <span class="text-warning">Chưa có Số điện thoại</span>
+      @endif
+      
+      @if($item->contact_email)
+        | <a href="mailto:{{ $item->contact_email }}" class="text-decoration-none">
+          <i class="fas fa-envelope text-info"></i> {{ $item->contact_email }}
+        </a>
+      @endif
+    </p>
     <p><strong>Sản phẩm:</strong> {{ $item->product->name ?? 'Sản phẩm' }}</p>
     <p><strong>Chi tiết:</strong> 
        @if($item->orderDetail)
@@ -19,17 +34,50 @@
          Giá chậu: {{ number_format($item->orderDetail->pot_price ?? 0, 0, ',', '.') }}đ
        @endif
     </p>
-    <p><strong>SL trả:</strong> {{ $item->quantity }}</p>
+    <p><strong>Số lượng trả:</strong> 
+       {{-- ✅ HIỂN THỊ CHI TIẾT VỚI TÊN CỤ THỂ --}}
+       @if($item->plant_quantity > 0 && $item->pot_quantity > 0)
+         <div class="mt-1">
+           <span class="badge bg-success me-1">🌱 {{ $item->plant_quantity }} × {{ $item->product->name ?? 'Cây' }}</span>
+           <span class="badge bg-info">🪴 {{ $item->pot_quantity }} × {{ $item->orderDetail->product_pot ?? 'Chậu' }}</span>
+         </div>
+         <small class="text-muted d-block">Khách hàng trả cả cây lẫn chậu</small>
+       @elseif($item->plant_quantity > 0)
+         <div class="mt-1">
+           <span class="badge bg-success">🌱 {{ $item->plant_quantity }} × {{ $item->product->name ?? 'Cây' }}</span>
+         </div>
+         <small class="text-muted d-block">Khách hàng chỉ trả cây, giữ lại chậu</small>
+       @elseif($item->pot_quantity > 0)
+         <div class="mt-1">
+           <span class="badge bg-info">🪴 {{ $item->pot_quantity }} × {{ $item->orderDetail->product_pot ?? 'Chậu' }}</span>
+         </div>
+         <small class="text-muted d-block">Khách hàng chỉ trả chậu, giữ lại cây</small>
+       @else
+         <div class="mt-1">
+           <span class="badge bg-secondary">❓ {{ $item->quantity }} (không rõ loại)</span>
+         </div>
+         <small class="text-warning d-block">⚠️ Dữ liệu từ phiên bản cũ, chưa phân loại cây/chậu</small>
+       @endif
+    </p>
     <p><strong>Giá trị hoàn tiền đề xuất:</strong> 
        @php
+         // ✅ TÍNH ĐÚNG theo plant_quantity và pot_quantity
          $suggestedAmount = 0;
          if ($item->orderDetail) {
              $productPrice = $item->orderDetail->product_price ?? 0;
              $potPrice = $item->orderDetail->pot_price ?? 0;
-             $suggestedAmount = ($productPrice + $potPrice) * $item->quantity;
+             $plantRefund = $productPrice * ($item->plant_quantity ?? 0);
+             $potRefund = $potPrice * ($item->pot_quantity ?? 0);
+             $suggestedAmount = $plantRefund + $potRefund;
          }
        @endphp
        <strong class="text-success">{{ number_format($suggestedAmount, 0, ',', '.') }}đ</strong>
+       @if($item->plant_quantity > 0 && $item->pot_quantity > 0)
+         <br><small class="text-muted">
+           ({{ number_format(($item->orderDetail->product_price ?? 0) * $item->plant_quantity, 0, ',', '.') }}đ cây + 
+            {{ number_format(($item->orderDetail->pot_price ?? 0) * $item->pot_quantity, 0, ',', '.') }}đ chậu)
+         </small>
+       @endif
     </p>
     <p><strong>Trạng thái:</strong> 
       @switch($item->status)
@@ -53,7 +101,7 @@
       @endswitch
     </p>
     <p><strong>Lý do:</strong> {{ $item->reason ?: '-' }}</p>
-    <p><strong>Bank:</strong> {{ $item->bank_name }} — {{ $item->bank_account_name }} — {{ $item->bank_account_number }}</p>
+    <p><strong>Tài khoản ngân hàng:</strong> {{ $item->bank_name }} — {{ $item->bank_account_name }} — {{ $item->bank_account_number }}</p>
 
     @if(!empty($item->images))
       <div class="d-flex flex-wrap gap-2">
@@ -121,11 +169,19 @@
         <form method="POST" action="{{ route('admin.returns.refund', $item->id) }}" enctype="multipart/form-data">
           @csrf
           <div class="alert alert-info">
-            <strong>Thông tin tính toán:</strong><br>
-            - Giá cây: {{ number_format($item->orderDetail->product_price ?? 0, 0, ',', '.') }}đ<br>
-            - Giá chậu: {{ number_format($item->orderDetail->pot_price ?? 0, 0, ',', '.') }}đ<br>
-            - Số lượng: {{ $item->quantity }}<br>
-            <strong>Tổng đề xuất: {{ number_format($suggestedAmount, 0, ',', '.') }}đ</strong>
+            <strong>Thông tin chi tiết:</strong><br>
+            @if($item->plant_quantity > 0)
+              - <strong>Cây:</strong> {{ $item->product->name ?? 'Sản phẩm' }} - 
+              Giá: {{ number_format($item->orderDetail->product_price ?? 0, 0, ',', '.') }}đ × {{ $item->plant_quantity }} = 
+              <strong>{{ number_format(($item->orderDetail->product_price ?? 0) * ($item->plant_quantity ?? 0), 0, ',', '.') }}đ</strong><br>
+            @endif
+            @if($item->pot_quantity > 0)
+              - <strong>Chậu:</strong> {{ $item->orderDetail->product_pot ?? 'Chậu' }} - 
+              Giá: {{ number_format($item->orderDetail->pot_price ?? 0, 0, ',', '.') }}đ × {{ $item->pot_quantity }} = 
+              <strong>{{ number_format(($item->orderDetail->pot_price ?? 0) * ($item->pot_quantity ?? 0), 0, ',', '.') }}đ</strong><br>
+            @endif
+            <hr class="my-2">
+            <strong>💰 Tổng hoàn tiền đề xuất: {{ number_format($suggestedAmount, 0, ',', '.') }}đ</strong>
           </div>
           
           <div class="mb-2">
@@ -176,13 +232,34 @@
 
 <h5 class="mt-4">Lịch sử giao dịch</h5>
 <table class="table">
-  <thead><tr><th>ID</th><th>Type</th><th>Amount</th><th>Bằng chứng</th><th>Note</th><th>Processed</th></tr></thead>
+  <thead><tr><th>STT</th><th>Loại giao dịch</th><th>Số tiền</th><th>Bằng chứng</th><th>Ghi chú</th><th>Thời gian xử lý</th></tr></thead>
   <tbody>
     @forelse($item->transactions as $t)
       <tr>
         <td>{{ $t->id }}</td>
-        <td>{{ $t->type }}</td>
-        <td>{{ number_format($t->amount) }}</td>
+        <td>
+          {{-- ✅ Chuyển đổi trạng thái sang tiếng Việt --}}
+          @switch($t->type)
+            @case('refund')
+              <span class="badge bg-success">Đã hoàn tiền</span>
+              @break
+            @case('exchange')
+              <span class="badge bg-primary">Đã đổi hàng</span>
+              @break
+            @case('partial_refund')
+              <span class="badge bg-warning">Hoàn tiền một phần</span>
+              @break
+            @default
+              <span class="badge bg-secondary">{{ ucfirst($t->type) }}</span>
+          @endswitch
+        </td>
+        <td>
+          @if($t->amount > 0)
+            <strong class="text-success">{{ number_format($t->amount, 0, ',', '.') }}đ</strong>
+          @else
+            <span class="text-muted">-</span>
+          @endif
+        </td>
         <td>
           @if(!empty($t->proof_images))
             <div class="d-flex flex-wrap gap-1">
@@ -196,11 +273,11 @@
             <span class="text-muted">-</span>
           @endif
         </td>
-        <td>{{ $t->note }}</td>
-        <td>{{ optional($t->processed_at)->format('d/m/Y H:i') }}</td>
+        <td>{{ $t->note ?: '-' }}</td>
+        <td>{{ optional($t->processed_at)->format('d/m/Y H:i') ?: '-' }}</td>
       </tr>
     @empty
-      <tr><td colspan="6" class="text-muted">Chưa có giao dịch.</td></tr>
+      <tr><td colspan="6" class="text-muted text-center py-3">Chưa có giao dịch nào.</td></tr>
     @endforelse
   </tbody>
 </table>

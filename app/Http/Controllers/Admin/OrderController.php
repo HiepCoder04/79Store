@@ -19,7 +19,15 @@ class OrderController extends Controller
         // ✅ Thêm các bộ lọc mà không thay đổi logic cũ
         // Lọc theo trạng thái đơn hàng
         if ($request->filled('status')) {
-            $query->where('status', $request->status);
+            // ✅ XỬ LÝ CÁC TRẠNG THÁI TRẢ HÀNG MỚI
+            if (in_array($request->status, ['delivered_with_returns', 'delivered_fully_returned', 'delivered_partial_returned'])) {
+                $query->where('status', 'delivered')
+                      ->whereHas('returnRequests', function ($returnQuery) {
+                          $returnQuery->whereIn('status', ['refunded', 'exchanged']);
+                      });
+            } else {
+                $query->where('status', $request->status);
+            }
         }
 
         // Lọc theo thời gian
@@ -122,7 +130,7 @@ class OrderController extends Controller
                     $query->orderBy('total_after_discount', 'asc');
                     break;
                 case 'status_priority':
-                    $query->orderByRaw("FIELD(status, 'pending', 'confirmed', 'shipping', 'delivered', 'cancelled', 'returned')");
+                    $query->orderByRaw("FIELD(status, 'pending', 'confirmed', 'shipping', 'delivered', 'cancelled',)");
                     break;
                 default:
                     $query->latest();
@@ -134,7 +142,33 @@ class OrderController extends Controller
 
         $orders = $query->paginate(10)->appends($request->query());
 
-       
+        // ✅ LỌC THÊM SAU KHI LOAD DỮ LIỆU CHO CÁC TRƯỜNG HỢP ĐẶC BIỆT
+        if (in_array($request->filled('status') ? $request->status : '', ['delivered_fully_returned', 'delivered_partial_returned'])) {
+            $filteredCollection = collect($orders->items())->filter(function ($order) use ($request) {
+                if (!$order) return false; // ✅ Kiểm tra order không null
+                
+                $returnedQty = $order->total_returned_quantity ?? 0;
+                $totalQty = $order->total_items_quantity ?? 0;
+                
+                if ($request->status === 'delivered_fully_returned') {
+                    return $returnedQty >= $totalQty && $returnedQty > 0;
+                } elseif ($request->status === 'delivered_partial_returned') {
+                    return $returnedQty > 0 && $returnedQty < $totalQty;
+                }
+                
+                return true;
+            })->values(); // ✅ Reset keys để tránh lỗi index
+            
+            // Create a new paginator with the filtered items
+            $orders = new \Illuminate\Pagination\LengthAwarePaginator(
+                $filteredCollection,
+                $filteredCollection->count(),
+                $orders->perPage(),
+                $orders->currentPage(),
+                ['path' => request()->url(), 'query' => request()->query()]
+            );
+        }
+        
         foreach ($orders as $order) {
             $order->total_amount = $order->orderDetails->sum(function ($item) {
                 return $item->quantity * $item->price;
@@ -149,7 +183,6 @@ class OrderController extends Controller
         'pending' => ['confirmed', 'cancelled'],
         'confirmed' => ['shipping', 'cancelled'],
         'shipping' => ['delivered'],
-        'delivered' => ['returned'],
         'cancelled' => [], // Không thể chuyển sang trạng thái khác
         'returned' => []   // Không thể chuyển sang trạng thái khác
     ];

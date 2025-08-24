@@ -12,7 +12,7 @@
 <section class="breadcrumb-area">
     <div class="top-breadcrumb-area bg-img bg-overlay d-flex align-items-center justify-content-center"
          style="background-image: url('{{ asset('assets/img/bg-img/24.jpg') }}'); height: 250px;">
-        <h2 class="text-white">Lịch sử trả hàng của đơn #{{ $order->id }}</h2>
+        <h2 class="text-white">Lịch sử trả hàng</h2>
     </div>
 </section>
 
@@ -22,17 +22,22 @@
 <table class="table table-striped">
   <thead>
     <tr>
-      <th>ID</th><th>Sản phẩm</th><th>SL</th><th>Giá trị</th><th>Trạng thái</th><th>Ngày</th><th>Phản hồi admin</th><th>Chi tiết</th>
+      <th>STT</th><th>Sản phẩm</th><th>SL</th><th>Giá trị</th><th>Trạng thái</th><th>Ngày</th><th>Phản hồi admin</th><th>Chi tiết</th>
     </tr>
   </thead>
   <tbody>
     @forelse($requests as $r)
       @php
+        // ✅ TÍNH ĐÚNG theo plant_quantity và pot_quantity
         $refundValue = 0;
         if ($r->orderDetail) {
             $productPrice = $r->orderDetail->product_price ?? 0;
             $potPrice = $r->orderDetail->pot_price ?? 0;
-            $refundValue = ($productPrice + $potPrice) * $r->quantity;
+            
+            // Tính riêng từng loại
+            $plantRefund = $productPrice * ($r->plant_quantity ?? 0);
+            $potRefund = $potPrice * ($r->pot_quantity ?? 0);
+            $refundValue = $plantRefund + $potRefund;
         }
         $actualRefund = $r->transactions()->where('type', 'refund')->sum('amount');
         $proofImages = $r->transactions()->where('type', 'refund')->first()?->proof_images ?? [];
@@ -47,9 +52,37 @@
             @endif
           </small>
         </td>
-        <td>{{ $r->quantity }}</td>
+        <td>
+          {{-- ✅ HIỂN THỊ CHI TIẾT TÊN CÂY VÀ TÊN CHẬU --}}
+          @if($r->plant_quantity > 0 && $r->pot_quantity > 0)
+            <div class="fw-bold text-success">{{ $r->plant_quantity }} × {{ $r->product->name ?? 'Cây' }}</div>
+            <div class="fw-bold text-info">{{ $r->pot_quantity }} × chậu {{ $r->orderDetail->product_pot ?? 'Chậu' }}</div>
+            <small class="text-muted">(Trả cả cây lẫn chậu)</small>
+          @elseif($r->plant_quantity > 0)
+            <div class="fw-bold text-success">
+              <i class="fas fa-seedling"></i> {{ $r->plant_quantity }} × {{ $r->product->name ?? 'Cây' }}
+            </div>
+            <small class="text-muted">(Chỉ trả cây)</small>
+          @elseif($r->pot_quantity > 0)
+            <div class="fw-bold text-info">
+              <i class="fas fa-seedling"></i> {{ $r->pot_quantity }} × Chậu {{ $r->orderDetail->product_pot ?? 'Chậu' }}
+            </div>
+            <small class="text-muted">(Chỉ trả chậu)</small>
+          @else
+            <div class="text-warning">
+              <i class="fas fa-question-circle"></i> {{ $r->quantity ?? 0 }} (không rõ)
+            </div>
+            <small class="text-muted">Dữ liệu cũ</small>
+          @endif
+        </td>
         <td>
           <div class="text-muted small">Ước tính: {{ number_format($refundValue, 0, ',', '.') }}đ</div>
+          @if($r->plant_quantity > 0 && $r->pot_quantity > 0)
+            <div class="text-muted small">
+              ({{ number_format(($r->orderDetail->product_price ?? 0) * $r->plant_quantity, 0, ',', '.') }}đ cây + 
+               {{ number_format(($r->orderDetail->pot_price ?? 0) * $r->pot_quantity, 0, ',', '.') }}đ chậu)
+            </div>
+          @endif
           @if($actualRefund > 0)
             <div class="text-success small fw-bold">Đã hoàn: {{ number_format($actualRefund, 0, ',', '.') }}đ</div>
             @if(!empty($proofImages))

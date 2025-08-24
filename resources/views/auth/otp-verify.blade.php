@@ -159,7 +159,6 @@
                         <footer class="mt-4 text-center">
                             ©
                             <script>document.write(new Date().getFullYear())</script> 79Store.
-                            Powered by <a href="https://creative-tim.com" target="_blank">Creative Tim</a>.
                         </footer>
                     </div>
                 </div>
