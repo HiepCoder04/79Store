@@ -130,7 +130,7 @@ class OrderController extends Controller
                     $query->orderBy('total_after_discount', 'asc');
                     break;
                 case 'status_priority':
-                    $query->orderByRaw("FIELD(status, 'pending', 'confirmed', 'shipping', 'delivered', 'cancelled', 'returned')");
+                    $query->orderByRaw("FIELD(status, 'pending', 'confirmed', 'shipping', 'delivered', 'cancelled',)");
                     break;
                 default:
                     $query->latest();
@@ -183,7 +183,6 @@ class OrderController extends Controller
         'pending' => ['confirmed', 'cancelled'],
         'confirmed' => ['shipping', 'cancelled'],
         'shipping' => ['delivered'],
-        'delivered' => ['returned'],
         'cancelled' => [], // Không thể chuyển sang trạng thái khác
         'returned' => []   // Không thể chuyển sang trạng thái khác
     ];

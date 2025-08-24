@@ -123,7 +123,7 @@
             <table class="table table-bordered align-middle">
                 <thead class="table-light">
                     <tr>
-                        <th>ID</th>
+                        <th>STT</th>
                         <th>Họ tên</th>
                         <th>Email</th>
                         <th>SĐT</th>
