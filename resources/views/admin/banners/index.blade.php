@@ -140,4 +140,20 @@
         </tbody>
     </table>
 </div>
+
+{{-- Thêm phần pagination để đồng bộ --}}
+<div class="d-flex justify-content-between align-items-center mt-3">
+    <div>
+        @if($banners->total() > 0)
+            Hiển thị {{ $banners->firstItem() }} - {{ $banners->lastItem() }} 
+            trong tổng số {{ $banners->total() }} banner
+        @else
+            Không có banner nào
+        @endif
+    </div>
+</div>
+
+<div class="d-flex justify-content-center mt-3">
+    {{ $banners->appends(request()->query())->onEachSide(1)->links('pagination::bootstrap-4') }}
+</div>
 @endsection

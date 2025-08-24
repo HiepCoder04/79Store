@@ -75,16 +75,20 @@ class ProductController extends Controller
     }
     private function getAllChildCategoryIds($parentId)
     {
-        $childIds = Category::where('parent_id', $parentId)->pluck('id')->toArray();
-        foreach ($childIds as $childId) {
-            $childIds = array_merge($childIds, $this->getAllChildCategoryIds($childId));
+        $category = Category::find($parentId);
+        if ($category) {
+            return $category->getAllChildrenIds();
         }
-        return $childIds;
+        return [];
     }
 
     public function create()
     {
-        $categories = Category::all();
+        // Sắp xếp danh mục theo cấp độ và tên
+        $categories = Category::with('parent')
+                             ->orderBy('parent_id', 'asc')
+                             ->orderBy('name', 'asc')
+                             ->get();
         $pots = Pot::all();
         return view('admin.products.create', compact('categories', 'pots'));
     }
@@ -92,15 +96,41 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|max:255',
-            'description' => 'required|string|max:1500',
+            'name' => 'required|string|max:255|min:3',
+            'description' => 'required|string|max:1500|min:10',
             'category_id' => 'required|exists:categories,id',
             'variants' => 'required|array|min:1',
-            'variants.*.pot' => 'nullable|exists:pots,id',
             'variants.*.height' => 'nullable|string|max:100',
-            'variants.*.price' => 'nullable|numeric|min:0',
-            'variants.*.stock_quantity' => 'nullable|integer|min:0',
-            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
+            'variants.*.price' => 'required|numeric|min:1000|max:99999999',
+            'variants.*.stock_quantity' => 'required|integer|min:0|max:9999',
+            'images' => 'required|array|min:1|max:10',
+            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:5120',
+            'selected_pots' => 'nullable|array',
+            'selected_pots.*' => 'exists:pots,id',
+        ], [
+            'name.required' => 'Tên sản phẩm không được để trống.',
+            'name.min' => 'Tên sản phẩm phải có ít nhất 3 ký tự.',
+            'name.max' => 'Tên sản phẩm không được quá 255 ký tự.',
+            'description.required' => 'Mô tả sản phẩm không được để trống.',
+            'description.min' => 'Mô tả phải có ít nhất 10 ký tự.',
+            'description.max' => 'Mô tả không được quá 1500 ký tự.',
+            'category_id.required' => 'Vui lòng chọn danh mục.',
+            'category_id.exists' => 'Danh mục không hợp lệ.',
+            'variants.required' => 'Phải có ít nhất 1 biến thể.',
+            'variants.min' => 'Phải có ít nhất 1 biến thể.',
+            'variants.*.price.required' => 'Giá là bắt buộc.',
+            'variants.*.price.min' => 'Giá phải từ 1.000 VNĐ trở lên.',
+            'variants.*.price.max' => 'Giá không được quá 99.999.999 VNĐ.',
+            'variants.*.stock_quantity.required' => 'Số lượng tồn là bắt buộc.',
+            'variants.*.stock_quantity.min' => 'Số lượng tồn không được âm.',
+            'variants.*.stock_quantity.max' => 'Số lượng tồn không được quá 9999.',
+            'images.required' => 'Vui lòng chọn ít nhất 1 ảnh sản phẩm.',
+            'images.min' => 'Phải có ít nhất 1 ảnh sản phẩm.',
+            'images.max' => 'Chỉ được tải lên tối đa 10 ảnh.',
+            'images.*.required' => 'Ảnh không được để trống.',
+            'images.*.image' => 'File phải là ảnh.',
+            'images.*.mimes' => 'Ảnh phải có định dạng: jpeg, png, jpg, gif.',
+            'images.*.max' => 'Kích thước ảnh không được quá 5MB.',
         ]);
 
         DB::beginTransaction();
@@ -176,7 +206,11 @@ class ProductController extends Controller
 
     public function edit(Product $product)
     {
-        $categories = Category::all();
+        // Sắp xếp danh mục theo cấp độ và tên
+        $categories = Category::with('parent')
+                             ->orderBy('parent_id', 'asc')
+                             ->orderBy('name', 'asc')
+                             ->get();
         $pots = Pot::all();
         $selectedPotIds = $product->variants->flatMap->pots->pluck('id')->unique();
         return view('admin.products.edit', compact('product', 'categories', 'pots', 'selectedPotIds'));
@@ -185,16 +219,36 @@ class ProductController extends Controller
     public function update(Request $request, Product $product)
     {
         $request->validate([
-            'name' => 'required|max:255',
-            'description' => 'required|string|max:1500',
+            'name' => 'required|string|max:255|min:3',
+            'description' => 'required|string|max:1500|min:10',
             'category_id' => 'required|exists:categories,id',
             'variants' => 'nullable|array',
-            'variants.*.pot' => 'nullable|exists:pots,id',
-
             'variants.*.height' => 'nullable|string|max:100',
-            'variants.*.price' => 'nullable|numeric|min:0',
-            'variants.*.stock_quantity' => 'nullable|integer|min:0',
+            'variants.*.price' => 'nullable|numeric|min:1000|max:99999999',
+            'variants.*.stock_quantity' => 'nullable|integer|min:0|max:9999',
+            'images' => 'nullable|array|max:10',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
+            'selected_pots' => 'nullable|array',
+            'selected_pots.*' => 'exists:pots,id',
+            'delete_images' => 'nullable|array',
+            'delete_images.*' => 'exists:product_galleries,id',
+        ], [
+            'name.required' => 'Tên sản phẩm không được để trống.',
+            'name.min' => 'Tên sản phẩm phải có ít nhất 3 ký tự.',
+            'name.max' => 'Tên sản phẩm không được quá 255 ký tự.',
+            'description.required' => 'Mô tả sản phẩm không được để trống.',
+            'description.min' => 'Mô tả phải có ít nhất 10 ký tự.',
+            'description.max' => 'Mô tả không được quá 1500 ký tự.',
+            'category_id.required' => 'Vui lòng chọn danh mục.',
+            'category_id.exists' => 'Danh mục không hợp lệ.',
+            'variants.*.price.min' => 'Giá phải từ 1.000 VNĐ trở lên.',
+            'variants.*.price.max' => 'Giá không được quá 99.999.999 VNĐ.',
+            'variants.*.stock_quantity.min' => 'Số lượng tồn không được âm.',
+            'variants.*.stock_quantity.max' => 'Số lượng tồn không được quá 9999.',
+            'images.max' => 'Chỉ được tải lên tối đa 10 ảnh.',
+            'images.*.image' => 'File phải là ảnh.',
+            'images.*.mimes' => 'Ảnh phải có định dạng: jpeg, png, jpg, gif.',
+            'images.*.max' => 'Kích thước ảnh không được quá 5MB.',
         ]);
 
         DB::beginTransaction();
@@ -283,7 +337,7 @@ class ProductController extends Controller
         } catch (\Throwable $e) {
             DB::rollBack();
             Log::error('Lỗi khi cập nhật sản phẩm: ' . $e->getMessage());
-            return back()->with('error', 'Đã xảy ra lỗi khi cập nhật sản phẩm.')->withInput();
+            return back()->withInput()->with('error', 'Đã xảy ra lỗi khi cập nhật sản phẩm.');
         }
     }
 

@@ -123,9 +123,21 @@
         @endforelse
       </tbody>
     </table>
-    <div class="d-flex justify-content-center mt-3">
+    {{-- <div class="d-flex justify-content-center mt-3">
       {{ $vouchers->links('pagination::bootstrap-5') }}
+    </div> --}}
+
+    <div class="d-flex justify-content-between align-items-center mt-3">
+      <div>
+        Hiển thị {{ $vouchers->firstItem() ?? 0 }} - {{ $vouchers->lastItem() ?? 0 }} 
+        trong tổng số {{ $vouchers->total() }} voucher
+      </div>
     </div>
+
+    <div class="d-flex justify-content-center mt-3">
+      {{ $vouchers->onEachSide(1)->links('pagination::bootstrap-4') }}
+    </div>
+
   </div>
 </div>
 @endsection
