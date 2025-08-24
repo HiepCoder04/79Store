@@ -191,9 +191,28 @@
     </div>
 
     {{-- Phân trang --}}
-    <div class="d-flex justify-content-center mt-3">
+    {{-- <div class="d-flex justify-content-between align-items-center">
+        <div>
+            Hiển thị {{ $products->firstItem() ?? 0 }} - {{ $products->lastItem() ?? 0 }} 
+            trong tổng số {{ $products->total() }} sản phẩm
+        </div>
         {{ $products->appends(request()->query())->links() }}
-    </div>
+    </div> --}}
+
+        <div class="d-flex justify-content-between align-items-center">
+        <div>
+            Hiển thị {{$products->firstItem() ?? 0 }} - {{ $products->lastItem() ?? 0 }} 
+            trong tổng số {{ $products->total() }} sản phẩm
+        </div>
+        </div>
+
+        <div class="d-flex justify-content-center mt-3">
+            {{ $products->onEachSide(1)->links('pagination::bootstrap-4') }}
+        </div>
+
+    
+
+
 </div>
 
 {{-- JavaScript đặt ngay trong section --}}

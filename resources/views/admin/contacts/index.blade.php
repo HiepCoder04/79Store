@@ -60,8 +60,19 @@
     </table>
 
     {{-- Phân trang --}}
-    <div>
+    {{-- <div>
         {{ $contacts->withQueryString()->links() }}
+    </div> --}}
+
+    <div class="d-flex justify-content-between align-items-center mt-3">
+      <div>
+        Hiển thị {{ $contacts->firstItem() ?? 0 }} - {{ $contacts->lastItem() ?? 0 }} 
+        trong tổng số {{ $contacts->total() }} liên hệ
+      </div>
+    </div>
+
+    <div class="d-flex justify-content-center mt-3">
+      {{ $contacts->onEachSide(1)->links('pagination::bootstrap-4') }}
     </div>
 
     {{-- Link xem liên hệ đã xoá --}}

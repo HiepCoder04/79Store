@@ -106,6 +106,22 @@
                     </tbody>
                 </table>
             </div>
+
+            {{-- Thêm phần pagination để đồng bộ --}}
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <div>
+                    @if($pots->total() > 0)
+                        Hiển thị {{ $pots->firstItem() }} - {{ $pots->lastItem() }} 
+                        trong tổng số {{ $pots->total() }} chậu
+                    @else
+                        Không có chậu nào
+                    @endif
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-center mt-3">
+                {{ $pots->appends(request()->query())->onEachSide(1)->links('pagination::bootstrap-4') }}
+            </div>
         @endif
     </div>
 </div>

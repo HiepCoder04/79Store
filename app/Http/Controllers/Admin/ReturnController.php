@@ -25,7 +25,8 @@ class ReturnController extends Controller
 
     if ($request->filled('status'))   $q->where('status', $request->status);
     if ($request->filled('order_id')) $q->where('order_id', $request->order_id);
-    $items = $q->paginate(20);
+    // ✅ Đảm bảo pagination 10 items/page
+    $items = $q->paginate(10);
     return view('admin.returns.index', compact('items'));
 }
 

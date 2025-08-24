@@ -34,7 +34,7 @@ class PotController extends Controller
     if (is_int($max)) $query->where('price', '<=', $max);
 
     $pots = $query->latest()
-        ->paginate(20)
+        ->paginate(10)
         ->appends($request->query()); // giữ tham số khi phân trang
 
     return view('admin.pot.index', compact('pots'));

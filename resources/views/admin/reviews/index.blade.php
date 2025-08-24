@@ -155,8 +155,18 @@
             </div>
 
             <!-- Pagination -->
-            <div class="mt-3">
+            {{-- <div class="mt-3">
                 {{ $reviews->links('pagination::bootstrap-5') }}
+            </div> --}}
+
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <div>
+                    Hiển thị {{ $reviews->firstItem() ?? 0 }} - {{ $reviews->lastItem() ?? 0 }} 
+                    trong tổng số {{ $reviews->total() }} đánh giá
+                </div>
+            </div>
+            <div class="d-flex justify-content-center mt-3">
+                {{ $reviews->onEachSide(1)->links('pagination::bootstrap-4') }}
             </div>
         </div>
     </div>

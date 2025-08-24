@@ -63,6 +63,10 @@
   .badge.text-decoration-none:hover {
     text-decoration: underline !important;
   }
+
+  .pagination-info {
+    display: none !important;
+}
 </style>
 
 <div class="card">
@@ -359,8 +363,12 @@
                 Hiển thị {{ $orders->firstItem() ?? 0 }} - {{ $orders->lastItem() ?? 0 }} 
                 trong tổng số {{ $orders->total() }} đơn hàng
             </div>
-            {{ $orders->links() }}
         </div>
+
+        <div class="d-flex justify-content-center mt-3">
+            {{ $orders->onEachSide(1)->links('pagination::bootstrap-4') }}
+        </div>
+
     </div>
 </div>
 
