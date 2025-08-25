@@ -145,9 +145,9 @@
         </tr>
       </thead>
       <tbody>
-        @foreach($blogs as $blog)
+        @foreach($blogs as $key =>$blog)
         <tr>
-          <td>{{ $blog->id }}</td>
+          <td>{{ $key +1 }}</td>
           <td>
             <img src="{{ asset($blog->img ?: 'assets/img/no-image.jpg') }}" alt="{{ $blog->title }}" class="avatar-sm">
           </td>

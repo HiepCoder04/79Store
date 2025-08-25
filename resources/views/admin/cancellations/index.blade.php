@@ -28,9 +28,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($cancellations as $cancel)
+                    @forelse($cancellations as $key=>$cancel)
                         <tr>
-                            <td>{{ $cancel->id }}</td>
+                            <td>{{ $key+1 }}</td>
                             <td>
                                 <a href="{{ route('admin.orders.show', $cancel->order_id) }}" target="_blank">
                                     {{ $cancel->order->order_code }}

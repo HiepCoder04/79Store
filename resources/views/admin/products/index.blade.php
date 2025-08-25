@@ -134,9 +134,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($products as $product)
+                    @forelse($products as $key=>$product)
                     <tr class="{{ $product->deleted_at ? 'table-secondary' : '' }}">
-                        <td>{{ $product->id }}</td>
+                        <td>{{  $key +1 }}</td>
                         <td>
                             {{ $product->name }}
                             @if($product->deleted_at)

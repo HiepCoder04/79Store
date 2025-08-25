@@ -108,7 +108,7 @@
         <table class="table table-bordered table-hover align-middle mb-0">
             <thead>
                 <tr>
-                    <th style="width: 60px">ID</th>
+                    <th style="width: 60px">STT</th>
                     <th class="text-start">Tên danh mục</th>
                     <th>Cấp độ</th>
                     <th>Danh mục cha</th>
@@ -116,9 +116,9 @@
                 </tr>
             </thead>
             <tbody>
-                @forelse ($categories as $cat)
+                @forelse ($categories as $key=>$cat)
                     <tr class="{{ $cat->parent_id ? 'table-light' : '' }}">
-                        <td>{{ $cat->id }}</td>
+                        <td>{{ $key +1 }}</td>
                         <td class="text-start fw-medium">
                             @if($cat->parent_id)
                                 <span class="text-muted me-2">└─</span>

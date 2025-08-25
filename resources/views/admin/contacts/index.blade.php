@@ -22,6 +22,7 @@
     <table class="table table-bordered">
         <thead class="table-light">
             <tr>
+                <th>STT</th>
                 <th>Tên</th>
                 <th>Email</th>
                 <th>Ngày gửi</th>
@@ -30,8 +31,9 @@
             </tr>
         </thead>
         <tbody>
-            @forelse ($contacts as $contact)
+            @forelse ($contacts as $key=>$contact)
                 <tr>
+                    <td>{{  $key +1 }}</td>
                     <td>{{ $contact->name }}</td>
                     <td>{{ $contact->email }}</td>
                     <td>{{ $contact->created_at->format('H:i d/m/Y') }}</td>

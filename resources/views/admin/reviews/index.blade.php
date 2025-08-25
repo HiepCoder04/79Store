@@ -79,9 +79,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($reviews as $review)
+                        @forelse($reviews as $key=>$review)
                             <tr>
-                                <td>{{ $review->id }}</td>
+                                <td>{{  $key +1}}</td>
                                 <td>{{ $review->user->name ?? 'Ẩn danh' }}</td>
                                 <td>{{ $review->product->name ?? 'Sản phẩm đã xoá' }}</td>
                                 <td>
