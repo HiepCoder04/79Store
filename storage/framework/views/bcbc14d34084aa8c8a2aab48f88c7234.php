@@ -1,0 +1,283 @@
+<?php $__env->startSection('title', 'Giỏ hàng'); ?>
+
+<?php use Illuminate\Support\Str; ?>
+
+<?php $__env->startSection('content'); ?>
+    <!-- ##### Breadcrumb Area Start ##### -->
+    <div class="breadcrumb-area">
+        <div class="top-breadcrumb-area bg-img bg-overlay d-flex align-items-center justify-content-center"
+            style="background-image: url(<?php echo e(asset('assets/img/bg-img/24.jpg')); ?>);">
+            <h2>Thanh Toán</h2>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb bg-white py-2 px-3 rounded">
+                            <li class="breadcrumb-item"><a href="<?php echo e(route('home')); ?>"><i class="fa fa-home"></i> Home</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Thanh Toán</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ##### Breadcrumb Area End ##### -->
+
+    <!-- ##### Checkout Area Start ##### -->
+    <div class="checkout_area mb-100">
+    <div class="container">
+        <!-- Main checkout form -->
+        <form action="<?php echo e(route('checkout.store')); ?>" method="POST" id="checkout-form">
+            <?php echo csrf_field(); ?>
+             <input type="hidden" name="selected_ids" value="<?php echo e(request('selected')); ?>">
+            <div class="row g-4">
+                <div class="col-lg-7">
+                    <?php echo $__env->make('client.users.customer_info', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+                </div>
+
+                <div class="col-lg-5">
+                    <div class="p-4 border rounded shadow-sm bg-white">
+                        <h5 class="fw-bold mb-4">Tóm Tắt Đơn Hàng</h5>
+
+                        <?php
+                            $cartTotal = $cart->items->sum(function ($item) {
+                                $productPrice = $item->productVariant->price;
+                                $potPrice = $item->pot?->price ?? 0;
+                                return ($productPrice + $potPrice) * $item->quantity;
+                            });
+                            $voucherId = session('applied_voucher');
+                            $voucher = $voucherId ? \App\Models\Voucher::find($voucherId) : null;
+                            $discount = 0;
+                            if ($voucher && $voucher->is_active && now()->between($voucher->start_date, $voucher->end_date)) {
+                                if ($cartTotal >= $voucher->min_order_amount) {
+                                    $discount = $cartTotal * ($voucher->discount_percent / 100);
+                                    if ($voucher->max_discount && $discount > $voucher->max_discount) {
+                                        $discount = $voucher->max_discount;
+                                    }
+                                }
+                            } else {
+                                $voucher = null;
+                                session()->forget('applied_voucher');
+                            }
+                            $finalTotal = $cartTotal - $discount;
+                        ?>
+
+                        <?php $__currentLoopData = $cart->items; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <?php
+                                $product = $item->productVariant->product;
+                                $gallery = $product->galleries->first();
+                                $image = optional($gallery)->image;
+                                $imageUrl = $image
+                                    ? (Str::startsWith($image, ['http', '/']) ? $image : asset($image))
+                                    : asset('assets/img/bg-img/default.jpg');
+                            ?>
+
+                            <div class="d-flex mb-3 align-items-center pb-2 border-bottom">
+                                <div class="flex-shrink-0">
+                                    <img src="<?php echo e($imageUrl); ?>"
+                                         onerror="this.onerror=null;this.src='<?php echo e(asset('assets/img/default.jpg')); ?>';"
+                                         alt="<?php echo e($product->name); ?>"
+                                         class="rounded-2 border"
+                                         style="width: 60px; height: 60px; object-fit: cover;">
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h6 class="mb-1 text-truncate" style="max-width: 200px;">
+                                        <?php echo e($product->name); ?>
+
+                                    </h6>
+                                    <?php
+                                        $potName = $item->pot->name ?? 'Không có chậu';
+                                        $potPrice = $item->pot->price ?? 0;
+                                        $productPrice = $item->productVariant->price;
+                                        $unitPrice = $productPrice + $potPrice;
+                                    ?>
+
+                                    <small>
+                                        Chậu: <?php echo e($potName); ?> (<?php echo e(number_format($potPrice, 0, ',', '.')); ?>đ) <br>
+                                        Giá: <?php echo e(number_format($productPrice, 0, ',', '.')); ?>đ <br>
+                                        Số Lượng: <?php echo e($item->quantity); ?>
+
+                                    </small>
+                                </div>
+                            </div>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+
+                        <hr>
+
+                        <div class="d-flex justify-content-between">
+                            <span>Vận Chuyển</span>
+                            <strong class="text-success">Miễn Phí</strong>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <span>Tạm tính</span>
+                            <strong><?php echo e(number_format($cartTotal, 0, ',', '.')); ?>đ</strong>
+                        </div>
+
+                        <?php if($voucher): ?>
+                            <div class="d-flex justify-content-between text-danger">
+                                <span>Mã giảm: <?php echo e($voucher->code); ?></span>
+                                <strong>-<?php echo e(number_format($discount, 0, ',', '.')); ?>đ</strong>
+                            </div>
+                        <?php endif; ?>
+
+                        <div class="d-flex justify-content-between mt-2">
+                            <span class="fw-bold">Tổng cộng</span>
+                            <span class="fw-bold"><?php echo e(number_format($finalTotal, 0, ',', '.')); ?>đ</span>
+                        </div>
+
+                        <input type="hidden" name="voucher_id" value="<?php echo e($voucher?->id); ?>">
+                        <input type="hidden" name="discount" value="<?php echo e($discount); ?>">
+
+                        <button type="button" id="place-order-btn" class="btn btn-dark mt-4 w-100">
+                            Đặt Hàng
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <!-- ✅ VNPAY FORM -->
+        <form action="<?php echo e(url('/vnpay_payment')); ?>" method="POST" id="vnpay-form" style="display: none;">
+            <?php echo csrf_field(); ?>
+            <input type="hidden" name="amount" value="<?php echo e($finalTotal); ?>">
+            <input type="hidden" name="redirect" value="1">
+            <input type="hidden" name="voucher_id" value="<?php echo e($voucher?->id); ?>">
+            <input type="hidden" name="discount" value="<?php echo e($discount); ?>">
+            <input type="hidden" name="selected_ids" id="vnpay-selected_ids" value="<?php echo e(request('selected')); ?>">
+            <!-- Thông tin chuyển từ form chính -->
+            <input type="hidden" name="name" id="vnpay-name">
+            <input type="hidden" name="phone" id="vnpay-phone">
+            <input type="hidden" name="email" id="vnpay-email">
+            <input type="hidden" name="address_id" id="vnpay-address_id">
+            <input type="hidden" name="new_address" id="vnpay-new_address">
+            <input type="hidden" name="set_default" id="vnpay-set_default">
+            <input type="hidden" name="note" id="vnpay-note">
+            <input type="hidden" name="payment_method" value="vnpay" id="vnpay-payment_method">
+        </form>
+    </div>
+</div>
+<?php $__env->stopSection(); ?>
+
+<?php $__env->startSection('page_scripts'); ?>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const placeOrderBtn = document.getElementById('place-order-btn');
+        const methodCod = document.getElementById('method_cod');
+        const methodOnline = document.getElementById('method_online');
+        const checkoutForm = document.getElementById('checkout-form');
+        const vnpayForm = document.getElementById('vnpay-form');
+
+        placeOrderBtn.addEventListener('click', function () {
+            const name = document.getElementById('name').value;
+            const phone = document.getElementById('phone').value;
+            const email = document.getElementById('email').value;
+            const newAddress = document.getElementById('new_address')?.value || '';
+            const addressId = document.querySelector('input[name="address_id"]:checked')?.value || '';
+            const note = document.getElementById('note')?.value || '';
+            const setDefault = document.getElementById('set_default')?.checked ? '1' : '0';
+
+            if (!name || !phone || !email || (!addressId && !newAddress)) {
+                alert('Vui lòng điền đầy đủ thông tin và địa chỉ.');
+                return;
+            }
+
+            if (methodOnline && methodOnline.checked) {
+                // Gán vào form VNPAY
+                document.getElementById('vnpay-name').value = name;
+                document.getElementById('vnpay-phone').value = phone;
+                document.getElementById('vnpay-email').value = email;
+                document.getElementById('vnpay-new_address').value = newAddress;
+                document.getElementById('vnpay-address_id').value = addressId;
+                document.getElementById('vnpay-set_default').value = setDefault;
+                document.getElementById('vnpay-note').value = note;
+
+                vnpayForm.submit();
+            } else {
+                checkoutForm.submit();
+            }
+        });
+    });
+    // Thêm sự kiện cho nút xác nhận địa chỉ mới
+    document.addEventListener('DOMContentLoaded', function () {
+    const confirmBtn = document.getElementById('confirm-new-address');
+    const cancelBtn = document.getElementById('cancel-new-address');
+    const addressInput = document.getElementById('new_address');
+    const setDefaultCheckbox = document.getElementById('set_default');
+    const successBox = document.getElementById('address-added-success');
+    const addNewBox = document.getElementById('add-new-address');
+
+    confirmBtn.addEventListener('click', function () {
+        const address = addressInput.value.trim();
+        const setDefault = setDefaultCheckbox.checked;
+
+        if (!address) {
+            alert('Vui lòng nhập địa chỉ.');
+            return;
+        }
+
+        fetch("<?php echo e(route('user.saveAddress')); ?>", {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                address: address,
+                set_default: setDefault
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            successBox.classList.remove('d-none');
+            setTimeout(() => {
+                successBox.classList.add('d-none');
+            }, 3000);
+            addressInput.value = '';
+            setDefaultCheckbox.checked = false;
+            addNewBox.classList.add('d-none');
+            // Có thể reload để thấy địa chỉ mới
+            location.reload();
+        })
+        .catch(error => {
+            alert('Có lỗi xảy ra khi lưu địa chỉ.');
+            console.error(error);
+        });
+    });
+
+    cancelBtn.addEventListener('click', function () {
+        addNewBox.classList.add('d-none');
+    });
+
+    const changeBtn = document.getElementById('change-address-btn');
+    if (changeBtn) {
+        changeBtn.addEventListener('click', function () {
+            document.getElementById('change-address').classList.toggle('d-none');
+        });
+    }
+});
+//update lai dia chi moi khi user chon dia chi moi
+document.addEventListener('DOMContentLoaded', function () {
+    const radios = document.querySelectorAll('input[name="address_id"]');
+    const display = document.getElementById('selected-address-text');
+
+    radios.forEach(radio => {
+        radio.addEventListener('change', function () {
+            const address = this.getAttribute('data-address');
+            if (address && display) {
+                display.textContent = address;
+            }
+        });
+    });
+
+    // Auto hiển thị địa chỉ đã chọn lúc load
+    const selected = document.querySelector('input[name="address_id"]:checked');
+    if (selected && display) {
+        display.textContent = selected.getAttribute('data-address');
+    }
+});
+</script>
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('client.layouts.default', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\laragon\www\79Store\79Store\resources\views/client/users/Checkout.blade.php ENDPATH**/ ?>
