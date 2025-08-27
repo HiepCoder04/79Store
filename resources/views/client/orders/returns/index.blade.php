@@ -22,7 +22,7 @@
 <table class="table table-striped">
   <thead>
     <tr>
-      <th>ID</th><th>Sản phẩm</th><th>SL</th><th>Giá trị</th><th>Trạng thái</th><th>Ngày</th><th>Phản hồi admin</th><th>Chi tiết</th>
+      <th>STT</th><th>Sản phẩm</th><th>SL</th><th>Giá trị</th><th>Trạng thái</th><th>Ngày</th><th>Phản hồi admin</th><th>Chi tiết</th>
     </tr>
   </thead>
   <tbody>
