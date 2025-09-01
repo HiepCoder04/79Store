@@ -11,11 +11,18 @@ use App\Models\Category;
 class ChatbotController extends Controller
 {
     private $geminiApiKey;
-    private string $geminiApiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+    private string $geminiApiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent';
 
     public function __construct()
     {
         $this->geminiApiKey = env('GEMINI_API_KEY');
+        
+        // Debug: Kiểm tra API key
+        if (!$this->geminiApiKey) {
+            Log::error('GEMINI_API_KEY not found in environment');
+        } else {
+            Log::info('GEMINI_API_KEY loaded: ' . substr($this->geminiApiKey, 0, 10) . '...');
+        }
     }
 
     public function chat(Request $request)
@@ -26,130 +33,135 @@ class ChatbotController extends Controller
 
         $userMessage = $request->input('message');
         
-        // Lấy thông tin sản phẩm để cung cấp context tốt hơn
-        $products = Product::with(['category', 'variants'])->take(20)->get();
-        $categories = Category::take(15)->get();
+        // Log user message
+        Log::info('User message: ' . $userMessage);
         
-        $productInfo = $products->map(function($product) {
-            $categoryName = $product->category ? $product->category->name : 'Chưa phân loại';
+        try {
+            // Lấy thông tin sản phẩm với xử lý encoding an toàn
+            $products = Product::with(['category', 'variants'])->take(20)->get();
+            $categories = Category::take(15)->get();
             
-            // Lấy giá từ variant đầu tiên hoặc giá thấp nhất
-            $minPrice = 0;
-            $maxPrice = 0;
-            if ($product->variants && $product->variants->count() > 0) {
-                $minPrice = $product->variants->min('price');
-                $maxPrice = $product->variants->max('price');
-            }
+            $productInfo = $products->map(function($product) {
+                try {
+                    $categoryName = $product->category ? $this->cleanText($product->category->name) : 'Chưa phân loại';
+                    
+                    // Lấy giá từ variant với xử lý chi tiết hơn
+                    $minPrice = 0;
+                    $maxPrice = 0;
+                    $priceRange = "Liên hệ";
+                    
+                    if ($product->variants && $product->variants->count() > 0) {
+                        $prices = $product->variants->pluck('price')->filter(function($price) {
+                            return $price > 0;
+                        });
+                        
+                        if ($prices->count() > 0) {
+                            $minPrice = $prices->min();
+                            $maxPrice = $prices->max();
+                            
+                            $formattedMinPrice = number_format($minPrice, 0, ',', '.');
+                            $formattedMaxPrice = number_format($maxPrice, 0, ',', '.');
+                            
+                            if ($minPrice == $maxPrice) {
+                                $priceRange = "{$formattedMinPrice}đ";
+                            } else {
+                                $priceRange = "{$formattedMinPrice}đ - {$formattedMaxPrice}đ";
+                            }
+                        }
+                    }
+                    
+                    $productName = $this->cleanText($product->name);
+                    $description = $product->description ? ' - ' . $this->cleanText(substr($product->description, 0, 80)) : '';
+                    
+                    return "- {$productName} | Giá: {$priceRange} | Danh mục: {$categoryName}{$description}";
+                } catch (\Exception $e) {
+                    Log::warning('Error processing product: ' . $e->getMessage());
+                    return "- Sản phẩm | Giá: Liên hệ | Danh mục: Cây cảnh";
+                }
+            })->filter()->implode("\n");
             
-            $formattedMinPrice = number_format($minPrice);
-            $formattedMaxPrice = number_format($maxPrice);
-            $priceRange = $minPrice == $maxPrice ? "{$formattedMinPrice}đ" : "{$formattedMinPrice}đ – {$formattedMaxPrice}đ";
+            $categoryInfo = $categories->map(function($category) {
+                try {
+                    return "- " . $this->cleanText($category->name);
+                } catch (\Exception $e) {
+                    return "- Danh mục cây cảnh";
+                }
+            })->filter()->implode("\n");
             
-            $description = $product->description ? ' - ' . substr($product->description, 0, 100) : '';
-            
-            return "- {$product->name} | Giá: {$priceRange} | Danh mục: {$categoryName}{$description}";
-        })->implode("\n");
+        } catch (\Exception $e) {
+            Log::error('Error loading products/categories: ' . $e->getMessage());
+            $productInfo = "- Các loại cây cảnh đa dạng | Giá: Liên hệ";
+            $categoryInfo = "- Cây trong nhà\n- Cây ngoài trời\n- Chậu và phụ kiện";
+        }
         
-        $categoryInfo = $categories->map(function($category) {
-            return "- {$category->name}";
-        })->implode("\n");
-        
-        // Tạo context về cửa hàng cây cảnh với thông tin sản phẩm thực tế
-        $systemPrompt = "Bạn là trợ lý AI thân thiện và chuyên nghiệp của cửa hàng cây cảnh 79Store - chuyên cung cấp cây cảnh chất lượng cao tại Việt Nam.
+        // Tạo system prompt chi tiết hơn về giá cả
+        $systemPrompt = "Bạn là trợ lý AI của cửa hàng cây cảnh 79Store. Hãy trả lời thân thiện và chi tiết về cây cảnh.
 
-**THÔNG TIN CỬA HÀNG:**
-- Tên cửa hàng: 79Store
-- Chuyên ngành: Cây cảnh, cây trong nhà, cây ngoài trời, chậu và phụ kiện
+THÔNG TIN CỬA HÀNG:
+- Tên: 79Store
+- Chuyên: Cây cảnh, cây trong nhà, cây ngoài trời, chậu và phụ kiện
 - Dịch vụ: Tư vấn chuyên sâu, hướng dẫn chăm sóc, giao hàng tận nơi
 
-**DANH MUC SẢN PHẨM:**
-{$categoryInfo}
-
-**SẢN PHẨM CỤ THỂ VÀ GIÁ:**
+SẢN PHẨM VÀ GIÁ CỤ THỂ:
 {$productInfo}
 
-**VAI TRÒ CỦA BẠN:**
-1. Tư vấn cây cảnh phù hợp theo không gian, điều kiện sống, sở thích
-2. Hướng dẫn chăm sóc chi tiết (tưới nước, phân bón, ánh sáng, nhiệt độ, độ ẩm)
-3. Gợi ý chậu và phụ kiện phù hợp với từng loại cây
-4. Giải đáp thắc mắc về sản phẩm, giá cả trong cửa hàng
-5. Tư vấn bố trí cây trong nhà/văn phòng theo phong thủy
-6. Hướng dẫn quy trình mua hàng, chính sách bảo hành
+DANH MỤC SẢN PHẨM:
+{$categoryInfo}
 
-**CÁCH TRẢ LỜI:**
-- Luôn thân thiện, nhiệt tình và chuyên nghiệp
-- Sử dụng emoji phù hợp để tạo cảm giác gần gũi
-- Đưa ra lời khuyên thực tế, dễ thực hiện
-- Khi nói về giá cả, LUÔN tham khảo danh sách sản phẩm cụ thể ở trên
-- Khi khách hỏi về mức giá hoặc sản phẩm trong khoảng giá nào đó, hãy tìm và liệt kê các sản phẩm phù hợp kèm giá chính xác
-- Khi tư vấn chậu, hãy xem xét kích thước cây, loại cây và điều kiện môi trường
-- Nếu không tìm thấy thông tin cụ thể, hãy tư vấn dựa trên kinh nghiệm chung về cây cảnh
-
-**KIẾN THỨC CHUYÊN MÔN:**
-- Hiểu biết sâu về đặc tính từng loại cây
-- Nắm rõ cách chăm sóc theo mùa và điều kiện khí hậu Việt Nam  
-- Biết cách phối hợp chậu và cây hài hòa
-- Hiểu về phong thủy và ý nghĩa cây cảnh
-
-**LƯU Ý QUAN TRỌNG:**
-- Nếu được hỏi về chủ đề không liên quan cây cảnh, hãy lịch sự chuyển hướng
-- Luôn khuyến khích khách hàng liên hệ trực tiếp nếu cần tư vấn chi tiết hơn
-- Khi không chắc chắn về thông tin, hãy thẳng thắn nói và đề xuất liên hệ trực tiếp
-- Luôn đề cập đến việc ghé thăm cửa hàng để xem sản phẩm trực tiếp";
+HƯỚNG DẪN TƯ VẤN:
+- Khi khách hỏi về giá, hãy tham khảo danh sách sản phẩm cụ thể ở trên
+- Khi khách hỏi trong khoảng giá nào đó, hãy liệt kê các sản phẩm phù hợp
+- Luôn đề cập đến việc ghé thăm cửa hàng để xem sản phẩm trực tiếp
+- Tư vấn cây phù hợp với không gian, điều kiện chăm sóc
+- Hướng dẫn chăm sóc cây chi tiết (tưới nước, ánh sáng, phân bón)";
 
         try {
-            $response = Http::timeout(30)->withHeaders([
-                'Content-Type' => 'application/json',
-            ])->post($this->geminiApiUrl . '?key=' . $this->geminiApiKey, [
+            $apiUrl = $this->geminiApiUrl . '?key=' . $this->geminiApiKey;
+            
+            $requestData = [
                 'contents' => [
                     [
                         'parts' => [
                             [
-                                'text' => $systemPrompt . "\n\n**Câu hỏi của khách hàng:** " . $userMessage
+                                'text' => $systemPrompt . "\n\nCâu hỏi: " . $userMessage
                             ]
                         ]
                     ]
                 ],
                 'generationConfig' => [
-                    'temperature' => 0.8,
-                    'topK' => 40,
-                    'topP' => 0.95,
-                    'maxOutputTokens' => 1500,
-                ],
-                'safetySettings' => [
-                    [
-                        'category' => 'HARM_CATEGORY_HARASSMENT',
-                        'threshold' => 'BLOCK_MEDIUM_AND_ABOVE'
-                    ],
-                    [
-                        'category' => 'HARM_CATEGORY_HATE_SPEECH', 
-                        'threshold' => 'BLOCK_MEDIUM_AND_ABOVE'
-                    ]
+                    'temperature' => 0.7,
+                    'maxOutputTokens' => 800,
                 ]
-            ]);
+            ];
+            
+            $response = Http::timeout(30)->withHeaders([
+                'Content-Type' => 'application/json',
+            ])->post($apiUrl, $requestData);
+
+            Log::info('API Response Status: ' . $response->status());
 
             if ($response->successful()) {
                 $data = $response->json();
                 
                 if (isset($data['candidates'][0]['content']['parts'][0]['text'])) {
-                    $botReply = $data['candidates'][0]['content']['parts'][0]['text'];
+                    $botReply = $this->cleanText($data['candidates'][0]['content']['parts'][0]['text']);
                     
                     return response()->json([
                         'success' => true,
                         'message' => $botReply
                     ]);
                 } else {
+                    Log::error('Invalid response format from Gemini API');
                     throw new \Exception('Invalid response format from Gemini API');
                 }
             } else {
-                Log::error('Gemini API Error: ' . $response->body());
+                Log::error('Gemini API Error - Status: ' . $response->status());
                 throw new \Exception('API request failed: ' . $response->status());
             }
 
         } catch (\Exception $e) {
             Log::error('Chatbot error: ' . $e->getMessage());
             
-            // Chỉ fallback cơ bản nhất khi API hoàn toàn fail
             return response()->json([
                 'success' => true,
                 'message' => $this->getMinimalFallback($userMessage)
@@ -157,17 +169,32 @@ class ChatbotController extends Controller
         }
     }
 
+    /**
+     * Làm sạch text và xử lý encoding UTF-8
+     */
+    private function cleanText($text)
+    {
+        if (empty($text)) {
+            return '';
+        }
+        
+        // Chuyển đổi encoding và làm sạch text
+        $text = mb_convert_encoding($text, 'UTF-8', 'UTF-8');
+        $text = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $text);
+        $text = trim($text);
+        
+        return $text;
+    }
+
     private function getMinimalFallback($message)
     {
         $message = strtolower($message);
         
-        // Chỉ xử lý những trường hợp cực kỳ cơ bản
         if (strpos($message, 'chào') !== false || strpos($message, 'hello') !== false || strpos($message, 'hi') !== false) {
-            return "Xin chào! 👋 Chào mừng bạn đến với 79Store - cửa hàng cây cảnh uy tín. Tôi đang gặp sự cố kỹ thuật nhỏ nhưng vẫn sẵn sàng hỗ trợ bạn! Bạn có thể:\n\n🌿 Xem sản phẩm tại phần Shop\n📞 Liên hệ trực tiếp để được tư vấn\n⏳ Hoặc thử hỏi lại sau ít phút\n\nCảm ơn bạn đã tin tưởng 79Store! 😊";
+            return "Xin chào! 👋 Chào mừng bạn đến với 79Store - cửa hàng cây cảnh uy tín!\n\n🌿 Tôi có thể tư vấn:\n• Cây phù hợp với không gian\n• Cách chăm sóc cây cảnh\n• Chậu và phụ kiện\n• Giá cả sản phẩm\n\nHãy hỏi tôi bất cứ điều gì về cây cảnh nhé! 😊";
         }
         
-        // Fallback chung cho mọi trường hợp khác
-        return "Xin lỗi, tôi đang gặp sự cố kỹ thuật tạm thời. 😔\n\n🌿 **79Store luôn sẵn sàng hỗ trợ bạn:**\n• Ghé thăm phần Shop để xem sản phẩm\n• Liên hệ trực tiếp để được tư vấn chi tiết\n• Thử hỏi lại sau vài phút\n\nCảm ơn bạn đã kiên nhẫn! 🙏";
+        return "Xin chào! 🌿 Tôi là trợ lý AI của 79Store.\n\nTôi có thể giúp bạn:\n• Tư vấn chọn cây phù hợp\n• Hướng dẫn chăm sóc cây\n• Thông tin về sản phẩm và giá cả\n• Gợi ý cây theo phong thủy\n\nBạn muốn tìm hiểu về loại cây nào? 😊";
     }
 
     public function getSuggestions()
@@ -189,3 +216,4 @@ class ChatbotController extends Controller
         ]);
     }
 }
+
