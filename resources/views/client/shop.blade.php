@@ -204,58 +204,64 @@
 
 
                         <!-- Pagination -->
-                        <nav aria-label="Page navigation">
-                            <ul class="pagination justify-content-center" id="pagination"></ul>
-                        </nav>
+                        <!-- Pagination -->
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center" id="pagination"></ul>
+</nav>
 
-                        <script>
-                            document.addEventListener("DOMContentLoaded", function() {
-                                const totalPages = {{ $products->lastPage() }};
-                                let currentPage = {{ $products->currentPage() }};
-                                const baseUrl = "{{ url()->current() }}";
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const totalPages = {{ $products->lastPage() }};
+        let currentPage = {{ $products->currentPage() }};
+        const baseUrl = "{{ url()->current() }}";
+        const queryString = new URLSearchParams(window.location.search);
 
-                                const pagination = document.getElementById("pagination");
+        const pagination = document.getElementById("pagination");
 
-                                function renderPagination() {
-                                    pagination.innerHTML = "";
+        function renderPagination() {
+            pagination.innerHTML = "";
 
-                                    // Prev
-                                    const prev = document.createElement("li");
-                                    prev.className = "page-item" + (currentPage === 1 ? " disabled" : "");
-                                    prev.innerHTML = <a class="page-link" href="#"><span>&laquo;</span></a>;
-                                    prev.addEventListener("click", () => {
-                                        if (currentPage > 1) {
-                                            window.location.href = baseUrl + '?page=' + (currentPage - 1);
-                                        }
-                                    });
-                                    pagination.appendChild(prev);
+            // Prev
+            const prev = document.createElement("li");
+            prev.className = "page-item" + (currentPage === 1 ? " disabled" : "");
+            prev.innerHTML = `<a class="page-link" href="#"><span>&laquo;</span></a>`;
+            prev.addEventListener("click", () => {
+                if (currentPage > 1) {
+                    queryString.set("page", currentPage - 1);
+                    window.location.href = baseUrl + "?" + queryString.toString();
+                }
+            });
+            pagination.appendChild(prev);
 
-                                    // Pages
-                                    for (let i = 1; i <= totalPages; i++) {
-                                        const li = document.createElement("li");
-                                        li.className = "page-item" + (i === currentPage ? " active" : "");
-                                        li.innerHTML = <a class="page-link" href="#">${i}</a>;
-                                        li.addEventListener("click", () => {
-                                            window.location.href = baseUrl + '?page=' + i;
-                                        });
-                                        pagination.appendChild(li);
-                                    }
+            // Pages
+            for (let i = 1; i <= totalPages; i++) {
+                const li = document.createElement("li");
+                li.className = "page-item" + (i === currentPage ? " active" : "");
+                li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+                li.addEventListener("click", () => {
+                    queryString.set("page", i);
+                    window.location.href = baseUrl + "?" + queryString.toString();
+                });
+                pagination.appendChild(li);
+            }
 
-                                    // Next
-                                    const next = document.createElement("li");
-                                    next.className = "page-item" + (currentPage === totalPages ? " disabled" : "");
-                                    next.innerHTML = <a class="page-link" href="#"><span>&raquo;</span></a>;
-                                    next.addEventListener("click", () => {
-                                        if (currentPage < totalPages) {
-                                            window.location.href = baseUrl + '?page=' + (currentPage + 1);
-                                        }
-                                    });
-                                    pagination.appendChild(next);
-                                }
+            // Next
+            const next = document.createElement("li");
+            next.className = "page-item" + (currentPage === totalPages ? " disabled" : "");
+            next.innerHTML = `<a class="page-link" href="#"><span>&raquo;</span></a>`;
+            next.addEventListener("click", () => {
+                if (currentPage < totalPages) {
+                    queryString.set("page", currentPage + 1);
+                    window.location.href = baseUrl + "?" + queryString.toString();
+                }
+            });
+            pagination.appendChild(next);
+        }
 
-                                renderPagination();
-                            });
-                        </script>
+        renderPagination();
+    });
+</script>
+
 
                     </div>
                 </div>
